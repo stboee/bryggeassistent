@@ -1,0 +1,2118 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kravspesifikasjon 02 – Home Assistant-dashboard og rapporttilgang</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="kravspesifikasjon-02--home-assistant-dashboard-og-rapporttilgang">Kravspesifikasjon
+02 – Home Assistant-dashboard og rapporttilgang</h1>
+<h2 id="1-dokumentstatus">1. Dokumentstatus</h2>
+<blockquote>
+<p><strong>Styringsregel:</strong> Home Assistant-modulen skal ikke
+godkjennes bare fordi regresjonstesten består. Hvert normativt krav skal
+være koblet til implementasjon, automatisert verifikasjon eller
+begrunnet manuell akseptanse, og faktisk resultat.</p>
+</blockquote>
+<table>
+<thead>
+<tr class="header">
+<th>Felt</th>
+<th>Verdi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>System</td>
+<td>Bryggedagsassistent</td>
+</tr>
+<tr class="even">
+<td>Modul</td>
+<td>Home Assistant-dashboard og rapporttilgang</td>
+</tr>
+<tr class="odd">
+<td>Kravgrunnlag</td>
+<td><code>2026.11.07-1</code> med implementasjonsbaseline
+<code>v1.0.0-rc3.3.2</code></td>
+</tr>
+<tr class="even">
+<td>Avhengig schema</td>
+<td><code>1.0</code></td>
+</tr>
+<tr class="odd">
+<td>Dokumenttype</td>
+<td>Normativ kravspesifikasjon</td>
+</tr>
+<tr class="even">
+<td>Dokumentversjon</td>
+<td>2.0</td>
+</tr>
+<tr class="odd">
+<td>Dato</td>
+<td>2026-08-26</td>
+</tr>
+<tr class="even">
+<td>Revisjonsstatus</td>
+<td>Endelig normativt kravgrunnlag for 2026.11.07-1</td>
+</tr>
+</tbody>
+</table>
+<p>Dokumentet beskriver 2026.11.07-1-målet for dashboardet som operatørens
+normale kommandoflate og Home Assistants tilgang til den ferdige
+bryggerapporten. Node-RED eier rapportmodell, HTML-generering, arkiv og
+public-kopi; denne modulen eier presentasjon, lenking og
+livssyklusavhengig tilgang.</p>
+<p>Kravordene <strong>skal</strong>, <strong>bør</strong> og
+<strong>kan</strong> angir henholdsvis obligatorisk krav, anbefalt
+egenskap og tillatt mulighet. Kolonnen «Forklaring og praktisk
+betydning» avgrenser hvordan kravet skal forstås og avsluttes med en
+observerbar effekt og kontrollmåte. Denne teksten er del av
+fortolkningen av kravet, men oppretter ikke et ekstra krav ved siden av
+ID-en.</p>
+<h2 id="2-formål-og-omfang">2. Formål og omfang</h2>
+<p>Dashboardet skal gjøre det mulig å:</p>
+<ul>
+<li>følge og styre en bryggedag uten å åpne Node-RED</li>
+<li>se aktiv fase, fremdrift, fasepunkter, timere, ETA og overtid</li>
+<li>konfigurere aktiv template i <code>idle</code></li>
+<li>kontrollere systemhelse, rapportarkiv og loggarkiv</li>
+<li>åpne siste publiserte bryggerapport uten
+nettlesercache-problemer</li>
+<li>feilsøke alle eksponerte entiteter i en egen teknisk visning</li>
+</ul>
+<h3 id="21-ansvarsdeling">2.1 Ansvarsdeling</h3>
+<p>Dashboardet er en presentasjons- og kommandoflate. Det er ikke en
+selvstendig bryggemotor. Ansvarsdelingen skal forstås slik:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Del</th>
+<th>Ansvar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Home Assistant-dashboardet</td>
+<td>Bestemmer hvilke kort som vises, presenterer entity-state og sender
+knappetrykk eller redigerte felt til Companion-entitetene.</td>
+</tr>
+<tr class="even">
+<td>Home Assistant</td>
+<td>Gjør de delte entitetene tilgjengelige for alle brukere som har
+tilgang, og gjør rapportfilen under <code>www</code> tilgjengelig via
+<code>/local/</code>.</td>
+</tr>
+<tr class="odd">
+<td>Node-RED</td>
+<td>Eier autoritativ bryggedagsstate, validerer alle kommandoer,
+beregner tider og status, lagrer template/state/logg og genererer
+rapport.</td>
+</tr>
+</tbody>
+</table>
+<p>Et synlig eller aktivt dashboardelement er derfor ikke bevis på at
+handlingen kan gjennomføres. Node-RED skal alltid gjøre den endelige
+kontrollen når kommandoen mottas.</p>
+<h3 id="22-begreper">2.2 Begreper</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Begrep</th>
+<th>Betydning i dette dokumentet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bryggedag eller sesjon</td>
+<td>Én sammenhengende runtime fra «Start bryggedag» til
+<code>completed</code> eller <code>ended</code>, og fram til «Klargjør
+ny bryggedag».</td>
+</tr>
+<tr class="even">
+<td>Template</td>
+<td>Den generelle prosessmalen med faser, fasepunkter, timere og
+template-notat. En konkret øloppskrift er ikke del av
+dashboardmodulen.</td>
+</tr>
+<tr class="odd">
+<td>Fase</td>
+<td>Et navngitt hovedtrinn med permanent ID, aktiv-status, rekkefølge og
+planlagt varighet.</td>
+</tr>
+<tr class="even">
+<td>Fasepunkt</td>
+<td>En tidsplassert aktivitet, tilsetning, måling, kontroll eller varsel
+innenfor en fase. Punktet kan kreve manuell bekreftelse.</td>
+</tr>
+<tr class="odd">
+<td>Hendelse/timer</td>
+<td>En templatedrevet opptelling eller nedtelling mellom to definerte
+runtimehendelser.</td>
+</tr>
+<tr class="even">
+<td>Companion-entitet</td>
+<td>En sensor, knapp, select, number eller text som Node-RED registrerer
+i Home Assistant gjennom websocket-integrasjonen.</td>
+</tr>
+<tr class="odd">
+<td>Public-kopi</td>
+<td>Den faste rapportfilen som Node-RED publiserer i Home Assistants
+<code>www/brygging</code>-katalog og som åpnes fra
+<code>/local/brygging/</code>.</td>
+</tr>
+<tr class="even">
+<td>Autoritativ state</td>
+<td>Den tilstanden Node-RED har godkjent og lagret. Dashboardets lokale
+visning er bare en presentasjon av denne.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-hvordan-entity-id-er-og-kravgrenser-leses">2.3 Hvordan
+entity-ID-er og kravgrenser leses</h3>
+<p>Når et krav gjelder en konkret Home Assistant-entitet, skal full
+entity-ID stå i kravet. Når kravet gjelder en generert familie, brukes
+disse plassholderne:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Plassholder</th>
+<th>Omfang</th>
+<th>Eksempel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>FF</code></td>
+<td>Permanent fase-ID <code>01</code>–<code>15</code></td>
+<td><code>text.brygging_fase_FF_navn</code> betyr eksempelvis
+<code>text.brygging_fase_01_navn</code>.</td>
+</tr>
+<tr class="even">
+<td><code>PP</code></td>
+<td>Fast fasepunkteditorplass <code>01</code>–<code>15</code></td>
+<td>Plassen brukes i <code>select</code>-, <code>text</code>- og
+<code>number</code>-familiene; runtimevisningen publiseres som én
+strukturert liste.</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_*</code></td>
+<td>Bare når kravet gjelder alle operative knapper som klasse</td>
+<td>Detaljkravet skal fortsatt navngi knappen når én bestemt handling
+omtales.</td>
+</tr>
+</tbody>
+</table>
+<p>Node-RED-dokumentet eier produksjon og validering av entity-state.
+Dette dokumentet eier plassering, synlighet, presentasjon og
+tjenestekall. To krav som beskriver hver sin side av samme
+entity-grensesnitt er derfor et bevisst produsent-/forbrukerpar, ikke et
+dobbelt funksjonskrav.</p>
+<h3 id="24-felles-state-og-flere-home-assistant-brukere">2.4 Felles
+state og flere Home Assistant-brukere</h3>
+<p>Flere brukere og nettlesere kan ha dashboardet åpent samtidig. De får
+ikke hver sin bryggedag eller hver sin editorkladd. Alle leser og
+skriver de samme HA-entitetene, og endringer blir derfor synlige på
+tvers av klientene.</p>
+<p>Dette betyr ikke at systemet har flerbrukertransaksjoner. Det finnes
+ingen operatørlås, eier av aktiv redigering eller konfliktvarsling når
+to brukere sender forskjellige kommandoer samtidig. Slike kommandoer
+behandles av Node-RED i den rekkefølgen de mottas. Aktiv betjening må
+derfor koordineres, selv om samtidig visning er fullt støttet.</p>
+<p>Følgende er utenfor modulens omfang:</p>
+<ul>
+<li>generering og lagring av rapport-HTML</li>
+<li>validering og persistens av template/state</li>
+<li>installasjon, backup og containerstyring</li>
+<li>automatisk varsling, fysiske knapper, brukerspesifikk
+bryggedagsstate, operatørlås og konfliktløsning for samtidige
+kommandoer</li>
+<li>innholdet i konkrete øloppskrifter</li>
+</ul>
+<h2 id="3-overordnede-brukerkrav">3. Overordnede brukerkrav</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-BRUK-001</td>
+<td>Dashboardet skal være på norsk.</td>
+<td>Alle synlige titler, hjelpetekster, knappetekster, bekreftelser og
+feilmeldinger skal kunne forstås uten engelske systembegreper. Tekniske
+statusverdier kan fortsatt være engelske når de er en del av
+grensesnittet mot Node-RED.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kontroller kravets brukerutfall i både mobil- og bred
+visning; handling eller informasjon skal være forståelig uten
+Node-RED-editoren.</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-002</td>
+<td>Dashboardet skal være den normale kommandoflaten for bryggedagen og
+skal sende alle prosesshandlinger gjennom de dokumenterte
+<code>button.brygging_*</code>-entitetene.</td>
+<td>Operatøren skal ikke måtte åpne Node-RED-editoren for normal drift.
+Dashboardet endrer aldri runtime direkte; det kaller
+<code>button.press</code>, og Node-RED godkjenner eller sperrer
+kommandoen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kontroller kravets brukerutfall i både mobil- og bred visning; handling
+eller informasjon skal være forståelig uten Node-RED-editoren.</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-003</td>
+<td>Dashboardet skal være lesbart på mobil, nettbrett og bred skjerm
+uten horisontalt brede tabeller i hovedvisningene.</td>
+<td>De viktigste opplysningene skal kunne leses uten sideveis rulling.
+Lange tekniske detaljer kan legges i egne blokker eller
+Teknisk-visningen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kontroller kravets brukerutfall i både mobil- og bred
+visning; handling eller informasjon skal være forståelig uten
+Node-RED-editoren.</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-004</td>
+<td>Dashboardet skal bruke Home Assistants innebygde korttyper og skal
+ikke kreve tredjeparts frontendkort.</td>
+<td>Dashboardet skal fungere i en ordinær Home Assistant-installasjon
+uten HACS-kort eller andre frontendtillegg. Dette reduserer
+avhengigheter og gjør oppgraderinger enklere.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kontroller kravets brukerutfall i både
+mobil- og bred visning; handling eller informasjon skal være forståelig
+uten Node-RED-editoren.</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-005</td>
+<td>Standard layout skal være responsivt masonry. Hovedkort skal være
+løse toppnivåkort, ikke låst i en fullbredde panel- eller
+trekolonne-gridvisning.</td>
+<td>Home Assistant skal selv fordele toppnivåkortene etter tilgjengelig
+skjermbredde. Kortene skal ikke tvinges inn i smale, faste
+kolonner.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kontroller kravets brukerutfall i både mobil- og bred visning; handling
+eller informasjon skal være forståelig uten Node-RED-editoren.</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-006</td>
+<td>På bred skjerm skal normal masonry-plassering kunne gi tre kolonner.
+På smal skjerm skal kortene stable naturlig.</td>
+<td>Tre kolonner er et forventet resultat på en bred skjerm, ikke en
+absolutt pikselstyrt layout. På telefon skal samme kortrekkefølge bli én
+naturlig, vertikal strøm.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kontroller kravets brukerutfall i både mobil- og bred
+visning; handling eller informasjon skal være forståelig uten
+Node-RED-editoren.</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-007</td>
+<td>Handlinger som i detaljkravene er klassifisert som destruktive eller
+som kan endre rapportgrunnlaget, skal ha en handlingsspesifikk
+bekreftelsesdialog.</td>
+<td>Dette er en tverrgående presentasjonsregel. De konkrete kravene
+angir hvilke knapper som omfattes og hvilken konsekvens dialogen skal
+forklare; dette kravet oppretter ikke en ekstra dialog for samme
+knapp.<br><br><strong>Observerbar effekt og kontroll:</strong> Åpne hver
+handling som detaljkravene klassifiserer som destruktiv; dialogen skal
+beskrive akkurat den handlingen, Avbryt skal sende null tjenestekall og
+Bekreft ett.</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-008</td>
+<td>Når funksjonskort skjules på grunn av livssyklus eller feil, skal
+dashboardet vise en forklarende tekst i stedet for et tomt område.</td>
+<td>Operatøren skal forstå om et kort er skjult fordi bryggingen ikke er
+startet, er avsluttet, har feil, eller fordi entitetene ikke er
+tilgjengelige.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kontroller kravets brukerutfall i både mobil- og bred visning; handling
+eller informasjon skal være forståelig uten Node-RED-editoren.</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-009</td>
+<td>Dashboardet skal presentere state fra
+<code>sensor.brygging_status</code> og de øvrige delte
+Companion-entitetene som én felles bryggedag for alle Home
+Assistant-klienter med tilgang.</td>
+<td>Alle klienter leser og skriver de samme entitetene. En endring i
+eksempelvis <code>select.brygging_template</code> eller et knappresultat
+fra <code>button.brygging_pause</code> skal derfor bli synlig i de andre
+klientene etter Node-REDs publisering; det finnes ingen brukerspesifikk
+kladd.<br><br><strong>Observerbar effekt og kontroll:</strong> Åpne
+dashboardet i to HA-klienter, endre
+<code>select.brygging_template</code> eller trykk
+<code>button.brygging_pause</code> i den ene; begge skal vise samme
+Node-RED-kvitterte resultat.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-visningsstruktur">4. Visningsstruktur</h2>
+<p>Dashboardet skal ha fire visninger i denne rekkefølgen:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Rekkefølge</th>
+<th>Visning</th>
+<th>Path</th>
+<th>Ikon</th>
+<th>Hovedansvar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td>Bryggedag</td>
+<td><code>bryggedag</code></td>
+<td><code>mdi:beer</code></td>
+<td>Aktiv kjøring, status og rapport</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td>Oppsett og template</td>
+<td><code>oppsett-template</code></td>
+<td><code>mdi:tune-variant</code></td>
+<td>Template, faser, timere, system og arkiver</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td>Fasepunkter</td>
+<td><code>fasepunkter</code></td>
+<td><code>mdi:playlist-edit</code></td>
+<td>Redigering av inntil 15 punkter for valgt fase</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td>Teknisk</td>
+<td><code>teknisk</code></td>
+<td><code>mdi:tools</code></td>
+<td>Full entitetsoversikt og feilsøking</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-STR-001</td>
+<td>Dashboardtittelen skal inneholde dashboardversjonen.</td>
+<td>Tittelen gjør det mulig å se hvilken dashboardfil som faktisk er
+importert. Dette er nødvendig fordi Node-RED ikke kan lese versjonen på
+aktiv dashboard-YAML.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Parse YAML-en og åpne alle fire views; tittel, path,
+ikon og navigasjon skal samsvare med kontrakten.</td>
+</tr>
+<tr class="even">
+<td>HA-STR-002</td>
+<td>De fire visningstitlene og path-verdiene skal være stabile i
+1.0-linjen.</td>
+<td>Stabile paths gjør at bokmerker, mobilnavigasjon og dokumentasjon
+ikke brytes av mindre oppdateringer. Endring krever en bevisst
+grensesnittbeslutning.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Parse YAML-en og åpne alle fire views; tittel, path,
+ikon og navigasjon skal samsvare med kontrakten.</td>
+</tr>
+<tr class="odd">
+<td>HA-STR-003</td>
+<td>Normal brukerflyt skal kunne gjennomføres i de tre første
+visningene. Teknisk-visningen skal ikke være nødvendig i normal
+drift.</td>
+<td>Bryggedag, Oppsett og template og Fasepunkter skal dekke all ordinær
+bruk. Teknisk er en kontroll- og
+feilsøkingsflate.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Parse YAML-en og åpne alle fire views; tittel, path,
+ikon og navigasjon skal samsvare med kontrakten.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="41-forventet-brukerflyt">4.1 Forventet brukerflyt</h3>
+<ol type="1">
+<li>I <code>idle</code> velger eller redigerer operatøren template,
+faser, fasepunkter og timere.</li>
+<li>Operatøren lagrer templaten og kontrollerer «System og
+arkiver».</li>
+<li>«Start bryggedag» sender en forespørsel til Node-RED, som kjører en
+fersk start-preflight før sesjonen eventuelt starter.</li>
+<li>Under aktiv brygging brukes visningen «Bryggedag» til fasebytte,
+kommentarer, bekreftelser, pause, timere og rapport.</li>
+<li>Ved <code>completed</code> eller <code>ended</code> skjules
+prosesskontrollene. Operatøren genererer og kontrollerer rapporten.</li>
+<li>«Klargjør ny bryggedag» nullstiller sesjonsvisningen og åpner
+editorene igjen.</li>
+</ol>
+<p>«Teknisk» brukes bare når entity-state må kontrolleres direkte. Den
+skal ikke være et nødvendig trinn i normal brukerflyt.</p>
+<h2 id="5-livssyklus-og-synlighet">5. Livssyklus og synlighet</h2>
+<h3 id="51-tilstander">5.1 Tilstander</h3>
+<p>Dashboardet skal forstå statusverdiene <code>idle</code>,
+<code>running</code>, <code>waiting_confirmation</code>,
+<code>waiting_event</code>, <code>paused</code>, <code>completed</code>,
+<code>ended</code>, <code>error</code>, <code>unknown</code> og
+<code>unavailable</code>. Norske fallbackverdier som <code>ukjent</code>
+og <code>ikke startet</code> skal behandles defensivt i
+synlighetsregler.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Status</th>
+<th>Praktisk betydning</th>
+<th>Hva dashboardet skal gjøre</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>idle</code></td>
+<td>Ingen aktiv eller avsluttet sesjon venter på
+rapport/nullstilling.</td>
+<td>Vise start, template- og editorfunksjoner. Skjule aktive
+prosesskort.</td>
+</tr>
+<tr class="even">
+<td><code>running</code></td>
+<td>Aktiv fase kjører normalt.</td>
+<td>Vise tidslinje, fasepunkter, Pause, fasehandlinger, timere og
+rapporthandlinger.</td>
+</tr>
+<tr class="odd">
+<td><code>waiting_confirmation</code></td>
+<td>Runtime venter på en eksplisitt kvittering før prosessen kan regnes
+som videreført.</td>
+<td>Beholde aktiv visning og gjøre bekreftelsesinformasjonen
+tydelig.</td>
+</tr>
+<tr class="even">
+<td><code>waiting_event</code></td>
+<td>En eldre eller kompatibel ventestatus som fortsatt skal behandles
+som aktiv brygging.</td>
+<td>Behandle statusen defensivt som aktiv og la Node-RED avgjøre gyldige
+kommandoer.</td>
+</tr>
+<tr class="odd">
+<td><code>paused</code></td>
+<td>Bryggedagen er satt på pause.</td>
+<td>Vise Fortsett i stedet for Pause. Øvrige tider og timere presenteres
+etter Node-REDs pauseberegning.</td>
+</tr>
+<tr class="even">
+<td><code>completed</code></td>
+<td>Alle aktive faser er fullført normalt.</td>
+<td>Skjule operative prosesskort og vise rapport/nullstilling for
+avsluttet sesjon.</td>
+</tr>
+<tr class="odd">
+<td><code>ended</code></td>
+<td>Operatøren har avsluttet bryggedagen før normal fullføring.</td>
+<td>Behandle sesjonen som avsluttet, men bevare logg og
+rapportgrunnlag.</td>
+</tr>
+<tr class="even">
+<td><code>error</code></td>
+<td>Node-RED har satt runtime i feiltilstand.</td>
+<td>Skjule handlinger som kan forverre tilstanden og vise vei til
+Systemkontroll/Teknisk.</td>
+</tr>
+<tr class="odd">
+<td><code>unknown</code>, <code>unavailable</code>, <code>ukjent</code>,
+<code>ikke startet</code></td>
+<td>Home Assistant mangler en pålitelig status, ofte under oppstart
+eller reconnect.</td>
+<td>Bruke sikker tomtilstand og ikke anta at brygging kan startes eller
+styres.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-LIV-001</td>
+<td>Kortene for aktiv bryggedag skal vises når
+<code>sensor.brygging_status</code> er <code>running</code>,
+<code>waiting_confirmation</code>, <code>waiting_event</code> eller
+<code>paused</code>.</td>
+<td>Disse fire sensorverdiene betyr at samme sesjon fortsatt pågår.
+Verdien avgjør blant annet om <code>button.brygging_pause</code> eller
+<code>button.brygging_fortsett</code>
+presenteres.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Sett <code>sensor.brygging_status</code> til hver relevant normal- og
+fallbackverdi og verifiser at bare de avtalte kortene og knappene er
+synlige.</td>
+</tr>
+<tr class="even">
+<td>HA-LIV-002</td>
+<td>Når <code>sensor.brygging_status</code> er <code>idle</code>, skal
+aktive prosesskort skjules, mens <code>button.brygging_start</code> og
+templateeditorene skal vises når deres øvrige betingelser er
+oppfylt.</td>
+<td>Operatøren skal se oppsett og startmulighet før sesjonen finnes, men
+ikke en tidslinje eller punktliste basert på gamle
+prosessdata.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Sett <code>sensor.brygging_status</code> til hver relevant normal- og
+fallbackverdi og verifiser at bare de avtalte kortene og knappene er
+synlige.</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-003</td>
+<td>Når <code>sensor.brygging_status</code> er <code>completed</code>
+eller <code>ended</code>, skal aktive prosesskort skjules og ett
+sluttkort vise status, <code>sensor.brygging_aktiv_template</code>,
+rapportlenke, <code>button.brygging_generer_rapport</code> og
+<code>button.brygging_klargjor_ny_bryggedag</code>.</td>
+<td>Prosesskommandoer fjernes, mens rapportering og kontrollert overgang
+til neste bryggedag beholdes.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-LIV-004</td>
+<td>Når <code>sensor.brygging_status</code> er <code>error</code>,
+<code>unknown</code>, <code>unavailable</code>, <code>ukjent</code>
+eller <code>ikke startet</code>, skal operative kort skjules og
+erstattes med forklaring og henvisning til
+<code>sensor.brygging_systemkontroll</code> eller
+Teknisk-visningen.</td>
+<td>Manglende eller ugyldig livssyklusverdi skal gi en sikker
+tomtilstand. Dashboardet skal ikke vise gamle knapper eller data som om
+runtime var under kontroll.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Sett <code>sensor.brygging_status</code> til hver
+relevant normal- og fallbackverdi og verifiser at bare de avtalte
+kortene og knappene er synlige.</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-005</td>
+<td>Template-, fase-, fasepunkt- og timereditorene skal bare vises når
+<code>sensor.brygging_status</code> er <code>idle</code>.</td>
+<td>Synlighetsregelen gjelder alle editorfamiliene, blant annet
+<code>select.brygging_template</code>,
+<code>text.brygging_fase_FF_navn</code>,
+<code>select.brygging_rediger_fase</code> og
+<code>select.brygging_rediger_timer</code>.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Sett <code>sensor.brygging_status</code>
+til hver relevant normal- og fallbackverdi og verifiser at bare de
+avtalte kortene og knappene er synlige.</td>
+</tr>
+<tr class="even">
+<td>HA-LIV-006</td>
+<td>Ved <code>completed</code> eller <code>ended</code> på
+<code>sensor.brygging_status</code> skal editorene fortsatt være skjult
+frem til <code>button.brygging_klargjor_ny_bryggedag</code> er godkjent
+av Node-RED.</td>
+<td>En avsluttet sesjon skal beholde samme template- og rapportgrunnlag.
+Editorene åpnes først når nullstilling faktisk har publisert
+<code>idle</code>.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Sett <code>sensor.brygging_status</code> til hver
+relevant normal- og fallbackverdi og verifiser at bare de avtalte
+kortene og knappene er synlige.</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-007</td>
+<td>Alle synlighetsregler som avhenger av en entitet, særlig
+<code>sensor.brygging_status</code>, skal behandle <code>unknown</code>
+og <code>unavailable</code> som ikke-operativ tilstand.</td>
+<td>En kort Home Assistant-restart eller reconnect skal gi forklaring og
+sikre tomtilstander, ikke gjøre start-, redigerings- eller
+prosessknapper synlige på grunn av manglende
+data.<br><br><strong>Observerbar effekt og kontroll:</strong> Sett
+<code>sensor.brygging_status</code> til hver relevant normal- og
+fallbackverdi og verifiser at bare de avtalte kortene og knappene er
+synlige.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-visningen-bryggedag">6. Visningen «Bryggedag»</h2>
+<h3 id="61-kortrekkefølge">6.1 Kortrekkefølge</h3>
+<p>Under aktiv brygging skal de tre første toppnivåkortene være:</p>
+<ol type="1">
+<li>Tidslinje</li>
+<li>Fasepunkter</li>
+<li>Tidsstyring</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-BRY-001</td>
+<td>De tre kortene skal være separate toppnivåkort i masonry-layouten og
+beholde rekkefølgen over.</td>
+<td>Rekkefølgen følger operatørens arbeidsflyt: først helheten, deretter
+neste konkrete oppgaver og til slutt tidsstyring og
+avslutningshandlinger.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør en aktiv testsekvens fra dashboardet og
+verifiser at kortrekkefølge og tjenestekall gir én Node-RED-kommando per
+handling.</td>
+</tr>
+<tr class="even">
+<td>HA-BRY-002</td>
+<td>Hvert operativt dashboardkort skal kalle tjenesten
+<code>button.press</code> mot den konkrete Companion-knappen som er
+angitt i det tilhørende detaljkravet og i entitetskontrakten i punkt
+10.</td>
+<td>Dashboardet skal ikke bruke lokale stateendringer, generiske
+serviceskript eller gamle aliaser. Entity-ID-en i YAML skal være
+identisk med <code>ha-entity-config</code> i
+releaseflowen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør en aktiv testsekvens fra dashboardet og verifiser at kortrekkefølge
+og tjenestekall gir én Node-RED-kommando per handling.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-tidslinje">6.2 Tidslinje</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-TL-001</td>
+<td>Kortet skal ha fast overskrift «Tidslinje».</td>
+<td>Fast navn gjør kortet lett å finne igjen på tvers av
+skjermstørrelser og dokumentasjon.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Publiser et kontrollert tidslinjedatasett og
+grensetilfeller for tid/overtid; kortet skal vise nøyaktig samme
+rekkefølge og tall.</td>
+</tr>
+<tr class="even">
+<td>HA-TL-002</td>
+<td>Tidslinjekortet skal vise <code>button.brygging_neste_fase</code> og
+<code>button.brygging_tilbake</code> øverst; Tilbake skal kreve
+bekreftelsen «Gå ett steg tilbake?».</td>
+<td>De to knappene er fasehandlingene for aktiv sesjon. Bekreftelsen
+skal redusere utilsiktet omkjøring, mens Node-RED fortsatt avgjør om
+handlingen er gyldig.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Trykk <code>button.brygging_neste_fase</code> og prøv
+både Avbryt og Bekreft for <code>button.brygging_tilbake</code>;
+knappene skal ligge øverst, og avbrutt dialog skal ikke sende
+tjenestekall.</td>
+</tr>
+<tr class="odd">
+<td>HA-TL-003</td>
+<td>Tidslinjen skal bygges dynamisk fra <code>phases</code> på
+<code>sensor.brygging_faseoversikt</code>.</td>
+<td>Dashboardet skal presentere rekkefølgen og de norske statusene
+Node-RED publiserer, uten en egen
+faseberegning.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-TL-004</td>
+<td>Tidslinjen skal vise bare objektene Node-RED publiserer i
+<code>sensor.brygging_faseoversikt.attributes.phases</code>, i mottatt
+rekkefølge.</td>
+<td>Deaktiverte templateplasser skal ikke gjenskapes lokalt i
+dashboardet.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-TL-005</td>
+<td>Hvert faseobjekt skal vise de kontraktfestede feltene
+<code>title</code>, <code>duration_min</code> og
+<code>status</code>.</td>
+<td>Dashboardet skal ikke oversette tekniske statuskoder; Node-RED
+leverer norsk visningsprojeksjon.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-TL-006</td>
+<td>Aktiv fase skal vises fra state og attributtene
+<code>planned_duration_min</code>, <code>elapsed_min</code>,
+<code>remaining_min</code>, <code>overtime_min</code> og
+<code>progress_percent</code> på
+<code>sensor.brygging_aktiv_fase</code>.</td>
+<td>Fasefremdrift skal ha én autoritativ sensorskriver; dashboardet skal
+ikke kombinere parallelle enkeltsensorer.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kravet skal ha en navngitt automatisert
+kontroll når dette er teknisk mulig, og ellers en eksplisitt
+målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-TL-007</td>
+<td>Det visuelle minuttfeltet skal bygges fra de fire aktive
+fasesensorene i <code>HA-TL-006</code>, bruke 15 minutter per rad og
+markere brukt plantid blått, gjenstående plantid lyst og overtid
+grønt.</td>
+<td>Feltet er en visualisering av publiserte minutter, ikke en egen
+klokke. Ved overtid skal grønne posisjoner legges etter planfeltet uten
+å endre sensordataene.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Publiser et kontrollert tidslinjedatasett og
+grensetilfeller for tid/overtid; kortet skal vise nøyaktig samme
+rekkefølge og tall.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-fasepunkter">6.3 Fasepunkter</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-PKT-001</td>
+<td>Fasepunktkortet skal vise
+<code>button.brygging_bekreft_fasepunkt</code> under aktiv brygging.
+Node-RED skal avvise trykket kontrollert når
+<code>sensor.brygging_neste_fasepunkt</code> ikke angir et bekreftbart,
+forfalt punkt.</td>
+<td>Knappesynlighet er ikke autorisasjon; runtimevalideringen er siste
+sperre.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-002</td>
+<td>Neste fasepunkt skal vises fra state og attributtene
+<code>phasepoint_name</code> og <code>requires_confirmation</code> på
+<code>sensor.brygging_neste_fasepunkt</code>.</td>
+<td>Tomtilstanden <code>Ingen</code> skal bruke <code>null</code> i alle
+fire attributter.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-003</td>
+<td>Fasepunktets tidsstatus skal styres av state <code>Ingen</code>,
+<code>Kommende</code> eller <code>Forfalt</code>, og tiden skal hentes
+fra <code>time_until_due</code> på
+<code>sensor.brygging_neste_fasepunkt</code>.</td>
+<td>Dashboardet skal ikke beregne forfall lokalt fra
+veggklokken.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-004</td>
+<td>Kortet skal vise inntil 15 kronologiske objekter fra
+<code>sensor.brygging_fasepunktoversikt.attributes.phasepoints</code>.</td>
+<td>En tom liste skal gi en lesbar tomtilstand; det finnes ingen
+separate fasepunktsensorer i
+2026.11.07-1-kontrakten.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-005</td>
+<td>Hvert synlig fasepunktobjekt skal formidle <code>type</code>,
+<code>name</code>, <code>description</code>,
+<code>expected_value</code>, <code>timing</code>,
+<code>time_until_due</code>, <code>status</code> og
+<code>requires_confirmation</code> uten lokal kodeoversettelse.</td>
+<td>Dashboardet skal presentere den norske Node-RED-projeksjonen
+direkte.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-006</td>
+<td>Operatøren skal velge kommentarmål i
+<code>select.brygging_fasepunkt_for_kommentar</code>, som skal tilby de
+permanente punkt-ID-ene i aktiv fase.</td>
+<td>Node-RED løser valget til permanent <code>FF_PP</code>-ID og avviser
+foreldet eller ugyldig valg.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-007</td>
+<td>Kommentar skal skrives i
+<code>text.brygging_fasepunktkommentar</code>, mål velges i
+<code>select.brygging_fasepunkt_for_kommentar</code>, og lagring skal
+utløses med <code>button.brygging_lagre_fasepunktkommentar</code>.</td>
+<td>Tekst og mål er en kladd fram til knappetrykket og skal valideres
+atomisk av Node-RED.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-008</td>
+<td>Kvitteringsblokken skal lese
+<code>sensor.brygging_siste_fasepunktkommentar</code> og vise
+sensorstate som tidspunkt samt attributtene <code>fase</code>,
+<code>fasepunkt</code> og <code>kommentar</code>.</td>
+<td>Operatøren skal kunne kontrollere at riktig kommentar ble lagret på
+riktig punkt. <code>unknown</code>, <code>unavailable</code> og
+<code>-</code> skal gi teksten om at ingen kommentar er lagret i
+sesjonen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Publiser punkter før og etter forfall og prøv både gyldig og ugyldig
+handling; visning, kvittering og Node-RED-logg skal samsvare.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64-tidsstyring-og-rapport">6.4 Tidsstyring og rapport</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-TID-001</td>
+<td>Tidsstyringskortet skal vise <code>button.brygging_pause</code> når
+<code>sensor.brygging_status</code> er aktiv og ikke
+<code>paused</code>, og <code>button.brygging_fortsett</code> bare når
+status er <code>paused</code>.</td>
+<td>Bare den relevante pausehandlingen skal være synlig. Overgangen skal
+følge den publiserte statusen etter Node-REDs godkjenning og ikke endres
+optimistisk i dashboardet.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Test normal kjøring, pause, overtid og tom
+timerliste; de synlige verdiene og knappene skal følge publiserte
+entiteter uten lokal tidsberegning.</td>
+</tr>
+<tr class="even">
+<td>HA-TID-002</td>
+<td>Tidsstyringskortet skal vise
+<code>sensor.brygging_tid_til_ferdig_bryggedag</code> og
+<code>sensor.brygging_estimert_ferdig_bryggedag</code>.</td>
+<td>Den første sensoren viser beregnet gjenstående varighet, og den
+andre viser forventet lokalt klokkeslett. Kortet skal ikke vise eller
+beregne en tredje verdi for «tid til neste
+hendelse».<br><br><strong>Observerbar effekt og kontroll:</strong> Test
+normal kjøring, pause, overtid og tom timerliste; de synlige verdiene og
+knappene skal følge publiserte entiteter uten lokal tidsberegning.</td>
+</tr>
+<tr class="odd">
+<td>HA-TID-003</td>
+<td>Aktiverte timere skal bygges dynamisk fra <code>timers</code> på
+<code>sensor.brygging_timeroversikt</code>.</td>
+<td>Dashboardet skal ikke hardkode timerne eller parse en parallell
+JSON-streng.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-TID-004</td>
+<td>Bare timerobjekter publisert i
+<code>sensor.brygging_timeroversikt.attributes.timers</code> skal vises;
+hvert objekt skal presentere <code>name</code>,
+<code>display_text</code> og <code>status</code>.</td>
+<td>En tom liste skal gi en dokumentert tomtilstand uten lokal
+reparasjon av produsentdata.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-TID-005</td>
+<td>Tidsstyringskortet skal vise
+<code>button.brygging_generer_rapport</code> og
+<code>button.brygging_avslutt</code> under aktiv brygging.</td>
+<td>Rapportknappen lager et øyeblikksbilde; avslutt er forskjellig fra
+klargjør ny bryggedag.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-TID-006</td>
+<td><code>button.brygging_avslutt</code> skal ha en bekreftelsesdialog
+som forklarer at aktiv prosess og aktive timere stoppes, mens logg og
+rapportgrunnlag beholdes.</td>
+<td>Dialogen skal beskrive konsekvensen før <code>button.press</code>
+sendes. Et avbrutt dialogvalg skal ikke sende noen
+kommando.<br><br><strong>Observerbar effekt og kontroll:</strong> Åpne
+bekreftelsen for <code>button.brygging_avslutt</code>; Avbryt skal
+bevare aktiv state uten tjenestekall, mens Bekreft skal sende nøyaktig
+ett <code>button.press</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-start-og-avsluttet-bryggedag">6.5 Start og avsluttet
+bryggedag</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-SLU-001</td>
+<td>Når <code>sensor.brygging_status</code> er <code>idle</code>, skal
+startkortet vise <code>button.brygging_start</code> sammen med en
+tydelig statusindikasjon basert på
+<code>sensor.brygging_systemkontroll</code> eller tilsvarende publisert
+systemstatus.</td>
+<td>Operatøren skal se både startmuligheten og om siste kontroll antyder
+et problem. Knappen er likevel bare en forespørsel; fersk preflight
+avgjør utfallet.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Test start, fullført og manuelt avsluttet livssyklus; riktig handling
+skal vises og et avslag skal ikke endre dashboardets state
+optimistisk.</td>
+</tr>
+<tr class="even">
+<td>HA-SLU-002</td>
+<td>Trykk på <code>button.brygging_start</code> skal alltid sendes til
+Node-RED, som skal kjøre en fersk preflight og publisere resultatet
+gjennom <code>sensor.brygging_systemkontroll</code> og
+<code>sensor.brygging_status</code>.</td>
+<td>Dashboardet skal ikke lagre et lokalt «klart»-flagg. Et gammelt
+grønt kontrollresultat kan vises som informasjon, men kan ikke godkjenne
+START.<br><br><strong>Observerbar effekt og kontroll:</strong> Test
+start, fullført og manuelt avsluttet livssyklus; riktig handling skal
+vises og et avslag skal ikke endre dashboardets state optimistisk.</td>
+</tr>
+<tr class="odd">
+<td>HA-SLU-003</td>
+<td><code>button.brygging_klargjor_ny_bryggedag</code> skal ha en
+bekreftelsesdialog som minner operatøren om å generere rapport før
+sesjonsdata nullstilles.</td>
+<td>Knappen skal først vises i avsluttet livssyklus og skal ikke sende
+kommando når dialogen avbrytes. Node-RED avgjør om nullstilling er
+tillatt.<br><br><strong>Observerbar effekt og kontroll:</strong> Vis
+avsluttet sesjon og prøv begge dialogvalg for
+<code>button.brygging_klargjor_ny_bryggedag</code>; bare bekreftet valg
+skal sende tjenestekall, og dialogen skal nevne rapport før
+nullstilling.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="66-hva-hovedhandlingene-betyr">6.6 Hva hovedhandlingene
+betyr</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Handling</th>
+<th>Forventet betydning for operatøren</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Start bryggedag</td>
+<td>Ber Node-RED kontrollere systemet på nytt og starte første aktive
+fase dersom alle startkritiske kontroller er bestått. Et trykk er ikke
+garanti for at start godtas.</td>
+</tr>
+<tr class="even">
+<td>Neste fase</td>
+<td>Avslutter gjeldende gjennomføring og starter neste aktive fase. Ikke
+nådde eller ubekreftede punkter kan bli dokumentert som avvik av
+Node-RED.</td>
+</tr>
+<tr class="odd">
+<td>Tilbake</td>
+<td>Avslutter gjeldende gjennomføring og starter forrige aktive fase på
+nytt fra null. Tidligere gjennomføring og kommentarer beholdes som
+historikk.</td>
+</tr>
+<tr class="even">
+<td>Bekreft fasepunkt</td>
+<td>Kvitterer det bekreftelsespunktet Node-RED anser som aktuelt.
+Knappen skal ikke brukes som en generell «utført»-knapp for vilkårlige
+punkter.</td>
+</tr>
+<tr class="odd">
+<td>Pause</td>
+<td>Fryser den pausefølsomme prosessberegningen. Timere som er
+konfigurert til å følge virkelig klokke kan fortsatt gå.</td>
+</tr>
+<tr class="even">
+<td>Fortsett</td>
+<td>Avslutter pausen og lar Node-RED forskyve relevante frister med
+akkumulert pausetid.</td>
+</tr>
+<tr class="odd">
+<td>Generer rapport</td>
+<td>Ber Node-RED bygge en ny HTML-rapport fra gjeldende session, logg og
+historikk. Den erstatter public-kopien når publiseringen lykkes.</td>
+</tr>
+<tr class="even">
+<td>Avslutt</td>
+<td>Stopper en aktiv bryggedag uten å late som alle faser ble fullført.
+Logg og rapportgrunnlag beholdes.</td>
+</tr>
+<tr class="odd">
+<td>Klargjør ny bryggedag</td>
+<td>Nullstiller den avsluttede sesjonsvisningen og går tilbake til
+<code>idle</code>. Handlingen er ikke det samme som «Avslutt».</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-visningen-oppsett-og-template">7. Visningen «Oppsett og
+template»</h2>
+<h3 id="71-lagring-og-templatebytte">7.1 Lagring og templatebytte</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-TPL-001</td>
+<td>Første kort skal hete «Lagring og templatebytte».</td>
+<td>Kortet skal være lett å finne og ligge før de mange fasekortene
+fordi templatevalg og lagringsstatus gjelder hele
+oppsettet.<br><br><strong>Observerbar effekt og kontroll:</strong> I
+<code>idle</code> endres den navngitte entiteten og aktuell knapp
+trykkes; status, dirty-flagg, filkvittering og feilmelding skal vise det
+faktiske Node-RED-resultatet.</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-002</td>
+<td>Kortet skal inneholde <code>button.brygging_lagre_template</code>,
+<code>button.brygging_oppdater_templateliste</code> og
+<code>button.brygging_forkast_templateendringer</code>.</td>
+<td>De tre konkrete entitetene har hvert sitt ansvar: atomisk lagring,
+ny katalogskanning og gjenlasting av aktiv fil. De skal ikke erstattes
+av én tvetydig generisk templateknapp.<br><br><strong>Observerbar effekt
+og kontroll:</strong> I <code>idle</code> endres den navngitte entiteten
+og aktuell knapp trykkes; status, dirty-flagg, filkvittering og
+feilmelding skal vise det faktiske Node-RED-resultatet.</td>
+</tr>
+<tr class="odd">
+<td>HA-TPL-003</td>
+<td><code>button.brygging_lagre_template</code> og
+<code>button.brygging_forkast_templateendringer</code> skal ha hver sin
+konsekvensspesifikke bekreftelsesdialog.</td>
+<td>Lagring endrer backingfilen, mens forkasting fjerner den lokale
+templatekladden. <code>button.brygging_oppdater_templateliste</code>
+skanner bare katalogen og omfattes ikke av dette
+dialogkravet.<br><br><strong>Observerbar effekt og kontroll:</strong> I
+<code>idle</code> endres den navngitte entiteten og aktuell knapp
+trykkes; status, dirty-flagg, filkvittering og feilmelding skal vise det
+faktiske Node-RED-resultatet.</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-004</td>
+<td><code>sensor.brygging_aktiv_template</code> skal vises i samme kort
+som og umiddelbart ved <code>select.brygging_template</code>.</td>
+<td>Sensoren er kvitteringen på hva Node-RED faktisk har lastet;
+selectverdien er brukerens valgflate. De to skal kunne sammenholdes før
+et templatebytte.<br><br><strong>Observerbar effekt og
+kontroll:</strong> I <code>idle</code> endres den navngitte entiteten og
+aktuell knapp trykkes; status, dirty-flagg, filkvittering og feilmelding
+skal vise det faktiske Node-RED-resultatet.</td>
+</tr>
+<tr class="odd">
+<td>HA-TPL-005</td>
+<td><code>select.brygging_template</code> skal bare inneholde
+templatefilnavn som Node-RED har godkjent med den strenge
+validatoren.</td>
+<td>Dashboardet skal ikke parse JSON eller legge til egne alternativer.
+En ugyldig fil skal være fraværende fra selectlisten og forklares i
+system-/templatestatus.<br><br><strong>Observerbar effekt og
+kontroll:</strong> I <code>idle</code> endres den navngitte entiteten og
+aktuell knapp trykkes; status, dirty-flagg, filkvittering og feilmelding
+skal vise det faktiske Node-RED-resultatet.</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-006</td>
+<td>Templateblokken skal bruke state og attributtene
+<code>status</code>, <code>dirty</code>, <code>saved_at</code>,
+<code>validation_errors</code> og <code>validation_warnings</code> på
+<code>sensor.brygging_aktiv_template</code>. Skrivefeil skal vises
+gjennom <code>sensor.brygging_driftsmeldinger</code>.</td>
+<td>Templateinformasjonen skal ha én autoritativ sensorskriver og
+eksplisitte tomverdier.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-TPL-007</td>
+<td><code>text.brygging_template_notat</code> skal være beholdt som
+templatefelt.</td>
+<td>Notatet lagres som en del av templaten og følger den til senere
+bryggedager. Det er ikke en kommentar til den aktive
+sesjonen.<br><br><strong>Observerbar effekt og kontroll:</strong> I
+<code>idle</code> endres den navngitte entiteten og aktuell knapp
+trykkes; status, dirty-flagg, filkvittering og feilmelding skal vise det
+faktiske Node-RED-resultatet.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-fasekonfigurasjon">7.2 Fasekonfigurasjon</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-FAS-001</td>
+<td>Visningen skal ha en introduksjon med tittelen
+«Fasekonfigurasjon».</td>
+<td>Introduksjonen skal forklare at kortene er permanente plasser, og at
+aktiv-status og rekkefølge bestemmer hvilke faser som
+brukes.<br><br><strong>Observerbar effekt og kontroll:</strong> Rediger
+første, midtre og siste faseplass og kontroller resynk av alle berørte
+editorentiteter og uendret permanent fase-ID.</td>
+</tr>
+<tr class="even">
+<td>HA-FAS-002</td>
+<td>Det skal finnes 15 separate kort «Fase 01»–«Fase 15».</td>
+<td>De 15 kortene er fast editor-kapasitet. En template kan bruke færre
+ved å deaktivere de øvrige plassene.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Rediger første, midtre og siste faseplass og
+kontroller resynk av alle berørte editorentiteter og uendret permanent
+fase-ID.</td>
+</tr>
+<tr class="odd">
+<td>HA-FAS-003</td>
+<td>Hvert fasekort <code>FF=01</code>–<code>15</code> skal vise
+<code>text.brygging_fase_FF_navn</code>,
+<code>number.brygging_fase_FF_varighet_min</code>,
+<code>select.brygging_fase_FF_status</code> og
+<code>number.brygging_fase_FF_rekkefolge</code>.</td>
+<td>De fire entitetene er hele faseeditoren: navn, planlagt tid,
+aktiv/deaktivert og ønsket plassering. Ingen av feltene skal erstattes
+av lokal YAML-state.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Rediger første, midtre og siste faseplass og
+kontroller resynk av alle berørte editorentiteter og uendret permanent
+fase-ID.</td>
+</tr>
+<tr class="even">
+<td>HA-FAS-004</td>
+<td>Endring i <code>number.brygging_fase_FF_rekkefolge</code> skal kunne
+flytte fasen uten å endre den permanente fase-ID-en <code>FF</code>
+eller entity-ID-ene i samme fasekort.</td>
+<td>Etter Node-REDs reindeksering skal alle 15 rekkefølgefeltene
+resynkroniseres. Timere, historikk og punkt-ID-er skal fortsatt referere
+samme fase.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Rediger første, midtre og siste faseplass og kontroller resynk av alle
+berørte editorentiteter og uendret permanent fase-ID.</td>
+</tr>
+<tr class="odd">
+<td>HA-FAS-005</td>
+<td>Kortene skal stå som løse masonry-kort og ikke i en tvungen bred
+tabell.</td>
+<td>Hvert fasekort skal være lesbart på mobil. En sammenhengende
+15-raders tabell ville blitt for bred og vanskelig å
+betjene.<br><br><strong>Observerbar effekt og kontroll:</strong> Rediger
+første, midtre og siste faseplass og kontroller resynk av alle berørte
+editorentiteter og uendret permanent fase-ID.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-hendelsertimere">7.3 Hendelser/timere</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-HEN-001</td>
+<td>Det skal finnes ett kort med tittelen «Hendelser».</td>
+<td>Alle timerfeltene samles i én editor fordi bare én timerplass
+redigeres om gangen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Velg minst to timerplasser, bytt mellom dem og bruk
+én kladd; riktig timer skal endres og feltverdiene skal overleve full
+resynk.</td>
+</tr>
+<tr class="even">
+<td>HA-HEN-002</td>
+<td>Kortet skal forklare forskjellen på start, slutt, planlagt, faktisk,
+passert, bekreftet, opptelling, nedtelling og pauseoppførsel.</td>
+<td>Hjelpeteksten skal gjøre det mulig å konfigurere en timer uten
+kjennskap til de interne eventnavnene. Den må særlig forklare
+forskjellen mellom løpende og faktisk slutt.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Velg minst to timerplasser, bytt mellom dem
+og bruk én kladd; riktig timer skal endres og feltverdiene skal overleve
+full resynk.</td>
+</tr>
+<tr class="odd">
+<td>HA-HEN-003</td>
+<td><code>select.brygging_rediger_timer</code> skal la operatøren velge
+permanent timer-ID <code>timer_01</code>–<code>timer_15</code> for den
+felles timereditoren.</td>
+<td>Når valget endres, skal de øvrige timerentitetene fylles med akkurat
+den valgte timerens konfigurasjon, også når timeren er
+deaktivert.<br><br><strong>Observerbar effekt og kontroll:</strong> Velg
+minst to timerplasser, bytt mellom dem og bruk én kladd; riktig timer
+skal endres og feltverdiene skal overleve full resynk.</td>
+</tr>
+<tr class="even">
+<td>HA-HEN-004</td>
+<td>Timereditoren skal bruke <code>select.brygging_timer_status</code>,
+<code>text.brygging_timer_navn</code>,
+<code>number.brygging_timer_rekkefolge</code>,
+<code>select.brygging_timer_retning</code>,
+<code>select.brygging_timer_pauseoppforsel</code>, start-/slutthendelse
+og -referanse samt de to offsetfeltene.</td>
+<td>Alle felt skal tilhøre timeren valgt i
+<code>select.brygging_rediger_timer</code> og resynkroniseres ved valg
+og reconnect.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-HEN-005</td>
+<td>Hver gyldig timereditorendring skal valideres atomisk mot valgt
+permanent timerplass, oppdatere runtimekopien og sette
+<code>template_dirty</code>; det skal ikke finnes en separat
+<code>Bruk</code>-knapp.</td>
+<td>Ugyldig eller foreldet editorverdi skal avvises uten delvis endring
+og etterfølges av autoritativ resynk.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll
+når dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-HEN-006</td>
+<td>Programmatisk resynk av <code>select.brygging_timer_*</code>,
+<code>number.brygging_timer_*</code> og
+<code>text.brygging_timer_navn</code> skal ikke tolkes som nye
+brukerendringer.</td>
+<td>Etter loading eller reconnect skal feltene vise runtimeverdiene uten
+feedback-løkke, utilsiktet <code>template_dirty</code> eller at en annen
+timerkladd overskrives.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Velg minst to timerplasser, bytt mellom dem og bruk
+én kladd; riktig timer skal endres og feltverdiene skal overleve full
+resynk.</td>
+</tr>
+</tbody>
+</table>
+<p>Timerbegrepene skal forstås slik:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Felt eller begrep</th>
+<th>Betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Start</td>
+<td>Hendelsen som oppretter timerens starttid. Det kan være bryggestart,
+fasehendelse eller fasepunkt.</td>
+</tr>
+<tr class="even">
+<td>Slutt</td>
+<td>Hendelsen som oppretter timerens sluttid. For en nedtelling er dette
+normalt tidspunktet det telles mot.</td>
+</tr>
+<tr class="odd">
+<td>Planlagt</td>
+<td>Tidspunkt beregnet fra template og offsets, uavhengig av når
+operatøren faktisk utfører handlingen.</td>
+</tr>
+<tr class="even">
+<td>Faktisk</td>
+<td>Tidspunkt registrert da en fase eller bryggedag virkelig startet
+eller sluttet.</td>
+</tr>
+<tr class="odd">
+<td>Passert</td>
+<td>Tidspunktet et tidsstyrt fasepunkt ble nådd av klokken.</td>
+</tr>
+<tr class="even">
+<td>Bekreftet</td>
+<td>Tidspunktet operatøren kvitterte et bekreftelsespunkt. Dette kan
+avvike fra plantid.</td>
+</tr>
+<tr class="odd">
+<td>Referanse</td>
+<td>Den permanente fase- eller punkt-ID-en hendelsen gjelder. Feltet er
+bare relevant for hendelser som trenger en slik ID.</td>
+</tr>
+<tr class="even">
+<td>Offset</td>
+<td>Antall minutter før eller etter den valgte hendelsen. Negativ verdi
+betyr før, positiv verdi betyr etter.</td>
+</tr>
+<tr class="odd">
+<td>Tell opp</td>
+<td>Viser tiden som har gått siden start.</td>
+</tr>
+<tr class="even">
+<td>Tell ned</td>
+<td>Viser tiden som gjenstår til slutt.</td>
+</tr>
+<tr class="odd">
+<td>Følg bryggepause</td>
+<td>Timeren fryses og forskyves med akkumulert pausetid.</td>
+</tr>
+<tr class="even">
+<td>Fortsett etter klokke</td>
+<td>Timeren følger virkelig tid selv om bryggedagen er satt på
+pause.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="74-system-og-arkiver">7.4 System og arkiver</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-SYS-001</td>
+<td><code>sensor.brygging_systemkontroll</code>,
+<code>sensor.brygging_rapportarkiv</code> og
+<code>sensor.brygging_sesjonsarkiv</code> skal presenteres i ett
+vertikalt hovedkort «System og arkiver».</td>
+<td>Systemhelse og lagringsarkiver hører sammen som driftsinformasjon.
+Vertikal stabling gjør at detaljene kan leses på
+telefon.<br><br><strong>Observerbar effekt og kontroll:</strong> Åpne
+Oppsett-visningen på mobil og bred skjerm; data fra de tre navngitte
+arkiv-/kontrollsensorene skal stå i samme vertikale hovedkort og forbli
+lesbare uten sideveis rulling.</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-002</td>
+<td><code>button.brygging_oppdater_systemkontroll</code> skal utløse en
+ny systemkontroll og oppdatere
+<code>sensor.brygging_systemkontroll</code>,
+<code>sensor.brygging_rapportarkiv</code> og
+<code>sensor.brygging_sesjonsarkiv</code>.</td>
+<td>Et knappetrykk skal gi et nytt <code>checked_at</code> og nye
+observerte resultater, ikke bare rendere forrige JSON på
+nytt.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+manuell systemkontroll og en relevant arkivhandling; sensorens
+tidsstempel, detaljer og summer skal oppdateres og vises uten
+dobbelttelling.</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-003</td>
+<td>Systemoversikten skal lese state og attributtene
+<code>start_summary</code>, <code>checked_at</code>,
+<code>ok_count</code>, <code>warning_count</code> og
+<code>error_count</code> fra
+<code>sensor.brygging_systemkontroll</code>.</td>
+<td>Operatøren skal kunne se samlet helse, om start er tillatt og om
+resultatet er ferskt før detaljlisten leses.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kjør manuell systemkontroll og en relevant
+arkivhandling; sensorens tidsstempel, detaljer og summer skal oppdateres
+og vises uten dobbelttelling.</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-004</td>
+<td>Elementer med <code>status=Feil</code> eller <code>Advarsel</code> i
+<code>checks_json</code> på <code>sensor.brygging_systemkontroll</code>
+skal vises før øvrige kontrollelementer.</td>
+<td>Prioriteringen skal bare endre presentasjonsrekkefølgen. Innhold,
+status og <code>blocks_start</code> fra Node-RED skal
+beholdes.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+manuell systemkontroll og en relevant arkivhandling; sensorens
+tidsstempel, detaljer og summer skal oppdateres og vises uten
+dobbelttelling.</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-005</td>
+<td>Hvert element i <code>checks_json</code> på
+<code>sensor.brygging_systemkontroll</code> skal vises som en vertikal
+blokk med <code>method</code>, <code>target</code>, <code>result</code>,
+<code>conclusion</code> og eventuelt <code>remediation</code>.</td>
+<td>Dashboardet skal gjøre hvert testresultat lesbart på mobil og
+forklare både hva som ble prøvd og hva operatøren bør gjøre. Det skal
+ikke bygges en bred resultattabell.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør manuell systemkontroll og en relevant
+arkivhandling; sensorens tidsstempel, detaljer og summer skal oppdateres
+og vises uten dobbelttelling.</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-006</td>
+<td>Rapportarkivet skal lese de ti kontraktfestede attributtene på
+<code>sensor.brygging_rapportarkiv</code> og vise separate ordinære og
+historiske summer, URL-er og public-kopistatus.</td>
+<td>Dashboardet skal bruke ferdige URL-er fra Node-RED og skal ikke
+bygge cacheversjon eller filklassifisering
+selv.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-007</td>
+<td><code>button.brygging_behold_siste_100_rapporter</code> skal kreve
+bekreftelse som sier at eldre rapporter slettes permanent og bare de 100
+nyeste beholdes.</td>
+<td>Avbrutt dialog skal ikke sende <code>button.press</code>. Etter
+utføring skal <code>sensor.brygging_rapportarkiv</code> vise nytt antall
+og størrelse.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør manuell systemkontroll og en relevant arkivhandling; sensorens
+tidsstempel, detaljer og summer skal oppdateres og vises uten
+dobbelttelling.</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-008</td>
+<td>Loggarkivet skal lese <code>total_count</code>,
+<code>total_size</code>, <code>active_count</code>,
+<code>completed_count</code>, <code>ended_count</code>,
+<code>unfinished_count</code> og <code>unclassified_count</code> fra
+<code>sensor.brygging_sesjonsarkiv</code>.</td>
+<td>Kategoriene skal vises separat og ikke summeres på en måte som
+dobbeltteller samme JSONL-fil. Operatøren skal se hva som kan slettes
+før handlingen tilbys.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør manuell systemkontroll og en relevant
+arkivhandling; sensorens tidsstempel, detaljer og summer skal oppdateres
+og vises uten dobbelttelling.</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-009</td>
+<td>Teknisk-visningen skal ikke tilby generell sletting av
+sesjonsjournaler. Den skal vise klassifisering og summer fra
+<code>sensor.brygging_sesjonsarkiv</code>.</td>
+<td>Oppbevaring og eventuell journalrydding er en separat driftsoppgave
+utenfor ordinær dashboardbetjening.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-visningen-fasepunkter">8. Visningen «Fasepunkter»</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-RED-001</td>
+<td>Første kort skal hete «Velg fase».</td>
+<td>Fase må velges før punktkortene tolkes. Kortet skal derfor stå først
+og fungere som kontekst for hele editoren.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Velg en kjent fase, rediger flere
+punktplasser og bruk kladden; Node-REDs template og resynk skal vise
+samme permanente fase og punktinnhold.</td>
+</tr>
+<tr class="even">
+<td>HA-RED-002</td>
+<td><code>select.brygging_rediger_fase</code> skal velge én permanent
+fase <code>01</code>–<code>15</code> og laste alle 15 faste
+fasepunkteditorplasser for denne fasen.</td>
+<td>En senere feltendring skal fortsatt kontrolleres mot valgt fase,
+slik at et foreldet eller skiftet valg ikke endrer feil
+fase.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-003</td>
+<td>Det skal finnes 15 separate kort «Fasepunkt 01»–«Fasepunkt 15».</td>
+<td>De 15 kortene er maksimal editor-kapasitet for valgt fase. En
+template kan bruke færre aktive punkter.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Velg en kjent fase, rediger flere
+punktplasser og bruk kladden; Node-REDs template og resynk skal vise
+samme permanente fase og punktinnhold.</td>
+</tr>
+<tr class="even">
+<td>HA-RED-004</td>
+<td>Hvert punktkort <code>PP=01</code>–<code>15</code> skal bruke
+<code>select.brygging_punkt_PP_aktiv</code>, <code>_type</code>,
+<code>_tid_ref</code> og <code>_bekreftelse</code>,
+<code>text.brygging_punkt_PP_navn</code>, <code>_beskrivelse</code> og
+<code>_forventet</code> samt
+<code>number.brygging_punkt_PP_tid_min</code>.</td>
+<td>De åtte entitetene beskriver ett editorpunkt. Dashboardet skal ikke
+generere permanent punkt-ID; Node-RED kombinerer valgt fase og
+punktplass til <code>FF_PP</code>.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Velg en kjent fase, rediger flere punktplasser og
+bruk kladden; Node-REDs template og resynk skal vise samme permanente
+fase og punktinnhold.</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-005</td>
+<td>Tomt fasepunktnavn skal godtas bare når den aktuelle editorplassen
+er <code>Deaktivert</code>; <code>Aktiv</code> med tomt navn skal
+avvises atomisk.</td>
+<td>Dette gjør alle 15 statiske Excel-generatorplasser brukbare uten å
+tillate navnløse runtimepunkter.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-RED-006</td>
+<td>Hver gyldig fasepunkteditorendring skal valideres atomisk og
+oppdatere runtimekopien direkte; det skal ikke finnes en separat samlet
+<code>Bruk fasepunkter</code>-knapp.</td>
+<td>Et avvist felt skal ikke committe andre synlige felt eller endre
+permanente ID-er.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-007</td>
+<td>Fasepunkteditoren skal bare vises når
+<code>sensor.brygging_status</code> er <code>idle</code>; andre statuser
+skal gi et forklaringskort.</td>
+<td>Node-RED skal i tillegg sperre editorinput i alle andre
+livssyklustilstander.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-RED-008</td>
+<td><code>sensor.brygging_aktiv_template</code> og
+<code>select.brygging_rediger_fase</code> skal vises samlet over
+punktkortene.</td>
+<td>Operatøren skal se både backingfil og permanent fasekontekst før
+Bruk-knappen trykkes, slik at feil mål oppdages
+visuelt.<br><br><strong>Observerbar effekt og kontroll:</strong> Velg en
+kjent fase, rediger flere punktplasser og bruk kladden; Node-REDs
+template og resynk skal vise samme permanente fase og punktinnhold.</td>
+</tr>
+</tbody>
+</table>
+<p>Fasepunktfeltene skal forstås slik:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Felt</th>
+<th>Betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Aktiv</td>
+<td>Bestemmer om editorplassen blir med som et faktisk punkt i
+templaten.</td>
+</tr>
+<tr class="even">
+<td>Type</td>
+<td>Klassifiserer punktet som aktivitet, tilsetning, måling, kontroll
+eller varsel. Typen påvirker presentasjon og rapporttekst, men erstatter
+ikke navnet.</td>
+</tr>
+<tr class="odd">
+<td>Navn</td>
+<td>Kort operatørtekst, for eksempel «Mål pH» eller «Tilsett
+bitterhumle». Tomt navn betyr ubrukt plass.</td>
+</tr>
+<tr class="even">
+<td>Beskrivelse</td>
+<td>Utfyllende instruksjon eller kontekst for handlingen.</td>
+</tr>
+<tr class="odd">
+<td>Forventet verdi</td>
+<td>Det planlagte resultatet eller mengden, for eksempel
+<code>5,3 pH</code>, <code>90 g</code> eller <code>78 °C</code>. Feltet
+er tekst og er ikke en automatisk måling.</td>
+</tr>
+<tr class="even">
+<td>Tidsreferanse</td>
+<td>Angir om offset regnes fra fasestart eller faseslutt.</td>
+</tr>
+<tr class="odd">
+<td>Offset</td>
+<td>Minutter fra valgt referanse. Ved faseslutt brukes normalt negativ
+verdi for et punkt før slutt.</td>
+</tr>
+<tr class="even">
+<td>Bekreftelse</td>
+<td>Angir om punktet bare passeres av klokken, eller om operatøren må
+kvittere det.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-visningen-teknisk">9. Visningen «Teknisk»</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-TEK-001</td>
+<td>Teknisk-visningen skal inneholde domenedelte entities-kort som til
+sammen viser alle Companion-entitetene i releasekontrakten:
+<code>sensor</code>, <code>select</code>, <code>number</code>,
+<code>button</code> og <code>text</code>.</td>
+<td>Det skal ikke finnes tekniske aliaser; de samme entity-ID-ene som
+brukes i normalvisningene, skal listes i
+Teknisk-visningen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Sammenlign entity-ID-settet i Teknisk-visningen med
+releaseflowens <code>ha-entity-config</code>; ingen ID skal mangle eller
+være et gammelt alias.</td>
+</tr>
+<tr class="even">
+<td>HA-TEK-002</td>
+<td>Teknisk-visningen kan være tettere enn normalvisningene, men skal
+ikke erstatte forklarende Systemkontroll.</td>
+<td>Rå entity-state er nyttig for feilsøking, men forklarer ikke hva som
+ble testet eller hva operatøren bør gjøre. Det ansvaret ligger i
+Systemkontroll.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Sammenlign entity-ID-settet i Teknisk-visningen med releaseflowens
+<code>ha-entity-config</code>; ingen ID skal mangle eller være et
+gammelt alias.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-entitetskontrakt">10. Entitetskontrakt</h2>
+<h3 id="101-antall-og-familier">10.1 Antall og familier</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Domene</th>
+<th style="text-align: right;">Antall</th>
+<th>Kontrakt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>button</code></td>
+<td style="text-align: right;">17</td>
+<td>Kjøring, template, rapport, system og arkiv</td>
+</tr>
+<tr class="even">
+<td><code>number</code></td>
+<td style="text-align: right;">48</td>
+<td>30 fasefelt, 15 punkt-offset og 3 timerfelt</td>
+</tr>
+<tr class="odd">
+<td><code>select</code></td>
+<td style="text-align: right;">87</td>
+<td>Template/fasevalg, 15 fasestatuser, 60 punktvalg, 9
+timer-/historikk-/kommentarvalg</td>
+</tr>
+<tr class="even">
+<td><code>sensor</code></td>
+<td style="text-align: right;">15</td>
+<td>Runtime, faser, fasepunkter, timere, template, diagnostikk og
+arkiver</td>
+</tr>
+<tr class="odd">
+<td><code>text</code></td>
+<td style="text-align: right;">63</td>
+<td>15 fasenavn, 45 punktfelt, kommentar, templatenotat og
+timernavn</td>
+</tr>
+<tr class="even">
+<td><strong>Totalt</strong></td>
+<td style="text-align: right;"><strong>230</strong></td>
+<td>Alle skal finnes i Node-RED og være referert i dashboardet</td>
+</tr>
+</tbody>
+</table>
+<h3 id="102-obligatoriske-knapper">10.2 Obligatoriske knapper</h3>
+<p><code>button.brygging_avslutt</code>,
+<code>button.brygging_behold_siste_100_rapporter</code>,
+<code>button.brygging_bekreft_fasepunkt</code>,
+<code>button.brygging_forkast_templateendringer</code>,
+<code>button.brygging_fortsett</code>,
+<code>button.brygging_generer_historisk_rapport</code>,
+<code>button.brygging_generer_rapport</code>,
+<code>button.brygging_klargjor_ny_bryggedag</code>,
+<code>button.brygging_lagre_fasepunktkommentar</code>,
+<code>button.brygging_lagre_template</code>,
+<code>button.brygging_neste_fase</code>,
+<code>button.brygging_nodavslutt_ved_systemfeil</code>,
+<code>button.brygging_oppdater_systemkontroll</code>,
+<code>button.brygging_oppdater_templateliste</code>,
+<code>button.brygging_pause</code>, <code>button.brygging_start</code>
+og <code>button.brygging_tilbake</code>.</p>
+<h3 id="103-sensoransvar">10.3 Sensoransvar</h3>
+<p>De 15 sensorene og deres 51 toppnivåattributter er normative i den
+separate entitets- og attributtkontrakten. Særlig gjelder:</p>
+<ul>
+<li><code>sensor.brygging_faseoversikt.attributes.phases</code></li>
+<li><code>sensor.brygging_fasepunktoversikt.attributes.phasepoints</code></li>
+<li><code>sensor.brygging_timeroversikt.attributes.timers</code></li>
+<li><code>sensor.brygging_driftsmeldinger.attributes.messages</code></li>
+<li><code>sensor.brygging_systemkontroll.attributes.checks_json</code></li>
+</ul>
+<h3 id="104-genererte-editorfamilier">10.4 Genererte editorfamilier</h3>
+<p><code>FF</code> og <code>PP</code> er
+<code>01</code>–<code>15</code>. Fasefamilien består av navn, varighet,
+status og rekkefølge. Fasepunktfamilien består av aktiv, type, navn,
+beskrivelse, forventet verdi, tidsreferanse, offset og bekreftelse.
+Timereditoren bruker de kontraktfestede enkeltentitetene for valgt
+permanent timerplass.</p>
+<h3 id="105-grensesnittkonsistens">10.5 Grensesnittkonsistens</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-INT-001</td>
+<td>Hver konkrete <code>sensor.*</code>, <code>button.*</code>,
+<code>select.*</code>, <code>number.*</code> og <code>text.*</code> som
+dashboard-YAML refererer, skal finnes som tilsvarende
+<code>ha-entity-config</code> i releaseflowen.</td>
+<td>Hele entity-ID-en, inkludert domene, skal sammenlignes
+automatisk.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-INT-002</td>
+<td>Hver av de 230 Companion-entitetene i releaseflowen skal forekomme i
+dashboard-YAML eller være uttrykkelig begrunnet som backend-only i
+entitetskontrakten. 2026.11.07-1 har ingen planlagte
+backend-only-entiteter.</td>
+<td>En ekstra ubrukt eller manglende entitet skal stoppe
+releasegodkjenning.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-INT-003</td>
+<td>Dashboardet skal bruke <code>sensor.brygging_status</code> som
+primær livssykluskilde og lese de fire kontraktfestede
+versjonsattributtene uten lokale reservefelt.</td>
+<td>Et blandet flow-/dashboardbygg skal kunne identifiseres
+entydig.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-INT-004</td>
+<td>Dashboardet skal lese templatefil, status, dirty, lagringstid,
+valideringsfeil og advarsler fra
+<code>sensor.brygging_aktiv_template</code>.</td>
+<td>Dashboardet skal ikke gjette alternative attributtnavn eller flytte
+templatevalidering tilbake til
+statussensoren.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-INT-005</td>
+<td>Tidslinje, fasepunkter og timere skal lese strukturerte lister fra
+henholdsvis <code>sensor.brygging_faseoversikt</code>,
+<code>sensor.brygging_fasepunktoversikt</code> og
+<code>sensor.brygging_timeroversikt</code>.</td>
+<td>Parallelle JSON-attributter og lokal kodeoversettelse skal ikke
+gjeninnføres.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-rapporttilgang-og-presentasjon">11. Rapporttilgang og
+presentasjon</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-RAP-001</td>
+<td>Home Assistant skal gjøre public-kopien tilgjengelig som
+<code>/local/brygging/siste-bryggerapport.html</code>.</td>
+<td>URL-en tilsvarer filen
+<code>www/brygging/siste-bryggerapport.html</code> på Home
+Assistant-siden av det bekreftede mountet.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Generer to rapporter etter hverandre og
+åpne lenken fra alle avtalte plasseringer; siste public-kopi skal åpnes
+uten gammel cache.</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-002</td>
+<td>Rapportlenker skal bruke <code>ordinary_latest_url</code> eller
+<code>historical_latest_url</code> fra
+<code>sensor.brygging_rapportarkiv</code> etter konteksten.</td>
+<td>Alle plasseringer skal åpne samme ferdige URL som Node-RED
+publiserer.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-RAP-003</td>
+<td>Dashboardet skal bruke rapportarkivets ferdige URL-er uendret;
+cacheversjon skal produseres av Node-RED.</td>
+<td>En ny rapport skal gi ny URL-verdi uten at dashboardet kombinerer
+filnavn og mtime selv.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-004</td>
+<td>Alle rapportlenker skal åpnes i ny fane med
+<code>target="_blank"</code> og
+<code>rel="noopener noreferrer"</code>.</td>
+<td>Dashboardfanen skal forbli åpen, og den nye rapportfanen skal ikke
+få tilgang til opprinnelig vindusobjekt.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Aktiver en rapportlenke og kontroller både
+YAML/DOM og nettleserutfall; rapporten skal åpnes i ny fane, og lenken
+skal ha <code>noopener noreferrer</code>.</td>
+</tr>
+<tr class="odd">
+<td>HA-RAP-005</td>
+<td>Når relevant rapporttall er null eller relevant
+<code>*_latest_url</code> er <code>null</code>, skal rapportområdet vise
+en forklarende tomtilstand uten lenke.</td>
+<td>Tomtilstanden skal følge den eksplisitte kontrakten, ikke Home
+Assistants <code>unknown</code> som normal
+verdi.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-006</td>
+<td>Rapportarkivet skal vise <code>ordinary_public_copy_ok</code> og
+<code>historical_public_copy_ok</code> fra
+<code>sensor.brygging_rapportarkiv</code>.</td>
+<td>Dashboardet skal presentere sann/usann/ukjent status, men ikke
+beregne hash selv.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-RAP-007</td>
+<td>Dashboardet skal ikke forsøke å bygge eller endre rapportinnholdet;
+det skal presentere filen Node-RED har generert.</td>
+<td>Rapportens innhold og escaping skal ha én eier. Dashboardet skal
+bare lenke til den ferdige filen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Sammenlign rapportfilen på public-mountet med filen
+som åpnes fra dashboardet; dashboardet skal bare lenke til filen og ikke
+inneholde en alternativ rapportmal.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="12-feilhåndtering-og-robusthet">12. Feilhåndtering og
+robusthet</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-FEIL-001</td>
+<td>Alle kort som leser Companion-entiteter, særlig
+<code>sensor.brygging_status</code>, skal håndtere <code>unknown</code>,
+<code>unavailable</code>, tom state og manglende attributter med
+dokumentert sikker fallback.</td>
+<td>Fallback skal være bindestrek, tom liste eller forklaringskort etter
+datatypen. Manglende data skal aldri gjøre en operativ handling mer
+tilgjengelig.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Sett berørte entiteter til manglende, ugyldige og gjenopprettede
+verdier; dashboardet skal forbli lesbart og aldri eksponere en farligere
+handling.</td>
+</tr>
+<tr class="even">
+<td>HA-FEIL-002</td>
+<td>Dashboardet skal bruke de strukturerte listeattributtene og
+kontraktfestede tomverdiene direkte. Det skal ikke parse parallelle
+JSON-strenger eller reparere ugyldige produsentverdier.</td>
+<td>En kontraktfeil skal stanses ved Node-REDs utgangsvalidator og vises
+gjennom driftsmeldinger; dashboardet skal ikke skjule
+feilen.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-FEIL-003</td>
+<td>Dashboardet skal ikke lokalt omgå Node-REDs kommandovern. En synlig
+knapp kan sende kommandoen, men Node-RED skal fortsatt være autoritativ
+for om den godtas.</td>
+<td>Dashboardet kan redusere feiltrykk med synlighet og dialog, men bare
+Node-RED kjenner autoritativ state og kan godta eller avvise
+kommandoen.<br><br><strong>Observerbar effekt og kontroll:</strong> Gjør
+en prosessknapp synlig i en tilstand der Node-RED skal sperre
+kommandoen; dashboardet kan sende forespørselen, men state skal være
+uendret og avslaget skal komme fra Node-RED.</td>
+</tr>
+<tr class="even">
+<td>HA-FEIL-004</td>
+<td>Feilstatus fra <code>sensor.brygging_status</code>,
+<code>sensor.brygging_systemkontroll</code> eller
+<code>sensor.brygging_driftsmeldinger</code> skal lede operatøren til
+Systemkontroll eller Teknisk-visningen med konkret forklaring.</td>
+<td>Feilteksten skal angi kilde og tiltak, ikke bare en farge eller
+generell feiltekst.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>HA-FEIL-005</td>
+<td>Dashboardet skal forbli lesbart når Home Assistant gjenoppretter
+entiteter etter restart eller reconnect.</td>
+<td>Under reconnect kan verdier kort være ukjente. Layouten skal
+fortsatt kunne rendres og senere fylle inn data uten manuell
+omlasting.<br><br><strong>Observerbar effekt og kontroll:</strong> Sett
+berørte entiteter til manglende, ugyldige og gjenopprettede verdier;
+dashboardet skal forbli lesbart og aldri eksponere en farligere
+handling.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="13-ikke-funksjonelle-krav">13. Ikke-funksjonelle krav</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HA-NF-001</td>
+<td>YAML-filen skal kunne importeres manuelt i Home Assistant uten
+egendefinerte kortressurser.</td>
+<td>Leveransen er én YAML-fil som kan legges inn i
+råkonfigurasjonseditoren. Ingen separat frontendinstallasjon skal være
+nødvendig.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider YAML statisk og test minst mobil og bred nettleser; ingen skjult
+frontend-, nettverks- eller miljøavhengighet skal kreves.</td>
+</tr>
+<tr class="even">
+<td>HA-NF-002</td>
+<td>Dashboardet skal ikke inneholde hardkodet IP-adresse, vertsport
+eller autentiseringsdata.</td>
+<td>YAML-en skal være flyttbar mellom miljøer som bruker samme
+entity-kontrakt. Tilkoblingsdetaljer og hemmeligheter hører hjemme i
+integrasjonene.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider YAML statisk og test minst mobil og bred nettleser; ingen skjult
+frontend-, nettverks- eller miljøavhengighet skal kreves.</td>
+</tr>
+<tr class="odd">
+<td>HA-NF-003</td>
+<td>Korttitler, navn og entitets-ID-er skal være konsekvente med
+Node-RED-grensesnittet.</td>
+<td>Samme handling skal ha samme norske navn og samme entity-ID i
+normalvisning, Teknisk og dokumentasjon.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Valider YAML statisk og test minst mobil og
+bred nettleser; ingen skjult frontend-, nettverks- eller
+miljøavhengighet skal kreves.</td>
+</tr>
+<tr class="even">
+<td>HA-NF-004</td>
+<td>Versjonen i dashboardtittelen skal samsvare med forventet
+dashboardversjon publisert av flowen. Denne sammenhengen må kontrolleres
+ved release eller installasjon fordi flowen ikke kan lese hvilken YAML
+som faktisk er aktiv i Home Assistant.</td>
+<td>Flowen publiserer hvilken dashboardversjon den forventer, men kan
+ikke inspisere brukerens aktive YAML. Releasekontrollen må derfor
+sammenligne dem eksplisitt.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Ved release skal dashboardtittelen sammenlignes med
+forventet <code>dashboard_version</code> fra flowen; et avvik skal
+dokumenteres og stoppe godkjenning selv om begge filer ellers
+parser.</td>
+</tr>
+<tr class="odd">
+<td>HA-NF-005</td>
+<td>Mobilvisning skal prioriteres fremfor tvungen symmetri på bred
+skjerm.</td>
+<td>Kort skal først og fremst være lesbare og trygge å betjene på
+telefon. Ulik kolonnehøyde på stor skjerm er
+akseptabelt.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider YAML statisk og test minst mobil og bred nettleser; ingen skjult
+frontend-, nettverks- eller miljøavhengighet skal kreves.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="14-akseptansekriterier">14. Akseptansekriterier</h2>
+<p>Dashboardmodulen kan godkjennes når:</p>
+<ol type="1">
+<li>YAML kan parses og inneholder de fem avtalte visningene.</li>
+<li>Alle entitetsreferanser i dashboardet finnes i releaseflowen, og
+alle Companion-entiteter i releasekontrakten er brukt eller uttrykkelig
+dokumentert. Begge sider skal telle 230.</li>
+<li>Bryggedag-visningen er kontrollert i <code>idle</code>, alle aktive
+statuser, <code>completed</code>, <code>ended</code>,
+<code>error</code>, <code>unknown</code> og
+<code>unavailable</code>.</li>
+<li>Tidslinje viser dynamisk rekkefølge, 15-minutters rader og grønn
+overtid.</li>
+<li>Ordinære og bekreftbare fasepunkter vises korrekt før og etter
+forfall.</li>
+<li>Pause/fortsett, neste, tilbake, bekreftelse, kommentar, rapport,
+avslutt og nullstill kan betjenes fra dashboardet.</li>
+<li>Template-, fase-, fasepunkt- og timereditor er tilgjengelig bare i
+<code>idle</code>.</li>
+<li>Home Assistant reconnect gjenoppretter alle editorfelt uten
+feedback-løkke.</li>
+<li>Systemkontrollen viser alle detaljer mobilvennlig og med problemer
+først.</li>
+<li>Rapportlenker åpnes i ny fane og viser nyeste rapport etter ny
+generering uten gammel cache.</li>
+<li>Mobilvisningen er testet gjennom en komplett akselerert
+bryggedag.</li>
+<li>Én komplett live-bryggedag er gjennomført før endelig
+<code>v1.0.0</code>.</li>
+<li>To samtidige HA-klienter viser samme state, og en endring fra den
+ene blir synlig i den andre uten at det opprettes brukerspesifikke
+editorverdier.</li>
+<li>Releasevalideringen kontrollerer at alle deklarerte
+attributtmappinger på <code>sensor.brygging_status</code> har en faktisk
+produsert kildeverdi.</li>
+</ol>
+<p>RC3.3.2 består den tekniske regresjonssuiten, men målmiljøscenariene
+i sporbarhetsmatrisen må dokumenteres separat. Full live-bryggedag og
+langtidstest gjenstår før endelig v1.0.0.</p>
+<h2 id="15-kjente-avgrensninger">15. Kjente avgrensninger</h2>
+<ul>
+<li>Dashboardet kan ikke selv kontrollere at YAML-versjonen som faktisk
+er limt inn, samsvarer med flowversjonen.</li>
+<li>Den faste grensen på 15 fase-, fasepunkt- og timerplasser gir mange
+entiteter, men er bevisst valgt for Home Assistant-integrasjonen.</li>
+<li>Rapportarkivet viser siste public-kopi; individuelle arkivrapporter
+gjøres ikke direkte tilgjengelige som egne dashboardlenker.</li>
+<li>Flere nettlesere kan vise og endre samme delte state, men systemet
+har ingen operatørlås, brukerspesifikk kladd eller konfliktvarsling for
+samtidige, motstridende kommandoer.</li>
+<li>Home Assistant-tilgang og hvilke brukere som får åpne dashboardet
+administreres av Home Assistant og er ikke en egen tilgangskontroll i
+Bryggedagsassistenten.</li>
+</ul>
+<h3 id="151-rc332-status">15.1 2026.11.07-1-status</h3>
+<p>2026.11.07-1 er første GitHub-publisering med datobasert versjon fra RC3.3.2.
+Modulfunksjonen er uendret; kravstatus og releasebevis fremgår av
+sporbarhetsmatrisen.</p>
+<h2 id="16-sporbarhet">16. Sporbarhet</h2>
+<p>Kravene spores i <code>KRAV-SPORBARHET-2026.11.07-1-matrise</code>
+mot RC3.3.2-dashboardet, den komplette 230-entitetskontrakten, navngitte
+tester og manuelle målmiljøscenarier.</p>
+</main></body></html>

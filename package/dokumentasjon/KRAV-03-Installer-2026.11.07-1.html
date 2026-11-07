@@ -1,0 +1,306 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kravspesifikasjon 03 – Installer for Bryggedagsassistent</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="kravspesifikasjon-03--installer-for-bryggedagsassistent">Kravspesifikasjon
+03 – Installer for Bryggedagsassistent</h1>
+<p><strong>Åpent designavvik:</strong> Installeren har fortsatt 16 operative CLI-valg og hjelp. Kravene beskriver arvet implementasjon, ikke godkjent sluttgrensesnitt. Se <a href="DRIFTSSTATUS.md">driftsstatus</a>.</p><h2 id="dokumentstatus">Dokumentstatus</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Felt</th>
+<th>Verdi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Modul</td>
+<td>Installer for Node-RED-flow</td>
+</tr>
+<tr class="even">
+<td>Release</td>
+<td>2026.11.07-1</td>
+</tr>
+<tr class="odd">
+<td>Direkte baseline</td>
+<td>v1.0.0-rc3.3.2</td>
+</tr>
+<tr class="even">
+<td>Dokumenttype</td>
+<td>Normativ kravspesifikasjon</td>
+</tr>
+<tr class="odd">
+<td>Status</td>
+<td>Samsvar med arvet skript; installerforenkling er et åpent designavvik</td>
+</tr>
+<tr class="even">
+<td>Dato</td>
+<td>2026-11-07</td>
+</tr>
+</tbody>
+</table>
+<h2 id="formål-og-endringsgrense">Formål og endringsgrense</h2>
+<p>Installeren validerer og bytter bare Node-REDs
+<code>flows.json</code> i et eksisterende Docker-/Compose-miljø. Den
+installerer ikke dashboard, templates, rapporter, journaler,
+katalogstruktur, mounts, Composefil eller tidssone. Dette er en bevisst
+grense, ikke manglende implementasjon.</p>
+<h2 id="faktisk-kommandolinjegrensesnitt">Faktisk
+kommandolinjegrensesnitt</h2>
+<pre class="text"><code>Bryggedagsassistent 2026.11.07-1 – installer Node-RED-flow
+
+Bruk:
+  ./install-brygging-2026.11.07-1.sh [--flow FLOW.json] [valg]
+
+Valg:
+  --flow FILE              Flowfil. Standard: brygging-assistent-2026.11.07-1-flow.json
+  --import-dir DIR         Ekstra katalog der flowfilen kan ligge
+  --data-dir DIR           Node-REDs hostkatalog for /data. Standard: /mnt/docker/nodered-brygging/data
+  --backup-root DIR        Rotkatalog for installerbackup. Standard: /mnt/docker/nodered-brygging/backup
+  --compose-dir DIR        Katalog med composefil. Standard: /mnt/docker
+  --service NAME           Compose-service. Standard: nodered-brygging
+  --container NAME         Containernavn. Standard: nodered-brygging
+  --start-stop-mode MODE   auto, compose eller docker. Standard: auto
+  --stability-seconds N    Kontrolltid etter oppstart, minst 15. Standard: 30
+  --node-red-uid UID       Eier av ny flows.json dersom ingen gammel fil finnes
+  --node-red-gid GID       Gruppe av ny flows.json dersom ingen gammel fil finnes
+  --recreate               Recreate compose-containeren ved oppstart
+  --dry-run                Valider og vis planlagte operasjoner
+  --validate-only          Valider bare flowfilen; Docker er ikke nødvendig
+  --auto-rollback          Rull tilbake flows.json dersom ettertesten feiler
+  --no-auto-rollback       Behold 2026.11.07-1 og backup ved ettertestfeil (standard)
+  -h, --help               Vis hjelpen
+
+Installeren gjør bare dette:
+  1. validerer 2026.11.07-1-flowen
+  2. nekter installasjon mens current_state.json peker på en session
+  3. stopper Node-RED
+  4. sikkerhetskopierer eksisterende flows.json
+  5. installerer og hash-kontrollerer ny flows.json
+  6. starter og ettertester Node-RED
+
+Den installerer eller endrer ikke Home Assistant-dashboard, templates,
+rapporter, sessionjournaler, katalogstruktur, Docker-mounts, composefil eller TZ.
+
+Installeren migrerer ikke state mellom schema. En aktiv sesjon må avsluttes eller gjenopprettes av runtime før flowbytte.</code></pre>
+<h2 id="normative-krav">Normative krav</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Verifikasjon og akseptansekriterium</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>INS-MIL-001</td>
+<td>Installeren skal være Bash med <code>set -Eeuo pipefail</code>.</td>
+<td>Statisk test og kontrollert feilinjeksjon.</td>
+</tr>
+<tr class="even">
+<td>INS-MIL-002</td>
+<td>Installeren skal arbeide mot en eksisterende Node-RED-container
+eller Compose-service; den skal ikke opprette hele Docker-miljøet.</td>
+<td>Hjelpetekst og målmiljøtest.</td>
+</tr>
+<tr class="odd">
+<td>INS-MIL-003</td>
+<td>Standard Node-RED hostkatalog skal være
+<code>/mnt/docker/nodered-brygging/data</code> og kunne overstyres med
+<code>--data-dir</code>.</td>
+<td>Argumenttest og dry-run.</td>
+</tr>
+<tr class="even">
+<td>INS-MIL-004</td>
+<td>Stabilitetsperioden skal være et heltall på minst 15 sekunder;
+standard er 30.</td>
+<td>Grenseverdier 14, 15 og 30.</td>
+</tr>
+<tr class="odd">
+<td>INS-CLI-001</td>
+<td>Installeren skal støtte nøyaktig valgene som vises av
+<code>--help</code> for flow, kataloger, service/container, start/stopp,
+UID/GID, recreate, dry-run, validate-only og rollback.</td>
+<td>Hjelpeteksten sammenlignes med parserens valg.</td>
+</tr>
+<tr class="even">
+<td>INS-CLI-002</td>
+<td>Ukjent valg eller manglende verdi skal gi ikke-null exit uten
+målendring.</td>
+<td>Negativ argumenttest.</td>
+</tr>
+<tr class="odd">
+<td>INS-CLI-003</td>
+<td><code>--start-stop-mode</code> skal bare godta <code>auto</code>,
+<code>compose</code> eller <code>docker</code>.</td>
+<td>Enumtest.</td>
+</tr>
+<tr class="even">
+<td>INS-CLI-004</td>
+<td><code>--recreate</code> skal bare kunne brukes med Compose.</td>
+<td>Konflikttest.</td>
+</tr>
+<tr class="odd">
+<td>INS-CLI-005</td>
+<td><code>--validate-only</code> skal validere releaseflowen uten krav
+om Docker og uten målendring.</td>
+<td>Kjøres i ren utpakking.</td>
+</tr>
+<tr class="even">
+<td>INS-CLI-006</td>
+<td><code>--dry-run</code> skal validere og vise planen uten å stoppe
+container eller skrive målfil.</td>
+<td>Målmiljøtest med filhash før/etter.</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-001</td>
+<td>Dersom <code>SHA256SUMS</code> finnes, skal alle oppføringer
+verifiseres før målendring.</td>
+<td>Gyldig og manipulert manifest.</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-002</td>
+<td>Flowfilen skal være en JSON-liste med unike node-ID-er og gyldige
+wire- og gruppereferanser.</td>
+<td>Gyldig flow og tre målrettede ugyldige varianter.</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-003</td>
+<td>Flowen skal ha produksjonsfanen <code>brygging_production</code> med
+etiketten <code>Brygging – Produksjonsflow</code> og ingen
+dokumentasjonsfane.</td>
+<td>Statisk flowtest.</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-004</td>
+<td>Flowen skal ha release-, state-, event- og
+templateschema-signaturene som 2026.11.07-1 krever.</td>
+<td>Markør- og syntakstest.</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-005</td>
+<td>Flowen skal ha nøyaktig 230 HA-entiteter: 15 sensorer, 17 knapper,
+87 selecter, 48 tall og 63 tekster.</td>
+<td>Entitetssett sammenlignes med kontrakt og baseline-manifest.</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-006</td>
+<td>Alle Function-noder skal syntaksvalideres på verten når Node.js
+finnes, og alltid i containeren etter oppstart.</td>
+<td>Vertstest og ettertest.</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-007</td>
+<td>Installerens validatorprobe skal godta en statisk
+schema-1.0-template med 15×15 fasepunktplasser og avvise aktivt punkt
+med tomt navn.</td>
+<td>Innebygd validate-only-probe.</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-008</td>
+<td>Template-, dashboard- og rapportfiler i pakken skal ikke installeres
+eller overskrives av installeren.</td>
+<td>Hjelpetekst, kodekontroll og filhash før/etter.</td>
+</tr>
+<tr class="odd">
+<td>INS-SIK-001</td>
+<td>Installasjon skal avvises når <code>current_state.json</code> angir
+en aktiv session.</td>
+<td>Fixtures for aktiv, manglende og inaktiv peker.</td>
+</tr>
+<tr class="even">
+<td>INS-SIK-002</td>
+<td>Stier, service-/containernavn og UID/GID skal valideres før
+containerstopp.</td>
+<td>Ugyldige argumenter skal stoppe i preflight.</td>
+</tr>
+<tr class="odd">
+<td>INS-BCK-001</td>
+<td>Eksisterende <code>flows.json</code> skal kopieres til en
+tidsstemplet backup før erstatning.</td>
+<td>Sammenlign backuphash med førbildet.</td>
+</tr>
+<tr class="even">
+<td>INS-BCK-002</td>
+<td>Backupkatalogen skal ligge under eksplisitt
+<code>--backup-root</code> og ikke bestemmes av innhold i flowen.</td>
+<td>Sti- og traversaltest.</td>
+</tr>
+<tr class="odd">
+<td>INS-INST-001</td>
+<td>Node-RED skal stoppes med valgt Compose-/Docker-mekanisme før
+<code>flows.json</code> byttes.</td>
+<td>Målmiljølogg og containerstatus.</td>
+</tr>
+<tr class="even">
+<td>INS-INST-002</td>
+<td>Ny flow skal skrives atomisk og hashkontrolleres mot
+kildefilen.</td>
+<td>Etterkontroll av målhash.</td>
+</tr>
+<tr class="odd">
+<td>INS-INST-003</td>
+<td>Eier og gruppe for eksisterende <code>flows.json</code> skal
+bevares; ved ny fil brukes eksplisitt UID/GID.</td>
+<td>Målmiljøtest for begge tilfeller.</td>
+</tr>
+<tr class="even">
+<td>INS-INST-004</td>
+<td>Node-RED skal startes med samme valgte mekanisme;
+<code>--recreate</code> skal bruke Compose uten avhengigheter.</td>
+<td>Kommando- og statuskontroll.</td>
+</tr>
+<tr class="odd">
+<td>INS-ETTER-001</td>
+<td>Containeren skal være kjørende gjennom hele
+stabilitetsperioden.</td>
+<td>Poll og ikke-null exit ved restart/stopp.</td>
+</tr>
+<tr class="even">
+<td>INS-ETTER-002</td>
+<td>Ettertesten skal parse faktisk <code>/data/flows.json</code>,
+kompilere Function-noder og kontrollere 2026.11.07-1-signaturer.</td>
+<td>Containerprobe.</td>
+</tr>
+<tr class="odd">
+<td>INS-ETTER-003</td>
+<td>Ettertesten skal kontrollere templatebackupvakten,
+oppstartsrestoremarkør og automatisk STORAGE_REFRESH uten
+dashboardknapp.</td>
+<td>Eksplisitt oppstartsprobe.</td>
+</tr>
+<tr class="even">
+<td>INS-ETTER-004</td>
+<td>Vellykket installasjon skal rapportere aktiv flow, backupsti og
+verifisert status.</td>
+<td>Installerlogg er akseptansebevis.</td>
+</tr>
+<tr class="odd">
+<td>INS-RBK-001</td>
+<td><code>--auto-rollback</code> skal gjenopprette førbildet når en feil
+oppstår etter filbyttet.</td>
+<td>Indusert ettertestfeil og hashkontroll.</td>
+</tr>
+<tr class="even">
+<td>INS-RBK-002</td>
+<td>Standard <code>--no-auto-rollback</code> skal beholde ny flow og
+backup ved ettertestfeil, stoppe og forklare manuell videreføring.</td>
+<td>Indusert feil uten auto-rollback.</td>
+</tr>
+<tr class="odd">
+<td>INS-SEC-001</td>
+<td>Installeren skal ikke inneholde eller skrive passord, token eller
+miljøspesifikke HA-hemmeligheter.</td>
+<td>Statisk hemmelighetsskann.</td>
+</tr>
+<tr class="even">
+<td>INS-NF-001</td>
+<td>Et vellykket installerskript er ikke bevis for alle 230 registrerte
+HA-entiteter, dashboardvisning eller langtidstabilitet.</td>
+<td>README og akseptanseplan skal holde målmiljøporten åpen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="godkjenning">Godkjenning</h2>
+<p><code>--validate-only</code> og pakketest må bestå før installasjon.
+Reell stop/start, backup, stabilitetsperiode og rollback godkjennes i
+målmiljø etter AKSEPTANSEPLAN-2026.11.07-1.html.</p>
+</main></body></html>

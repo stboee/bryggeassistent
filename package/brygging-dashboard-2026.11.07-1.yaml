@@ -1,0 +1,1924 @@
+title: Brygging 2026.11.07-1
+views:
+- title: Bryggedag
+  path: bryggedag
+  icon: mdi:beer
+  cards:
+  - type: vertical-stack
+    title: Start bryggedag
+    cards:
+    - type: entities
+      show_header_toggle: false
+      entities:
+      - entity: select.brygging_template
+        name: Velg template
+      - entity: sensor.brygging_aktiv_template
+        name: Lastet template
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Start bryggedag
+        icon: mdi:play-circle
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_start
+      - type: button
+        name: Oppdater templateliste
+        icon: mdi:refresh
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_oppdater_templateliste
+    - type: markdown
+      title: Templatestatus
+      content: |
+        {% set e = 'sensor.brygging_aktiv_template' %}
+        {% if states(e) == 'Ingen valgt' %}_Ingen template er valgt._{% else %}
+        **Valgt template:** {{ states(e) }}  
+        **Status:** {{ state_attr(e, 'status') }}  
+        **Sist lagret:** {% if state_attr(e, 'saved_at') is none %}Ikke lagret{% else %}{{ state_attr(e, 'saved_at') }}{% endif %}  
+        **Ulagrede endringer:** {{ 'Ja' if state_attr(e, 'dirty') else 'Nei' }}  
+        {% set errors = state_attr(e, 'validation_errors') %}{% set warnings = state_attr(e, 'validation_warnings') %}
+        {% if errors %}**Feil:**{% for error in errors %}  
+        - {{ error }}{% endfor %}{% endif %}
+        {% if warnings %}**Advarsler:**{% for warning in warnings %}  
+        - {{ warning }}{% endfor %}{% endif %}{% endif %}
+    - type: markdown
+      content: |
+        Start bruker alltid den **lagrede** versjonen av valgt template og forkaster ulagrede editorendringer.
+    - type: vertical-stack
+      title: Historisk rapport
+      cards:
+      - type: entities
+        show_header_toggle: false
+        entities:
+        - entity: select.brygging_historisk_sesjon
+          name: Historisk bryggedag
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+        - type: button
+          name: Generer historisk rapport
+          icon: mdi:history
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.brygging_generer_historisk_rapport
+        - type: markdown
+          content: ' '
+      - type: markdown
+        title: Siste historiske rapport
+        content: |
+          {% set e = 'sensor.brygging_rapportarkiv' %}
+          {% set f = state_attr(e, 'historical_latest_filename') %}
+          {% set u = state_attr(e, 'historical_latest_url') %}
+          {% if f is not none and u is not none %}<a href="{{ u }}" target="_blank" rel="noopener noreferrer">Åpne {{ f }}</a>{% else %}_Ingen historisk rapport er publisert ennå._{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+  - type: markdown
+    title: Skjulte bryggedagskort
+    content: |
+      Tidslinje, fasepunkter og tidsstyring er skjult fordi bryggedagen ikke er startet. Velg en gyldig template og trykk **Start bryggedag**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+  - type: vertical-stack
+    title: Tidslinje
+    cards:
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Neste fase
+        icon: mdi:skip-next-circle-outline
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_neste_fase
+      - type: button
+        name: Tilbake
+        icon: mdi:arrow-left-bold
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_tilbake
+          confirmation:
+            text: Gå til forrige fase og starte den på nytt?
+    - type: markdown
+      content: |
+        {% set phase = 'sensor.brygging_aktiv_fase' %}
+        {% set total = state_attr(phase, 'planned_duration_min') %}
+        {% set elapsed = state_attr(phase, 'elapsed_min') %}
+        {% set remaining = state_attr(phase, 'remaining_min') %}
+        {% set overtime = state_attr(phase, 'overtime_min') %}
+        {% set blue = [elapsed, total] | min %}
+        {% set row_len = 15 %}
+        {% set total_chars = total + overtime %}
+        {% set rows = ((total_chars + row_len - 1) // row_len) | int %}
+        **Aktiv fase:** {{ states(phase) }}  
+        **Fremdrift aktiv fase:** {{ state_attr(phase, 'progress_percent') }} %  
+        _{{ blue }} av {{ total }} min{% if overtime > 0 %} + {{ overtime }} min overtid{% endif %}_
+
+        {% for r in range(rows) %}
+        {% set start = r * row_len %}
+        {% set end = [start + row_len, total_chars] | min %}
+        {% for i in range(start, end) %}{% if i < blue %}🟦{% elif i < total %}⬜{% else %}🟩{% endif %}{% endfor %}  
+        {% endfor %}
+        **Tid brukt:** {{ elapsed }} min · **Tid igjen:** {{ remaining }} min · **Overtid:** {{ overtime }} min
+
+        {% set phases = state_attr('sensor.brygging_faseoversikt', 'phases') %}
+        {% for p in phases %}{% if p.status == 'Fullført' %}🟢 {{ p.title }} ({{ p.duration_min }} min){% elif p.status == 'Aktiv' %}🔵 **{{ p.title }} ({{ p.duration_min }} min)**{% else %}⚪ {{ p.title }} ({{ p.duration_min }} min){% endif %}  
+        {% endfor %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: completed
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: ended
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: error
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unavailable
+  - type: vertical-stack
+    title: Fasepunkter
+    cards:
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Bekreft fasepunkt
+        icon: mdi:checkbox-marked-outline
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_bekreft_fasepunkt
+      - type: markdown
+        content: |
+          {% set e = 'sensor.brygging_neste_fasepunkt' %}
+          {% set status = states(e) %}
+          {% set confirm = state_attr(e, 'requires_confirmation') == true %}
+          {% set overdue = status | lower == 'forfalt' %}
+          {% set symbol = '🟥' if overdue and confirm else '🔴' if overdue else '🟦' if confirm else '🔵' %}
+          {% set heading = 'Bekreftelsespunkt oversittet' if overdue and confirm else 'Fasepunkt oversittet' if overdue else 'Neste bekreftelsespunkt' if confirm else 'Neste fasepunkt' %}
+          # {{ symbol }} {{ state_attr(e, 'time_until_due') }}
+          **{{ heading }}**
+
+          {% set name = state_attr(e, 'phasepoint_name') %}{% if name %}{{ name }}{% else %}_Ingen kommende fasepunkter._{% endif %}
+    - type: markdown
+      content: |
+        {% set points = state_attr('sensor.brygging_fasepunktoversikt', 'phasepoints') %}
+        {% set next_id = state_attr('sensor.brygging_neste_fasepunkt', 'phasepoint_id') %}
+        {% if points is none %}_Fasepunktoversikten er utilgjengelig._{% elif not points %}_Ingen aktive fasepunkter i fasen._{% endif %}
+        {% if points is not none %}{% for p in points %}
+        {% if p.status == 'Bekreftet' %}{% set symbol = '✅' %}{% elif p.status == 'Passert' %}{% set symbol = '🟢' %}{% elif p.id == next_id and p.requires_confirmation %}{% set symbol = '🟦' %}{% elif p.id == next_id %}{% set symbol = '🔵' %}{% elif p.requires_confirmation %}{% set symbol = '⬜' %}{% else %}{% set symbol = '⚪' %}{% endif %}
+        {{ symbol }} {{ p.timing }}: [{{ p.type }}] **{{ p.name }}**{% if p.description %} ({{ p.description }}){% endif %}{% if p.expected_value %} – {{ p.expected_value }}{% endif %}{% if p.requires_confirmation %} – bekreftes{% endif %}{% if p.status == 'Bekreftet' %} – bekreftet{% elif p.status == 'Passert' %} – passert{% elif p.status == 'Forfalt' %} – venter {{ p.time_until_due }}{% else %} – om {{ p.time_until_due }}{% endif %}  
+        {% endfor %}{% endif %}
+    - type: entities
+      show_header_toggle: false
+      entities:
+      - entity: select.brygging_fasepunkt_for_kommentar
+        name: Fasepunkt
+      - entity: text.brygging_fasepunktkommentar
+        name: Kommentar
+    - type: markdown
+      title: Sist lagret fasepunktkommentar
+      content: |
+        {% set e = 'sensor.brygging_siste_fasepunktkommentar' %}
+        {% if states(e) == 'Ingen kommentar' %}_Ingen fasepunktkommentar er lagret i denne bryggedagen._{% elif states(e) in ['unknown', 'unavailable'] %}_Kommentarsensoren er utilgjengelig._{% else %}
+        **Tid:** {{ states(e) }}  
+        **Fase:** {{ state_attr(e, 'phase_title') }}  
+        **Fasepunkt:** {{ state_attr(e, 'phasepoint_name') }}  
+        **Kommentar:** {{ state_attr(e, 'comment_text') }}
+        {% endif %}
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Lagre fasepunktkommentar
+        icon: mdi:content-save-edit-outline
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_lagre_fasepunktkommentar
+      - type: markdown
+        content: ' '
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: completed
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: ended
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: error
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unavailable
+  - type: vertical-stack
+    title: Tidsstyring
+    cards:
+    - type: conditional
+      conditions:
+      - condition: state
+        entity: sensor.brygging_status
+        state_not: paused
+      card:
+        type: grid
+        columns: 2
+        square: false
+        cards:
+        - type: button
+          name: Pause
+          icon: mdi:pause
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.brygging_pause
+        - type: entity
+          entity: sensor.brygging_status
+          name: Status
+          icon: mdi:state-machine
+    - type: conditional
+      conditions:
+      - condition: state
+        entity: sensor.brygging_status
+        state: paused
+      card:
+        type: grid
+        columns: 2
+        square: false
+        cards:
+        - type: button
+          name: Fortsett
+          icon: mdi:play-pause
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.brygging_fortsett
+        - type: entity
+          entity: sensor.brygging_status
+          name: Status
+          icon: mdi:state-machine
+    - type: entities
+      show_header_toggle: false
+      entities:
+      - entity: sensor.brygging_tid_til_ferdig_bryggedag
+        name: Tid til ferdig bryggedag
+        icon: mdi:timer-sand
+      - entity: sensor.brygging_estimert_ferdig_bryggedag
+        name: Estimert ferdig
+        icon: mdi:clock-end
+    - type: markdown
+      title: Aktive timere
+      content: |
+        {% set timers = state_attr('sensor.brygging_timeroversikt', 'timers') %}
+        {% if timers is none %}_Timeroversikten er utilgjengelig._{% elif not timers %}_Ingen timere er aktivert i templaten._{% endif %}
+        {% if timers is not none %}{% for t in timers %}{% if t.status == 'Aktiv' %}⏱️{% elif t.status == 'Over tiden' %}🟠{% elif t.status == 'Fullført' %}✅{% else %}⚪{% endif %} **{{ t.name }}:** {{ t.display_text }}  
+        {% endfor %}{% endif %}
+    - type: markdown
+      title: Siste kommando
+      content: |
+        {% set e = 'sensor.brygging_kommandoresultat' %}
+        **Kommando:** {{ state_attr(e, 'command') }}  
+        **Resultat:** {{ states(e) }}{% set m = state_attr(e, 'message') %}{% if m %} – {{ m }}{% endif %}  
+        **Tid:** {{ state_attr(e, 'processed_at') }}
+    - type: markdown
+      title: Siste rapport
+      content: |
+        {% set e = 'sensor.brygging_rapportarkiv' %}
+        {% set f = state_attr(e, 'ordinary_latest_filename') %}
+        {% set u = state_attr(e, 'ordinary_latest_url') %}
+        {% if f is not none and u is not none %}<a href="{{ u }}" target="_blank" rel="noopener noreferrer">Åpne {{ f }}</a>{% else %}_Ingen ordinær rapport er publisert ennå._{% endif %}
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Generer rapport
+        icon: mdi:file-document-outline
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_generer_rapport
+      - type: button
+        name: Avslutt
+        icon: mdi:stop-circle-outline
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_avslutt
+          confirmation:
+            text: Avslutte bryggedagen nå? Sesjonsjournalen forsegles permanent og kan ikke fortsettes. Rapport kan fortsatt genereres før du klargjør en ny bryggedag.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: completed
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: ended
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: error
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unavailable
+  - type: vertical-stack
+    title: Bryggedagen er avsluttet
+    cards:
+    - type: markdown
+      title: Skjulte bryggedagskort
+      content: |
+        Tidslinje, fasepunkter og tidsstyring er skjult fordi bryggedagen er avsluttet. Generer rapport før du velger **Klargjør ny bryggedag**. Sesjonsjournalen og rapportene beholdes.
+    - type: entities
+      show_header_toggle: false
+      entities:
+      - entity: sensor.brygging_status
+        name: Status
+      - entity: sensor.brygging_aktiv_template
+        name: Brukt template
+    - type: markdown
+      title: Siste rapport
+      content: |
+        {% set e = 'sensor.brygging_rapportarkiv' %}
+        {% set f = state_attr(e, 'ordinary_latest_filename') %}
+        {% set u = state_attr(e, 'ordinary_latest_url') %}
+        {% if f is not none and u is not none %}<a href="{{ u }}" target="_blank" rel="noopener noreferrer">Åpne {{ f }}</a>{% else %}_Ingen ordinær rapport er publisert ennå._{% endif %}
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Generer rapport
+        icon: mdi:file-document-outline
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_generer_rapport
+      - type: button
+        name: Klargjør ny bryggedag
+        icon: mdi:restart
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_klargjor_ny_bryggedag
+          confirmation:
+            text: Klargjøre ny bryggedag? Det genereres først en arkivrapport. Deretter fjernes aktiv sessionpeker, templatevalget nullstilles og status går til idle.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: running
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: waiting_confirmation
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: waiting_event
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: paused
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: error
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: unavailable
+  - type: markdown
+    title: Bryggedag utilgjengelig
+    content: |
+      Bryggedagskortene er skjult fordi status er `{{ states('sensor.brygging_status') }}`. Se **Systemkontroll** og **Driftsmeldinger** i fanen **Teknisk**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: running
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: waiting_confirmation
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: waiting_event
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: paused
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: completed
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: ended
+- title: Faser
+  path: faser
+  icon: mdi:format-list-numbered
+  cards:
+  - type: vertical-stack
+    title: Lagre eller forkast faseendringer
+    cards:
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Lagre
+        icon: mdi:content-save
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_lagre_template
+      - type: button
+        name: Forkast
+        icon: mdi:undo-variant
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_forkast_templateendringer
+          confirmation:
+            text: Forkaste alle ulagrede endringer?
+    - type: markdown
+      content: |
+        {% set e = 'sensor.brygging_aktiv_template' %}
+        **Valgt template:** {{ states(e) }}  
+        **Status:** {{ state_attr(e, 'status') }}  
+        **Sist lagret:** {% if state_attr(e, 'saved_at') is none %}Ikke lagret{% else %}{{ state_attr(e, 'saved_at') }}{% endif %}  
+        **Ulagrede endringer:** {{ 'Ja' if state_attr(e, 'dirty') else 'Nei' }}  
+        {% set errors = state_attr(e, 'validation_errors') %}
+        {% set warnings = state_attr(e, 'validation_warnings') %}
+        {% if errors %}**Feil:**{% for error in errors %}  
+        - {{ error }}{% endfor %}{% endif %}
+        {% if warnings %}**Advarsler:**{% for warning in warnings %}  
+        - {{ warning }}{% endfor %}{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: markdown
+    title: Fasekonfigurasjon
+    content: |
+      Navn, varighet, status og kjørerekkefølge lagres i valgt template. **Flytt til plass** omnummererer de andre fasene automatisk. Endringer ligger i arbeidskopien til **Lagre** trykkes.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    entities:
+    - entity: text.brygging_template_notat
+      name: Template-notat
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 01
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_01_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_01_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_01_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_01_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 02
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_02_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_02_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_02_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_02_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 03
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_03_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_03_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_03_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_03_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 04
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_04_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_04_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_04_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_04_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 05
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_05_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_05_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_05_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_05_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 06
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_06_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_06_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_06_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_06_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 07
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_07_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_07_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_07_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_07_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 08
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_08_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_08_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_08_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_08_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 09
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_09_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_09_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_09_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_09_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 10
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_10_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_10_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_10_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_10_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 11
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_11_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_11_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_11_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_11_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 12
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_12_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_12_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_12_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_12_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 13
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_13_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_13_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_13_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_13_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 14
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_14_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_14_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_14_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_14_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fase 15
+    show_header_toggle: false
+    entities:
+    - entity: text.brygging_fase_15_navn
+      name: Navn
+      icon: mdi:format-title
+    - entity: number.brygging_fase_15_varighet_min
+      name: Varighet
+      icon: mdi:timer-cog-outline
+    - entity: select.brygging_fase_15_status
+      name: Status
+      icon: mdi:toggle-switch-outline
+    - entity: number.brygging_fase_15_rekkefolge
+      name: Flytt til plass
+      icon: mdi:sort-numeric-ascending
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: markdown
+    title: Ingen template valgt
+    content: |
+      Faseeditoren er skjult fordi ingen template er valgt. Velg en template i **Start bryggedag**-kortet på fanen **Bryggedag**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: Ingen valgt
+  - type: markdown
+    title: Templateinformasjon utilgjengelig
+    content: |
+      Faseeditoren er skjult fordi Home Assistant ikke har mottatt aktiv template. Kontroller **Systemkontroll** og **Driftsmeldinger**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: unknown
+  - type: markdown
+    title: Templateinformasjon utilgjengelig
+    content: |
+      Faseeditoren er skjult fordi Home Assistant-forbindelsen er utilgjengelig. Kontroller **Systemkontroll** og **Driftsmeldinger**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: unavailable
+  - type: markdown
+    title: Faser er låst
+    content: |
+      {% set s = states('sensor.brygging_status') %}
+      {% if s in ['running', 'waiting_confirmation', 'waiting_event', 'paused'] %}Faseeditoren er skjult og sperret mens bryggedagen er aktiv.{% elif s in ['completed', 'ended'] %}Faseeditoren er skjult for å bevare rapportgrunnlaget. Generer rapport og velg deretter **Klargjør ny bryggedag**.{% elif s == 'error' %}Faseeditoren er skjult på grunn av systemfeil. Bruk fanen **Teknisk** for feilsøking.{% else %}Faseeditoren er skjult fordi bryggestatus er `{{ s }}`.{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+- title: Fasepunkter
+  path: fasepunkter
+  icon: mdi:format-list-checks
+  cards:
+  - type: vertical-stack
+    title: Lagre eller forkast fasepunktendringer
+    cards:
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Lagre
+        icon: mdi:content-save
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_lagre_template
+      - type: button
+        name: Forkast
+        icon: mdi:undo-variant
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_forkast_templateendringer
+          confirmation:
+            text: Forkaste alle ulagrede endringer?
+    - type: markdown
+      content: |
+        {% set e = 'sensor.brygging_aktiv_template' %}
+        **Valgt template:** {{ states(e) }}  
+        **Status:** {{ state_attr(e, 'status') }}  
+        **Sist lagret:** {% if state_attr(e, 'saved_at') is none %}Ikke lagret{% else %}{{ state_attr(e, 'saved_at') }}{% endif %}  
+        **Ulagrede endringer:** {{ 'Ja' if state_attr(e, 'dirty') else 'Nei' }}  
+        {% set errors = state_attr(e, 'validation_errors') %}
+        {% set warnings = state_attr(e, 'validation_warnings') %}
+        {% if errors %}**Feil:**{% for error in errors %}  
+        - {{ error }}{% endfor %}{% endif %}
+        {% if warnings %}**Advarsler:**{% for warning in warnings %}  
+        - {{ warning }}{% endfor %}{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    entities:
+    - entity: select.brygging_rediger_fase
+      name: Fase som redigeres
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: markdown
+    title: Modell
+    content: |
+      Editorfeltene har 15 faste plasser. Tomt navn betyr ubrukt plass; **Deaktivert** beholder et meningsfullt punkt i templaten uten å bruke det i tidsplanen. Punkt-ID-er genereres automatisk fra fase og rekkefølge. Endringer ligger i arbeidskopien til **Lagre** trykkes.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 01
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_01_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_01_type
+      name: Type
+    - entity: text.brygging_punkt_01_navn
+      name: Navn
+    - entity: text.brygging_punkt_01_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_01_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_01_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_01_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_01_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 02
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_02_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_02_type
+      name: Type
+    - entity: text.brygging_punkt_02_navn
+      name: Navn
+    - entity: text.brygging_punkt_02_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_02_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_02_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_02_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_02_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 03
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_03_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_03_type
+      name: Type
+    - entity: text.brygging_punkt_03_navn
+      name: Navn
+    - entity: text.brygging_punkt_03_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_03_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_03_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_03_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_03_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 04
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_04_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_04_type
+      name: Type
+    - entity: text.brygging_punkt_04_navn
+      name: Navn
+    - entity: text.brygging_punkt_04_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_04_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_04_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_04_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_04_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 05
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_05_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_05_type
+      name: Type
+    - entity: text.brygging_punkt_05_navn
+      name: Navn
+    - entity: text.brygging_punkt_05_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_05_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_05_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_05_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_05_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 06
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_06_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_06_type
+      name: Type
+    - entity: text.brygging_punkt_06_navn
+      name: Navn
+    - entity: text.brygging_punkt_06_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_06_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_06_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_06_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_06_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 07
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_07_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_07_type
+      name: Type
+    - entity: text.brygging_punkt_07_navn
+      name: Navn
+    - entity: text.brygging_punkt_07_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_07_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_07_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_07_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_07_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 08
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_08_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_08_type
+      name: Type
+    - entity: text.brygging_punkt_08_navn
+      name: Navn
+    - entity: text.brygging_punkt_08_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_08_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_08_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_08_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_08_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 09
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_09_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_09_type
+      name: Type
+    - entity: text.brygging_punkt_09_navn
+      name: Navn
+    - entity: text.brygging_punkt_09_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_09_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_09_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_09_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_09_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 10
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_10_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_10_type
+      name: Type
+    - entity: text.brygging_punkt_10_navn
+      name: Navn
+    - entity: text.brygging_punkt_10_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_10_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_10_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_10_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_10_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 11
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_11_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_11_type
+      name: Type
+    - entity: text.brygging_punkt_11_navn
+      name: Navn
+    - entity: text.brygging_punkt_11_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_11_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_11_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_11_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_11_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 12
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_12_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_12_type
+      name: Type
+    - entity: text.brygging_punkt_12_navn
+      name: Navn
+    - entity: text.brygging_punkt_12_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_12_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_12_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_12_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_12_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 13
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_13_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_13_type
+      name: Type
+    - entity: text.brygging_punkt_13_navn
+      name: Navn
+    - entity: text.brygging_punkt_13_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_13_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_13_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_13_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_13_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 14
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_14_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_14_type
+      name: Type
+    - entity: text.brygging_punkt_14_navn
+      name: Navn
+    - entity: text.brygging_punkt_14_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_14_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_14_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_14_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_14_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: entities
+    title: Fasepunkt 15
+    show_header_toggle: false
+    entities:
+    - entity: select.brygging_punkt_15_aktiv
+      name: Aktiv
+    - entity: select.brygging_punkt_15_type
+      name: Type
+    - entity: text.brygging_punkt_15_navn
+      name: Navn
+    - entity: text.brygging_punkt_15_beskrivelse
+      name: Beskrivelse
+    - entity: text.brygging_punkt_15_forventet
+      name: Forventet verdi
+    - entity: number.brygging_punkt_15_tid_min
+      name: Tid offset min
+    - entity: select.brygging_punkt_15_tid_ref
+      name: Tidspunkt regnet fra
+    - entity: select.brygging_punkt_15_bekreftelse
+      name: Krever bekreftelse
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: markdown
+    title: Ingen template valgt
+    content: |
+      Fasepunkteditoren er skjult fordi ingen template er valgt. Velg en template i **Start bryggedag**-kortet på fanen **Bryggedag**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: Ingen valgt
+  - type: markdown
+    title: Templateinformasjon utilgjengelig
+    content: |
+      Fasepunkteditoren er skjult fordi Home Assistant ikke har mottatt aktiv template. Kontroller **Systemkontroll** og **Driftsmeldinger**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: unknown
+  - type: markdown
+    title: Templateinformasjon utilgjengelig
+    content: |
+      Fasepunkteditoren er skjult fordi Home Assistant-forbindelsen er utilgjengelig. Kontroller **Systemkontroll** og **Driftsmeldinger**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: unavailable
+  - type: markdown
+    title: Fasepunkter er låst
+    content: |
+      {% set s = states('sensor.brygging_status') %}
+      {% if s in ['running', 'waiting_confirmation', 'waiting_event', 'paused'] %}Fasepunkteditoren er skjult og sperret mens bryggedagen er aktiv.{% elif s in ['completed', 'ended'] %}Fasepunkteditoren er skjult for å bevare rapportgrunnlaget. Generer rapport og velg deretter **Klargjør ny bryggedag**.{% elif s == 'error' %}Fasepunkteditoren er skjult på grunn av systemfeil. Bruk fanen **Teknisk** for feilsøking.{% else %}Fasepunkteditoren er skjult fordi bryggestatus er `{{ s }}`.{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+- title: Timere
+  path: timere
+  icon: mdi:timer-cog-outline
+  cards:
+  - type: vertical-stack
+    title: Lagre eller forkast timerendringer
+    cards:
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Lagre
+        icon: mdi:content-save
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_lagre_template
+      - type: button
+        name: Forkast
+        icon: mdi:undo-variant
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_forkast_templateendringer
+          confirmation:
+            text: Forkaste alle ulagrede endringer?
+    - type: markdown
+      content: |
+        {% set e = 'sensor.brygging_aktiv_template' %}
+        **Valgt template:** {{ states(e) }}  
+        **Status:** {{ state_attr(e, 'status') }}  
+        **Sist lagret:** {% if state_attr(e, 'saved_at') is none %}Ikke lagret{% else %}{{ state_attr(e, 'saved_at') }}{% endif %}  
+        **Ulagrede endringer:** {{ 'Ja' if state_attr(e, 'dirty') else 'Nei' }}  
+        {% set errors = state_attr(e, 'validation_errors') %}
+        {% set warnings = state_attr(e, 'validation_warnings') %}
+        {% if errors %}**Feil:**{% for error in errors %}  
+        - {{ error }}{% endfor %}{% endif %}
+        {% if warnings %}**Advarsler:**{% for warning in warnings %}  
+        - {{ warning }}{% endfor %}{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: vertical-stack
+    title: Hendelser
+    cards:
+    - type: markdown
+      content: |
+        Konfigurer inntil 15 templatebaserte timere. Start bestemmer når timeren aktiveres; slutt bestemmer mål eller stopp.
+
+        **Plantid:** beregnet tidspunkt fra templaten. **Løpende:** oppdatert beregning som følger fremdrift og pause. **Faktisk:** finnes først når starten eller slutten virkelig har skjedd. **Passert:** fasepunktets plantid er nådd. **Bekreftet:** fasepunktet er kvittert manuelt.
+
+        For en nedtelling til et framtidig punkt, bruk normalt *Plantid* eller *Løpende* som slutthendelse. Velger du *Faktisk* eller *Bekreftet* som slutt, blir resultatet først kjent etter hendelsen. **Tell ned** viser tiden fram til sluttmålet; **Tell opp** viser tiden siden start. Positiv forskyvning er etter hendelsen; negativ er før.
+    - type: entities
+      show_header_toggle: false
+      entities:
+      - entity: select.brygging_rediger_timer
+        name: Timerplass
+      - entity: select.brygging_timer_status
+        name: Status
+      - entity: text.brygging_timer_navn
+        name: Tekst
+      - entity: number.brygging_timer_rekkefolge
+        name: Rekkefølge
+      - entity: select.brygging_timer_retning
+        name: Retning
+      - entity: select.brygging_timer_pauseoppforsel
+        name: Pauseoppførsel
+      - entity: select.brygging_timer_start_hendelse
+        name: Starthendelse
+      - entity: select.brygging_timer_start_referanse
+        name: Startreferanse
+      - entity: number.brygging_timer_start_offset_min
+        name: Startforskyvning
+      - entity: select.brygging_timer_slutt_hendelse
+        name: Slutthendelse
+      - entity: select.brygging_timer_slutt_referanse
+        name: Sluttreferanse
+      - entity: number.brygging_timer_slutt_offset_min
+        name: Sluttforskyvning
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: Ingen valgt
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unknown
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state_not: unavailable
+  - type: markdown
+    title: Ingen template valgt
+    content: |
+      Timereditoren er skjult fordi ingen template er valgt. Velg en template i **Start bryggedag**-kortet på fanen **Bryggedag**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: Ingen valgt
+  - type: markdown
+    title: Templateinformasjon utilgjengelig
+    content: |
+      Timereditoren er skjult fordi Home Assistant ikke har mottatt aktiv template. Kontroller **Systemkontroll** og **Driftsmeldinger**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: unknown
+  - type: markdown
+    title: Templateinformasjon utilgjengelig
+    content: |
+      Timereditoren er skjult fordi Home Assistant-forbindelsen er utilgjengelig. Kontroller **Systemkontroll** og **Driftsmeldinger**.
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state: idle
+    - condition: state
+      entity: sensor.brygging_aktiv_template
+      state: unavailable
+  - type: markdown
+    title: Timere er låst
+    content: |
+      {% set s = states('sensor.brygging_status') %}
+      {% if s in ['running', 'waiting_confirmation', 'waiting_event', 'paused'] %}Timereditoren er skjult og sperret mens bryggedagen er aktiv.{% elif s in ['completed', 'ended'] %}Timereditoren er skjult for å bevare rapportgrunnlaget. Generer rapport og velg deretter **Klargjør ny bryggedag**.{% elif s == 'error' %}Timereditoren er skjult på grunn av systemfeil. Bruk fanen **Teknisk** for feilsøking.{% else %}Timereditoren er skjult fordi bryggestatus er `{{ s }}`.{% endif %}
+    visibility:
+    - condition: state
+      entity: sensor.brygging_status
+      state_not: idle
+- title: Teknisk
+  path: teknisk
+  icon: mdi:wrench-cog
+  cards:
+  - type: markdown
+    title: Driftsmeldinger
+    content: |
+      {% set rows = state_attr('sensor.brygging_driftsmeldinger', 'messages') %}
+      {% if rows is none %}_Driftsmeldinger er utilgjengelige._{% elif not rows %}_Ingen aktive driftsmeldinger._{% endif %}
+      {% if rows is not none %}{% for row in rows %}{% if row.severity == 'Feil' %}🔴{% else %}🟠{% endif %} **{{ row.source }}:** {{ row.message }}  
+      {% endfor %}{% endif %}
+  - type: markdown
+    title: Systemkontroll
+    content: |
+      {% set e = 'sensor.brygging_systemkontroll' %}
+      {% set raw = state_attr(e, 'checks_json') %}
+      {% set checks = raw | from_json %}
+      # Systemkontroll
+
+      **Status:** {{ states(e) }}  
+      **Bryggestart:** {{ state_attr(e, 'start_summary') }}  
+      **Kontrollert:** {{ state_attr(e, 'checked_at') }}  
+      **Resultat:** {{ state_attr(e, 'ok_count') }} OK · {{ state_attr(e, 'warning_count') }} advarsler · {{ state_attr(e, 'error_count') }} feil
+
+      {% set ns = namespace(problem_count=0) %}
+      {% for c in checks %}{% if c.status in ['Feil', 'Advarsel'] %}{% set ns.problem_count = ns.problem_count + 1 %}{% endif %}{% endfor %}
+      {% if ns.problem_count > 0 %}
+      ## Feil, advarsler og tiltak
+      {% for c in checks %}
+      {% if c.status in ['Feil', 'Advarsel'] %}
+      ### {{ '❌' if c.status == 'Feil' else '⚠️' }} {{ c.name }}
+      **Resultat:** {{ c.result }}  
+      **Konklusjon:** {{ c.conclusion }}{% if c.blocks_start %}  
+      **Bryggestart:** Sperret{% endif %}{% if c.remediation %}  
+      **Tiltak:** {{ c.remediation }}{% endif %}
+
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      ## Utførte kontroller
+      {% set group = namespace(value='') %}
+      {% for c in checks %}
+      {% if c.group != group.value %}{% set group.value = c.group %}
+      ### {{ c.group }}
+      {% endif %}
+      {{ '✅' if c.status == 'OK' else '❌' if c.status == 'Feil' else '⚠️' if c.status == 'Advarsel' else 'ℹ️' }} **{{ c.name }}** — {{ c.status }}  
+      **Test:** {{ c.method }}  
+      **Mål:** `{{ c.target }}`  
+      **Resultat:** {{ c.result }}  
+      **Konklusjon:** {{ c.conclusion }}
+
+      {% endfor %}
+      {% if checks | length == 0 %}
+      Ingen detaljerte testresultater er mottatt ennå. Trykk **Oppdater systemkontroll**.
+      {% endif %}
+  - type: markdown
+    title: Rapportarkiv
+    content: |
+      {% set e = 'sensor.brygging_rapportarkiv' %}
+      **Totalt:** {{ state_attr(e, 'total_count') }} rapporter · {{ state_attr(e, 'total_size') }}  
+      **Ordinære:** {{ state_attr(e, 'ordinary_count') }}  
+      **Historiske:** {{ state_attr(e, 'historical_count') }}
+
+      {% set ordinary = state_attr(e, 'ordinary_latest_filename') %}{% set ordinary_url = state_attr(e, 'ordinary_latest_url') %}
+      **Siste ordinære rapport:** {% if ordinary is not none %}<a href="{{ ordinary_url }}" target="_blank" rel="noopener noreferrer">{{ ordinary }}</a>{% else %}Ingen rapport{% endif %}  
+      **Publisert kopi:** {% if state_attr(e, 'ordinary_public_copy_ok') is none %}Ingen rapport{% elif state_attr(e, 'ordinary_public_copy_ok') %}OK{% else %}FEIL{% endif %}
+
+      {% set historical = state_attr(e, 'historical_latest_filename') %}{% set historical_url = state_attr(e, 'historical_latest_url') %}
+      **Siste historiske rapport:** {% if historical is not none %}<a href="{{ historical_url }}" target="_blank" rel="noopener noreferrer">{{ historical }}</a>{% else %}Ingen rapport{% endif %}  
+      **Publisert historisk kopi:** {% if state_attr(e, 'historical_public_copy_ok') is none %}Ingen rapport{% elif state_attr(e, 'historical_public_copy_ok') %}OK{% else %}FEIL{% endif %}
+  - type: markdown
+    title: Sesjonsarkiv
+    content: |
+      {% set e = 'sensor.brygging_sesjonsarkiv' %}
+      **Totalt:** {{ state_attr(e, 'total_count') }} sesjoner · {{ state_attr(e, 'total_size') }}  
+      🔵 **Pågående:** {{ state_attr(e, 'active_count') }}  
+      🟢 **Normalt fullført:** {{ state_attr(e, 'completed_count') }}  
+      🟡 **Manuelt avsluttet:** {{ state_attr(e, 'ended_count') }}  
+      🟠 **Ufullført:** {{ state_attr(e, 'unfinished_count') }}  
+      ⚪ **Uklassifisert:** {{ state_attr(e, 'unclassified_count') }}
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+    - type: button
+      name: Oppdater systemkontroll
+      icon: mdi:refresh
+      tap_action:
+        action: call-service
+        service: button.press
+        target:
+          entity_id: button.brygging_oppdater_systemkontroll
+    - type: button
+      name: Behold siste 100 rapporter
+      icon: mdi:archive-arrow-down
+      tap_action:
+        action: call-service
+        service: button.press
+        target:
+          entity_id: button.brygging_behold_siste_100_rapporter
+        confirmation:
+          text: Slette alle rapporter unntatt de 100 nyeste? Dette kan ikke angres.
+  - type: conditional
+    conditions:
+    - condition: state
+      entity: sensor.brygging_status
+      state: error
+    card:
+      type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: button
+        name: Nødavslutt bryggedag
+        icon: mdi:alert-octagon
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.brygging_nodavslutt_ved_systemfeil
+          confirmation:
+            text: Nødavslutte sesjonen? Systemet forsøker å lage en gjenopprettingsrapport, fjerner koblingen til den aktive sesjonen og går til idle. Sesjonen kan ikke fortsettes og beholdes som Ufullført.
+      - type: markdown
+        content: ' '

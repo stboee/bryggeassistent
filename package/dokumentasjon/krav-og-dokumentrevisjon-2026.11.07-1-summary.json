@@ -1,0 +1,37 @@
+{
+  "release": "2026.11.07-1",
+  "baseline": "v1.0.0-rc3.3.2",
+  "flow_sha256": "93e6ba95cc1f8793222728c35d7fd5f59da006c6de979890a91ca1f9d87291f2",
+  "requirements": 342,
+  "requirement_documents": 4,
+  "named_runtime_tests": 159,
+  "runtime_assertions": 7154,
+  "acceptance_flows": 8,
+  "entities": 230,
+  "entity_counts": {
+    "sensor": 15,
+    "button": 17,
+    "select": 87,
+    "number": 48,
+    "text": 63
+  },
+  "top_level_attributes": 51,
+  "structured_fields": 27,
+  "documents": [
+    "00-DOKUMENTOVERSIKT-2026.11.07-1",
+    "KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1",
+    "SYSTEMOVERSIKT-2026.11.07-1",
+    "HOME-ASSISTANT-NODE-RED-ENTITETS-OG-ATTRIBUTTKONTRAKT-2026.11.07-1",
+    "KRAV-SPORBARHET-2026.11.07-1",
+    "AKSEPTANSEPLAN-2026.11.07-1",
+    "BYGGEOMFANG-2026.11.07-1",
+    "KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1",
+    "SYSTEMDOKUMENTASJON-Node-RED-2026.11.07-1",
+    "NODE-RED-VARIABEL-OG-DATAFLYTKONTRAKT-2026.11.07-1",
+    "KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1",
+    "SYSTEMDOKUMENTASJON-Home-Assistant-dashboard-2026.11.07-1",
+    "KRAV-03-Installer-2026.11.07-1",
+    "SYSTEMDOKUMENTASJON-Installer-2026.11.07-1",
+    "TEMPLATE-SCHEMA-OG-GENERATORVEILEDNING-2026.11.07-1"
+  ]
+}

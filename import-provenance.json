@@ -1,0 +1,17 @@
+{
+  "source_version": "v1.0.0-rc3.3.2",
+  "source_zip_sha256": "61f8e2655852ccf55cbb2273dc52b243d60d11ba715818cc01f12365160cd952",
+  "byte_identical_files": [
+    {
+      "source_name": "referansetemplate-2026-09-26-IPL-schema-1.0.json",
+      "release_path": "referansetemplate-2026-09-26-IPL-schema-1.0.json",
+      "source_sha256": "33e73c83d35f2f188434992a81a6d73f3f31c40b1ac6850fbda464f07c0c66b5"
+    },
+    {
+      "source_name": "bryggedagsassistent-templategenerator-schema-1.0-v1.0.0-rc3.3.2.xlsx",
+      "release_path": "verktoy/templategenerator/bryggedagsassistent-templategenerator-schema-1.0-2026.11.07-1.xlsx",
+      "source_sha256": "334d1470018ff04d30bf278fad812f890f61fba80540776147199eaef780e6ff"
+    }
+  ],
+  "normalized_installer_sha256": "819255ce7cc7e8bc3d1326a67cf0e5258a1bb5910266f67e849c57000969c45b"
+}

@@ -1,0 +1,29 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Template schema 1.0 og XLSX-generator – 2026.11.07-1</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1 id="template-schema-10-og-xlsx-generator--v100-rc332">Template
+schema 1.0 og XLSX-generator – 2026.11.07-1</h1>
+<h2 id="status">Status</h2>
+<p>Beskrivende bruker- og verktøydokumentasjon. Normative
+schema-/validatorregler ligger i KRAV-01 og HA-kontrakten.</p>
+<h2 id="arbeidsbok">Arbeidsbok</h2>
+<p><a
+href="../verktoy/templategenerator/bryggedagsassistent-templategenerator-schema-1.0-2026.11.07-1.xlsx">Last
+ned XLSX-templategeneratoren</a></p>
+<p>Arbeidsboken er makrofri og har fem faner: Forside, Faser,
+Fasepunkter, Timere og Template JSON. Den inneholder 15 permanente
+faser, 15 fasepunktplasser per fase (225 totalt) og 15 timerplasser.
+Deaktiverte punkt kan ha tomt navn; aktive punkt krever navn.</p>
+<h2 id="bruk">Bruk</h2>
+<ol type="1">
+<li>Rediger bare de markerte inndatafeltene og behold permanente
+ID-er.</li>
+<li>Flytt rekkefølge med <code>order_id</code>.</li>
+<li>Kontroller at alle valideringsceller viser <code>OK</code>.</li>
+<li>Kopier linjene fra <code>Template JSON</code> til filnavnet på
+Forside som UTF-8.</li>
+<li>Kjør alltid full runtimevalidering før templaten legges i
+<code>/data/brewing-assistant/templates</code>.</li>
+</ol>
+<h2 id="begrensninger">Begrensninger</h2>
+<p>Excel-formlene gir tidlig strukturkontroll, men erstatter ikke
+Node-RED-validatoren. Tekst gjennom Home Assistant er begrenset til 120
+eller 255 Unicode-tegn; generatoren lager ingen omvei rundt dette.</p>
+</main></body></html>

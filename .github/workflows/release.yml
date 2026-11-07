@@ -1,0 +1,57 @@
+name: Verify and publish release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bryggeassistent-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Install test dependency
+        run: python3 -m pip install -r requirements-dev.txt
+      - name: Verify and build exact commit, including clean extraction
+        run: python3 scripts/build_release.py --source-commit "$GITHUB_SHA"
+      - name: Publish immutable tag and prerelease
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          version=$(jq -r .version release.json)
+          artifact=$(jq -r .artifact release.json)
+          title=$(jq -r .title release.json)
+          head=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          test "$head" = "$GITHUB_SHA" || { echo 'main changed; refusing stale publication'; exit 1; }
+          # A prior publication is immutable: never clobber its tag or assets.
+          if gh release view "$version" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            existing=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$version" --jq .object.sha)
+            test "$existing" = "$GITHUB_SHA" || { echo 'Version already belongs to another commit'; exit 1; }
+            compare_dir=$(mktemp -d)
+            gh release download "$version" --repo "$GITHUB_REPOSITORY" --dir "$compare_dir"
+            for file in "$artifact" "$artifact.sha256" verification.json; do
+              cmp "dist/$file" "$compare_dir/$file" || { echo 'Published asset missing or differs; refusing overwrite'; exit 1; }
+            done
+            echo 'Release already exists; preserving published bytes.'
+            exit 0
+          fi
+          gh release create "$version" "dist/$artifact" "dist/$artifact.sha256" dist/verification.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "$title" --notes-file RELEASE-NOTES.md

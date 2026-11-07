@@ -1,0 +1,1629 @@
+{
+  "schema_version": "1.0",
+  "note": "",
+  "phases": [
+    {
+      "id": "01",
+      "order_id": 1,
+      "enabled": true,
+      "title": "Oppvarming av bryggevann",
+      "duration_min": 150,
+      "items": [
+        {
+          "id": "01_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Fyll vannkjele.",
+          "description": "Fylle Kaldt vann fra springen til vannkjele. Nesten opp til kanten, men ikke helt.",
+          "expected_value": "200 liter",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 2
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "01_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "activity",
+          "name": "Start vannvarming.",
+          "description": "Alle varmere skal brukes. To kurser fra melkerommet og en fra siderommet.",
+          "expected_value": "3 stk varmere",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 3
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "01_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "control",
+          "name": "Kontroller vannvarmere.",
+          "description": "Løft alle elementer for å Kontroller at alle elementer trekker effekt.",
+          "expected_value": "Alle freser når de løftes.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "01_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "control",
+          "name": "Kontroller at meskekjele er klar.",
+          "description": "",
+          "expected_value": "Ren ventil og silbunn montert.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 7
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "01_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "control",
+          "name": "Tell opp malt og råvarer.",
+          "description": "Se at vi har klargjort malt, humle og funnet frem tilsetninger.",
+          "expected_value": "Ihht oppskrift",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "01_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "control",
+          "name": "Oppladet meskeutstyr.",
+          "description": "Har drill og termometer oppladet batteri?",
+          "expected_value": "Batteri ok.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "01_07",
+          "order_id": 7,
+          "enabled": true,
+          "type": "activity",
+          "name": "Koble slanger i meskekonfigurasjon.",
+          "description": "Koble opp alle ledninger. 1\" fra vannkjel til T-stykke. 1/2\" fra meskekjele til T-stykke. Tstykket inn på inngangen på pumpa. Den lange 1/2\" slangen fra utgang på pumpa. Den løse tampen må være hevet så det ikke kommer vørter.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "01_08",
+          "order_id": 8,
+          "enabled": true,
+          "type": "control",
+          "name": "Prøv slangene i meskekonfigurasjon.",
+          "description": "Se at vannet renner fra vanntank til pumpe og videre ut i sluket. Dette rengjør samtidig pumpa for grums.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 22
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "01_09",
+          "order_id": 9,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling.",
+          "description": "Tidlig måling for å se om elementene yter det de er tenkt.",
+          "expected_value": "40c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 60
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "01_10",
+          "order_id": 10,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling.",
+          "description": "",
+          "expected_value": "80c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 120
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "01_11",
+          "order_id": 11,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling.",
+          "description": "",
+          "expected_value": "100c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 150
+          },
+          "requires_confirmation": true
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "order_id": 2,
+      "enabled": true,
+      "title": "Innmesk",
+      "duration_min": 15,
+      "items": [
+        {
+          "id": "02_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Fyll meskevann",
+          "description": "Fyll meskekar med totalt 80l vann. Ca 65l kokende og 15 l kaldt. Må justeres til målet.",
+          "expected_value": "80 l",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 9
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "02_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "control",
+          "name": "Temperatur innmesk.",
+          "description": "Må sende vann frem og tilbake mellom vanntank og mesketank til stabli mesketemperatur er oppnådd. Innmesktemperatur logges.",
+          "expected_value": "74,5c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "addition",
+          "name": "Melkesyre i meskekjele.",
+          "description": "312",
+          "expected_value": "20 ml i meskekar",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 11
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "addition",
+          "name": "Melkesyre i vannkjele.",
+          "description": "",
+          "expected_value": "20ml i vannkjele",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 12
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "addition",
+          "name": "Salter i meskekar.",
+          "description": "Tilsett planlagte salter i meskekar.",
+          "expected_value": "20g CaCL2",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 13
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "addition",
+          "name": "Salter i vannkjele.",
+          "description": "Tilsett planlagte salter i vannkjele.",
+          "expected_value": "10g CaCL2",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 14
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_07",
+          "order_id": 7,
+          "enabled": true,
+          "type": "addition",
+          "name": "Mesk inn.",
+          "description": "Rør godt fra bunn. Sirkuler med pumpa. Mål temperatur fortløpende som det tilsettes for å følge med.",
+          "expected_value": "Helt jevn velling.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_08",
+          "order_id": 8,
+          "enabled": false,
+          "type": "addition",
+          "name": "Mash-humle",
+          "description": "Tilsett eventuell mash-humle i meskekar.",
+          "expected_value": "Ihht oppskrift",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 19
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_09",
+          "order_id": 9,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling.",
+          "description": "Mål og loggfør faktisk start-mesketemperatur. Erklær mesk i gang.",
+          "expected_value": "66c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "02_10",
+          "order_id": 10,
+          "enabled": false,
+          "type": "measurement",
+          "name": "Måle pH",
+          "description": "Mål og loggfør faktisk pH i mesken, evt justere pH.",
+          "expected_value": "5.4 pH",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "order_id": 3,
+      "enabled": true,
+      "title": "Hovedmesk",
+      "duration_min": 60,
+      "items": [
+        {
+          "id": "03_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Etterfylle vannkjele",
+          "description": "Etterfyll til 150 liter i vannkjel og kok opp.",
+          "expected_value": "150 liter i vannkjele",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "03_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "activity",
+          "name": "Vaske buffer-kar",
+          "description": "Vask 30 liters buffer-kar. Det må være klart til å romme vørter i fasen utmesk.",
+          "expected_value": "Rent og tørt.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "03_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "control",
+          "name": "Vannkjele",
+          "description": "Koker vankjelen?",
+          "expected_value": "100c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "03_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling.",
+          "description": "Rør i mesken. Vurder om temperatur skal å loggføres.",
+          "expected_value": "65c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 30
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "03_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling.",
+          "description": "Rør i mesken. Vurder om temperatur skal å loggføres.",
+          "expected_value": "64c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 60
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "03_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "control",
+          "name": "Vurder mesketid",
+          "description": "Vurder om mesketiden skal forlenges. Loggfør om det gjøres endringer.",
+          "expected_value": "forleng / ikke forleng",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 60
+          },
+          "requires_confirmation": true
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "order_id": 4,
+      "enabled": true,
+      "title": "Mash-out",
+      "duration_min": 10,
+      "items": [
+        {
+          "id": "04_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Fyll bufferkar med vørter.",
+          "description": "Fyll buffer-kar med vørter fra mesketank. Intensjonen er å senke nivået i mesketank slik at det blir plass til kokende vann.",
+          "expected_value": "25 liter",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "04_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "activity",
+          "name": "Utmesk starter",
+          "description": "Etterfyll meskekaret med kokende vann for å heve temperaturen til 77 °C, men ikke høyere. Litt for kaldt er bedre enn for varmt. Rør og resirkuler til jevn temperatur. La mesken stå i 5 min slik at enzymene denatureres og konsistensen blir tynnere.",
+          "expected_value": "25 l@100c =77c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "04_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Utmesk temp måling",
+          "description": "Mesken skal være 77c etter at den er varmet opp. Vurder å logge temperatur.",
+          "expected_value": "77c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 11
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "04_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "control",
+          "name": "Utmesk ferdig",
+          "description": "Utmesk ferdig. Klart for å starte skylling.",
+          "expected_value": "77c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "order_id": 5,
+      "enabled": true,
+      "title": "Skylling og overføring til kokekjele",
+      "duration_min": 60,
+      "items": [
+        {
+          "id": "05_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Første avrenneing",
+          "description": "Rør opp mesken. Resirkuler vørter tilbake til meskekar til vørter klarner. Tapp av første avrenning, hell etter innholdet av buffer-kar når det blir rom for det.",
+          "expected_value": "75 l i kokekjele",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Første vørtermåling",
+          "description": "Mål sukkerinnhold i vørter.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 16
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "activity",
+          "name": "Flytt varmeelementer",
+          "description": "Vurder å flytte varmeelementer fra vannkjele til kokekjele. Etter første avrenning er det mulig å starte oppkok.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 17
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "activity",
+          "name": "Andre avrenning etterfylling",
+          "description": "Fyll meskekar med 77c vann til det er fullt.",
+          "expected_value": "60 liter vann",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "activity",
+          "name": "Andre avrenning",
+          "description": "Resirkuler og tapp av andre avrenning.",
+          "expected_value": "135 l i kokekjele",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 35
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Andre vørtermåling",
+          "description": "Mål sukkerinnhold i vørter.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 36
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_07",
+          "order_id": 7,
+          "enabled": true,
+          "type": "activity",
+          "name": "Tredje avrenning etterfylling",
+          "description": "Fyll meskekar med 77c vann til det er fullt.",
+          "expected_value": "60 liter vann",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 40
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_08",
+          "order_id": 8,
+          "enabled": true,
+          "type": "activity",
+          "name": "Tredje avrenning",
+          "description": "Resirkuler og tapp av andre avrenning.",
+          "expected_value": "195 l i kokekjele",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 55
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "05_09",
+          "order_id": 9,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Tredje vørtermåling",
+          "description": "Mål sukkerinnhold i vørter. Vurder loggføring.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 60
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "order_id": 6,
+      "enabled": true,
+      "title": "Oppkok",
+      "duration_min": 60,
+      "items": [
+        {
+          "id": "06_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Temperaturmåling i vørter før oppkok.",
+          "description": "Temperaturen på vørter er ca 70c. Kanskje mer om flaks. Det tar 45 min å koke opp.",
+          "expected_value": "Starter på ca 70c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 2
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "control",
+          "name": "Loggfør vørtertemperatur før oppkok",
+          "description": "Loggfør temperatur i vørter.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 3
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "activity",
+          "name": "Start vannvarming",
+          "description": "Alle varmere skal brukes. To kurser fra melkerommet og en fra siderommet.",
+          "expected_value": "3 varmere.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 4
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Vørtermåling på vørter før oppkok.",
+          "description": "Mål sukkerinnhold i vørter.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "control",
+          "name": "Loggfør vørterstyrke før oppkok.",
+          "description": "Loggfør vørterstyrke.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 6
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "activity",
+          "name": "Vaske meskekjele.",
+          "description": "Nå er et godt tidspunkt å tømme og vaske meskekjele.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_07",
+          "order_id": 7,
+          "enabled": true,
+          "type": "activity",
+          "name": "Skum av",
+          "description": "Etter hvert som temperaturen stiger vil protein klumpe seg sammen og stige opp som skum.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 40
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "06_08",
+          "order_id": 8,
+          "enabled": true,
+          "type": "control",
+          "name": "Oppkok ferdig",
+          "description": "Når det koker er oppkokfasen over.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 60
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "order_id": 7,
+      "enabled": true,
+      "title": "Kok",
+      "duration_min": 90,
+      "items": [
+        {
+          "id": "07_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "control",
+          "name": "Erklær kok!",
+          "description": "Viktig for å kunne ha kontroll på hvor lenge vi skal fortsette å koke. Ved bruk av pilsnermalt brukes 90 min kok, mørkere basemalt kan tåle 60 min. For enkelhet og gjentagbare prosesser brukes 90 min uansett.",
+          "expected_value": "100c",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -90
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "07_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "control",
+          "name": "Er motstrømskjøler ren.",
+          "description": "Verifiser at motstrømskjøler er ren. Viktig at det ikke ligger igjen ulumskheter i kjøleren etter forrige brygging. Gjøres ved å renne igjennom gjenværende varmtvann fra vannkjele.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -80
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "07_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "activity",
+          "name": "Koble slanger i kokekonfigurasjon.",
+          "description": "Koble om slanger 1\" slange fra kokekjele inn på pumpe. 1/2\" fra utgang pumpe til kjøler. Lang 1/2\" fra kjøler til inngang på kokekjele.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -70
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "07_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "addition",
+          "name": "Bitterhumle",
+          "description": "",
+          "expected_value": "150g",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -60
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "07_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "activity",
+          "name": "Koble til kjølevann",
+          "description": "Kjølevann hentes fra åa om mulig. Utløp i takrennenedløpet ute. Gardenakobling for kaldt vann skal kobles inn der den kaldeste vørteren er. Utløpet skal kobles til den enden der varm vørter tas inn.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -50
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "07_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "activity",
+          "name": "Prøv kjølesløyfe",
+          "description": "Prøv at kjølesløyfa fungerer. Sirkuler kokende vørter og se at alt fungerer.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -40
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "07_07",
+          "order_id": 7,
+          "enabled": true,
+          "type": "control",
+          "name": "Kontroller at OG treffer",
+          "description": "Ta vørtermåling. Vurder om OG nås. Om det blir helt feil så forleng koketid, evt tilsett mere vann. Vurder å loggføre.",
+          "expected_value": "Ihht oppskrift",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -20
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "07_08",
+          "order_id": 8,
+          "enabled": true,
+          "type": "addition",
+          "name": "Aromahumle 10 min",
+          "description": "",
+          "expected_value": "100g",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -10
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "07_09",
+          "order_id": 9,
+          "enabled": true,
+          "type": "addition",
+          "name": "Protafloc",
+          "description": "",
+          "expected_value": "2 tabletter",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -5
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "07_10",
+          "order_id": 10,
+          "enabled": true,
+          "type": "activity",
+          "name": "Flame-out",
+          "description": "Kutt strømmen til varmeelementene. La varmerne stå i vørteren.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -2
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "07_11",
+          "order_id": 11,
+          "enabled": true,
+          "type": "addition",
+          "name": "Aromahumle 1 min",
+          "description": "",
+          "expected_value": "100g",
+          "time": {
+            "reference": "phase_end",
+            "offset_min": -1
+          },
+          "requires_confirmation": true
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "order_id": 8,
+      "enabled": false,
+      "title": "Flame-out, resirkulering og varm kontakttid",
+      "duration_min": 20,
+      "items": [
+        {
+          "id": "08_01",
+          "order_id": 1,
+          "enabled": false,
+          "type": "activity",
+          "name": "Whirlpool kjølestart",
+          "description": "Start kjøler. Resirkuler tilbake i kokekjele.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 1
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "08_02",
+          "order_id": 2,
+          "enabled": false,
+          "type": "activity",
+          "name": "Whirlpool kjølt ferdig",
+          "description": "Resirkuler tilbake i gjæringstank frem til vørter er blitt 80c. Da er det klart for å tilsette whirlpoolhumle.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "08_03",
+          "order_id": 3,
+          "enabled": false,
+          "type": "activity",
+          "name": "Tilsett whirlpoolhumle.",
+          "description": "",
+          "expected_value": "200g",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 11
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "08_04",
+          "order_id": 4,
+          "enabled": false,
+          "type": "activity",
+          "name": "Whirlpool ekstraksjon",
+          "description": "Pause i 20 - 40 min mens ekstraksjon skjer.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 50
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "08_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "warning",
+          "name": "Whirlpool advarsel",
+          "description": "Whirlpoolhumle er forsøkt og gir lite effekt i oppsettet vårt.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 0
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "order_id": 9,
+      "enabled": true,
+      "title": "Kjøling",
+      "duration_min": 30,
+      "items": [
+        {
+          "id": "09_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Start kjøling",
+          "description": "Start kjøler. Resirkuler tilbake i kokekjele.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 1
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "09_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "activity",
+          "name": "Klargjør gjæringstank",
+          "description": "Siste finish med desinfisering og deler som må pusles sammen.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "09_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "activity",
+          "name": "Klargjør oksygen.",
+          "description": "Se at oksygen og regulator finnes og er i orden.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "09_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "activity",
+          "name": "Hovedkjøling",
+          "description": "Resirkuler tilbake i gjæringstank frem til vørter er blitt så kald at den kan overføres direkte til gjæringstank.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 40
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "order_id": 10,
+      "enabled": true,
+      "title": "Overføring til gjæringstank",
+      "duration_min": 30,
+      "items": [
+        {
+          "id": "10_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Start overføring til gjærtank",
+          "description": "Start overføring til gjæringstank. Stopp ved planlagt volum",
+          "expected_value": "Stoppe før trub blir med.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "10_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "measurement",
+          "name": "Hvor mye vørter i tanken?",
+          "description": "Kontroller og loggfør volum overført.",
+          "expected_value": "150 liter",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 25
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "10_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "control",
+          "name": "Legge Tilt i gjærtanken.",
+          "description": "Tilt er tenkt å gi verdier til loggeren. Må se at det fungerer før lokket legges igjen.",
+          "expected_value": "Tilt repporterer verdier.",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 30
+          },
+          "requires_confirmation": true
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "order_id": 11,
+      "enabled": true,
+      "title": "Gjæringsstart",
+      "duration_min": 10,
+      "items": [
+        {
+          "id": "11_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "addition",
+          "name": "Tilsett gjær.",
+          "description": "",
+          "expected_value": "250g",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "11_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "addition",
+          "name": "Tilsett O2",
+          "description": "Teorien sier 1l/min/25l vørter = 6 min eller 6 liter O2, men det er vanskelig å måle.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "11_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "activity",
+          "name": "Lukk tank",
+          "description": "",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 11
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "11_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "control",
+          "name": "Glykol temperatur",
+          "description": "Sett temperatur på glykolkjøler. Vurder å loggføre",
+          "expected_value": "4c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 13
+          },
+          "requires_confirmation": true
+        },
+        {
+          "id": "11_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "control",
+          "name": "Kjølesløyfe temperatur",
+          "description": "Sett temperatur på gjærtankens kjølesløyfe. Vurder å loggføre.",
+          "expected_value": "9c",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 14
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "11_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "control",
+          "name": "Trykk på spunding.",
+          "description": "Still inn spunding og tilfør vann i gjærlåsen. Vurder å logge.",
+          "expected_value": "0,0 Bar",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "order_id": 12,
+      "enabled": true,
+      "title": "Vask og rydding",
+      "duration_min": 45,
+      "items": [
+        {
+          "id": "12_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Ren motstrømskjøler",
+          "description": "Motstrømskjøler må skylles godt igjennom.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 5
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "activity",
+          "name": "Rene kjeler",
+          "description": "Alle kjeler skal være rene.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 10
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_03",
+          "order_id": 3,
+          "enabled": true,
+          "type": "activity",
+          "name": "Rene slanger",
+          "description": "Alle slanger skal være rene",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 15
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_04",
+          "order_id": 4,
+          "enabled": true,
+          "type": "activity",
+          "name": "Rene koblinger",
+          "description": "Alle koblinger skal være rene",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 20
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_05",
+          "order_id": 5,
+          "enabled": true,
+          "type": "activity",
+          "name": "Rent gulv",
+          "description": "Gulvet skal være rent",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 25
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_06",
+          "order_id": 6,
+          "enabled": true,
+          "type": "activity",
+          "name": "Ryddig arbeidsbenk",
+          "description": "Det må ryddes på arbeidsbenk.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 30
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_07",
+          "order_id": 7,
+          "enabled": true,
+          "type": "activity",
+          "name": "Ren gjærtank",
+          "description": "Gjærtanken må være ren utenpå, om ikke så mugner den.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 35
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "12_08",
+          "order_id": 8,
+          "enabled": true,
+          "type": "control",
+          "name": "Transport",
+          "description": "Skyss hjem må avklares, om det ikke er gjort før.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 45
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "order_id": 13,
+      "enabled": true,
+      "title": "Ferdig bryggedag",
+      "duration_min": 0,
+      "items": [
+        {
+          "id": "13_01",
+          "order_id": 1,
+          "enabled": true,
+          "type": "activity",
+          "name": "Avslutte mat og drikke",
+          "description": "Om det er igjen mere øl og potetgull så er det viktig å få i seg det.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 0
+          },
+          "requires_confirmation": false
+        },
+        {
+          "id": "13_02",
+          "order_id": 2,
+          "enabled": true,
+          "type": "control",
+          "name": "Avslutte bryggedagen",
+          "description": "Loggføre oppsummering av dagen.",
+          "expected_value": "",
+          "time": {
+            "reference": "phase_start",
+            "offset_min": 0
+          },
+          "requires_confirmation": false
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "order_id": 14,
+      "enabled": false,
+      "title": "",
+      "duration_min": 0,
+      "items": []
+    },
+    {
+      "id": "15",
+      "order_id": 15,
+      "enabled": false,
+      "title": "",
+      "duration_min": 0,
+      "items": []
+    }
+  ],
+  "timers": [
+    {
+      "id": "timer_01",
+      "order_id": 1,
+      "enabled": true,
+      "text": "Tid siden erklært mesk",
+      "mode": "count_up",
+      "pause_behavior": "continue",
+      "start": {
+        "event": "phase_start_actual",
+        "ref_id": "03",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_02",
+      "order_id": 2,
+      "enabled": true,
+      "text": "Tid igjen av erklært kok",
+      "mode": "count_down",
+      "pause_behavior": "continue",
+      "start": {
+        "event": "phase_start_actual",
+        "ref_id": "07",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "phase_end_effective",
+        "ref_id": "07",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_03",
+      "order_id": 3,
+      "enabled": true,
+      "text": "Tid til bitterhumle",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "phasepoint_due",
+        "ref_id": "07_04",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_04",
+      "order_id": 4,
+      "enabled": true,
+      "text": "Bryggedaglengde",
+      "mode": "count_up",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_actual",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_05",
+      "order_id": 5,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_06",
+      "order_id": 6,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_07",
+      "order_id": 7,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_08",
+      "order_id": 8,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_09",
+      "order_id": 9,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_10",
+      "order_id": 10,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_11",
+      "order_id": 11,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_12",
+      "order_id": 12,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_13",
+      "order_id": 13,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_14",
+      "order_id": 14,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    },
+    {
+      "id": "timer_15",
+      "order_id": 15,
+      "enabled": false,
+      "text": "",
+      "mode": "count_down",
+      "pause_behavior": "follow_pause",
+      "start": {
+        "event": "brew_start_actual",
+        "ref_id": "",
+        "offset_min": 0
+      },
+      "end": {
+        "event": "brew_end_effective",
+        "ref_id": "",
+        "offset_min": 0
+      }
+    }
+  ]
+}

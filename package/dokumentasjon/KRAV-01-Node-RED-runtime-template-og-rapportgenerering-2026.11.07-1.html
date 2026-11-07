@@ -1,0 +1,3011 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kravspesifikasjon 01 – Node-RED, runtime, template og rapportgenerering</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="kravspesifikasjon-01--node-red-runtime-template-og-rapportgenerering">Kravspesifikasjon
+01 – Node-RED, runtime, template og rapportgenerering</h1>
+<h2 id="1-dokumentstatus">1. Dokumentstatus</h2>
+<blockquote>
+<p><strong>Styringsregel:</strong> Node-RED-modulen skal ikke godkjennes
+bare fordi regresjonstesten består. Hvert normativt krav skal være
+koblet til implementasjon, automatisert verifikasjon eller begrunnet
+manuell akseptanse, og faktisk resultat.</p>
+</blockquote>
+<table>
+<thead>
+<tr class="header">
+<th>Felt</th>
+<th>Verdi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>System</td>
+<td>Bryggedagsassistent</td>
+</tr>
+<tr class="even">
+<td>Modul</td>
+<td>Node-RED, runtime, template og rapportgenerering</td>
+</tr>
+<tr class="odd">
+<td>Kravgrunnlag</td>
+<td><code>2026.11.07-1</code> med implementasjonsbaseline
+<code>v1.0.0-rc3.3.2</code></td>
+</tr>
+<tr class="even">
+<td>Template-, state- og hendelsesschema</td>
+<td><code>1.0</code></td>
+</tr>
+<tr class="odd">
+<td>Dokumenttype</td>
+<td>Normativ kravspesifikasjon</td>
+</tr>
+<tr class="even">
+<td>Dokumentversjon</td>
+<td>2.0</td>
+</tr>
+<tr class="odd">
+<td>Dato</td>
+<td>2026-08-26</td>
+</tr>
+<tr class="even">
+<td>Revisjonsstatus</td>
+<td>Endelig normativt kravgrunnlag for 2026.11.07-1</td>
+</tr>
+</tbody>
+</table>
+<p>Dokumentet beskriver den normative funksjonen og de tekniske
+grensesnittene for <code>2026.11.07-1</code>. Kravendringer skal
+oppdateres før senere funksjons- eller schemaendringer innføres.</p>
+<p>Kravordene <strong>skal</strong>, <strong>bør</strong> og
+<strong>kan</strong> angir henholdsvis obligatorisk krav, anbefalt
+egenskap og tillatt mulighet. Kolonnen «Forklaring og praktisk
+betydning» avgrenser hvordan kravet skal forstås og avsluttes med en
+observerbar effekt og kontrollmåte. Denne teksten er del av
+fortolkningen av kravet, men oppretter ikke et ekstra krav ved siden av
+ID-en.</p>
+<h2 id="2-formål-og-omfang">2. Formål og omfang</h2>
+<p>Modulen skal være den autoritative motoren for én bryggedag. Den
+skal:</p>
+<ul>
+<li>laste, validere, redigere og lagre en generell prosess-template</li>
+<li>styre bryggedagens tilstand, faser, fasepunkter, pauser og
+timere</li>
+<li>motta kommandoer fra Home Assistant og publisere et konsistent
+entitetsgrensesnitt tilbake</li>
+<li>lagre gjenopprettbar runtime-state og en separat hendelseslogg</li>
+<li>generere, arkivere og publisere HTML-bryggerapporter</li>
+<li>utføre systemkontroll og fersk start-preflight</li>
+</ul>
+<p>Følgende er utenfor modulens omfang:</p>
+<ul>
+<li>innholdet i konkrete øloppskrifter og konkrete bryggeprosedyrer</li>
+<li>Home Assistant-dashboardets visuelle layout</li>
+<li>automatisk import av dashboard-YAML</li>
+<li>mobilvarsler, fysiske betjeningsorganer og støtte for flere
+samtidige bryggedager</li>
+<li>automatisk migrering av template- eller statefiler fra eldre schema
+enn 1.0</li>
+</ul>
+<h3 id="21-ansvarsdeling">2.1 Ansvarsdeling</h3>
+<p>Node-RED-modulen er systemets autoritative motor. Home Assistant
+viser data og sender brukerhandlinger, mens installeren legger filene og
+kontrollerer miljøet. Ansvarsdelingen skal forstås slik:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Del</th>
+<th>Ansvar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Node-RED-runtime</td>
+<td>Godkjenner kommandoer, eier bryggedagsstate, beregner tider,
+validerer template og oppdaterer Home Assistant-entiteter.</td>
+</tr>
+<tr class="even">
+<td>Lagringslaget i flowen</td>
+<td>Skriver state, JSONL, template og rapport gjennom kontrollert filkø
+og håndterer retry/diagnostikk.</td>
+</tr>
+<tr class="odd">
+<td>Rapportgeneratoren</td>
+<td>Lager selvstendig HTML fra autoritativ state og publiserer en
+kontrollert kopi til HA-public.</td>
+</tr>
+<tr class="even">
+<td>Home Assistant</td>
+<td>Presenterer de publiserte entitetene og sender kommandoer; det er
+ikke en egen bryggemotor.</td>
+</tr>
+<tr class="odd">
+<td>Installeren</td>
+<td>Validerer og plasserer releasefiler, oppretter runtime-konfigurasjon
+og kontrollerer container/mount; den bestemmer ikke bryggedagens
+runtimeforløp.</td>
+</tr>
+</tbody>
+</table>
+<p>Et synlig dashboardelement er derfor ikke autorisasjon til å endre
+state. Hver kommando kontrolleres på nytt av Node-RED i den tilstanden
+som gjelder når meldingen mottas.</p>
+<h3 id="22-begreper">2.2 Begreper</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Begrep</th>
+<th>Betydning i dette dokumentet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Template</td>
+<td>En generell prosessmal med 15 faseplasser, inntil 15
+fasepunktplasser per fase og 15 generiske timerplasser. En konkret
+øloppskrift er ikke del av modulen.</td>
+</tr>
+<tr class="even">
+<td>Runtime-state</td>
+<td>Det autoritative øyeblikksbildet av bryggedagen: status, aktiv fase,
+tider, resultater, kommentarer, historikk og innebygd template.</td>
+</tr>
+<tr class="odd">
+<td>Session</td>
+<td>Én bryggedag fra vellykket start til <code>completed</code> eller
+<code>ended</code>, identifisert med en unik session-ID.</td>
+</tr>
+<tr class="even">
+<td>Fase</td>
+<td>Et hovedtrinn med permanent ID, redigerbar rekkefølge, navn,
+aktiv-status og planlagt varighet.</td>
+</tr>
+<tr class="odd">
+<td>Fasepunkt</td>
+<td>En tidsplassert aktivitet, tilsetning, måling, kontroll eller
+advarsel innenfor en bestemt fase.</td>
+</tr>
+<tr class="even">
+<td>Timer</td>
+<td>En opptelling eller nedtelling mellom to templatedefinerte
+runtimehendelser. Dette er noe annet enn fasens egen fremdrift.</td>
+</tr>
+<tr class="odd">
+<td>Statusprojeksjon</td>
+<td>Det avgrensede bildet av runtime som publiseres til Home
+Assistant-sensorer og editorentiteter.</td>
+</tr>
+<tr class="even">
+<td>Commit</td>
+<td>Punktet der en validert kommando blir en autoritativ stateendring og
+deretter sendes til lagring/publisering.</td>
+</tr>
+<tr class="odd">
+<td>Atomisk skriving</td>
+<td>Skriving til en midlertidig fil etterfulgt av rename, slik at
+målfilen enten er gammel eller komplett ny fil.</td>
+</tr>
+<tr class="even">
+<td>Restore</td>
+<td>Automatisk gjenoppretting ved Node-RED-oppstart fra current-state,
+previous-state eller til slutt standardtemplate.</td>
+</tr>
+<tr class="odd">
+<td>Preflight</td>
+<td>En fersk systemkontroll som kjøres som del av hvert startforsøk og
+avgjør om starten kan godkjennes.</td>
+</tr>
+<tr class="even">
+<td>Public-kopi</td>
+<td>Den faste rapportfilen under <code>ha-public</code> som Home
+Assistant tilbyr på
+<code>/local/brygging/siste-bryggerapport.html</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-grensesnitteierskap-og-entity-id-er">2.3 Grensesnitteierskap
+og entity-ID-er</h3>
+<p>Når et Node-RED-krav produserer eller mottar en bestemt Home
+Assistant-entitet, skal full entity-ID stå i kravet. Genererte familier
+bruker <code>FF=01</code>–<code>15</code> for permanente faser og
+<code>PP=01</code>–<code>15</code> for faste punktplasser.</p>
+<p>Node-RED-dokumentet eier gyldighet, beregning, commit og publisering.
+Home Assistant-dokumentet eier visning og tjenestekall. Eksempelvis er
+<code>NR-HA-010</code> produsentkravet for de tre strukturerte
+oversiktssensorene, mens <code>HA-TL-003</code>, <code>HA-PKT-001</code>
+og <code>HA-TID-003</code> er forbrukerkrav. Slike par skal samsvare,
+men skal ikke slås sammen på tvers av modulgrensen.</p>
+<p>Krav som ligner hverandre innen denne modulen er presisert etter
+livssyklus: schema-/templatekrav beskriver hva som er gyldig lagret
+modell, runtimekrav beskriver hva motoren gjør med modellen, og HA-krav
+beskriver hva som publiseres. Dermed får hvert krav én primær
+effekt.</p>
+<h3 id="24-hovedforløp-og-datavei">2.4 Hovedforløp og datavei</h3>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Trinn</th>
+<th>Hva som skjer</th>
+<th>Hva som ikke skjer ennå</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td>En HA-entitet, oppstartsrutine eller intern kontroll sender en
+melding.</td>
+<td>Meldingen har ikke rett til å endre state bare fordi den er
+mottatt.</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td>Inndata normaliseres og kontrolleres mot kjent kommando, verdi og
+livssyklus.</td>
+<td>Ugyldig inndata når ikke commit.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td>Kommandomodulen beregner en komplett foreslått stateendring.</td>
+<td>Home Assistant er fortsatt ikke autoritativ kilde.</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td>Runtime valideres og endringen godkjennes som ny autoritativ
+state.</td>
+<td>Persistens kan ikke endre hva kommandoen betydde.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td>Statusprojeksjon, filskriving og JSONL mottar resultatet.</td>
+<td>En feil i rapport/public-kopi skal ikke omskrive gyldig
+runtime.</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td>Home Assistant-klienter ser samme publiserte resultat.</td>
+<td>Det opprettes ikke en separat state per bruker eller nettleser.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-systemgrenser-og-forutsetninger">3. Systemgrenser og
+forutsetninger</h2>
+<h3 id="31-driftsmodell">3.1 Driftsmodell</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-DRIFT-001</td>
+<td>Modulen skal støtte nøyaktig én aktiv bryggedag om gangen.</td>
+<td>Det finnes bare ett autoritativt runtimeobjekt og én aktiv
+session-ID. En ny bryggedag kan derfor ikke startes før den forrige er
+avsluttet og klargjort.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Forsøk å starte en ny sesjon både mens en sesjon er
+aktiv og etter at den er avsluttet og nullstilt; bare det siste forsøket
+skal opprette ny session-ID.</td>
+</tr>
+<tr class="even">
+<td>NR-DRIFT-002</td>
+<td>Modulen skal ha én felles bryggedagsstate som kan vises samtidig i
+flere Home Assistant-klienter. Aktiv betjening og templateendringer skal
+koordineres fordi runtime ikke har operatørlås eller konfliktløsning for
+motstridende samtidige kommandoer.</td>
+<td>Flere kan følge dashboardet samtidig, men alle ser og påvirker samme
+state. Det finnes ingen operatørlås eller konfliktbehandling, så aktive
+kommandoer og templateendringer må
+koordineres.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Åpne samme bryggedag i to HA-klienter, utfør en endring i den ene og
+kontroller at begge viser samme publiserte state uten klientspesifikk
+kopi.</td>
+</tr>
+<tr class="odd">
+<td>NR-DRIFT-003</td>
+<td>Normal betjening skal skje gjennom Home Assistant-dashboardets
+dokumenterte <code>button.brygging_*</code>-, editor- og
+sensorentiteter; Node-RED-editoren skal ikke være en ordinær
+kommandoflate.</td>
+<td>Produksjonsflowen kan vedlikeholdes i Node-RED, men operatøren skal
+ikke trenge inject-noder eller manuell context-endring for normal
+bryggedrift.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Gjennomfør normal oppstart, fasebetjening, kommentar, rapport og
+nullstilling fra HA-dashboardet; ingen inject-node eller manuell
+context-endring skal være nødvendig.</td>
+</tr>
+<tr class="even">
+<td>NR-DRIFT-004</td>
+<td>Brukerrettede tekster, statusmeldinger, loggbeskrivelser og
+rapporter skal være på norsk. Interne status- og kommandoverdier kan
+være engelske når de er del av grensesnittkontrakten.</td>
+<td>Operatørtekst skal være forståelig på norsk. Engelske maskinverdier
+som <code>running</code> og <code>paused</code> beholdes når andre
+moduler er avhengige av nøyaktig skrivemåte.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kontroller dashboardstate, feilmeldinger,
+JSONL-beskrivelser og rapport i en testsesjon; operatørteksten skal være
+norsk, mens avtalte maskinverdier skal beholde eksakt
+grensesnittverdi.</td>
+</tr>
+<tr class="odd">
+<td>NR-DRIFT-005</td>
+<td>Modulen skal bruke konfigurert IANA-tidssone, normalt
+<code>Europe/Oslo</code>, for brukerrettede tidsstempler.</td>
+<td>Samme tidssone skal brukes i dashboarddata, logg og rapport, slik at
+klokkeslett kan sammenlignes. UTC kan fortsatt brukes internt i lagrede
+ISO-tidsstempler.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Bruk en kontrollert UTC-tid og
+<code>Europe/Oslo</code>, også rundt et sommertidsskifte; publiserte,
+loggede og rapporterte lokale klokkeslett skal samsvare.</td>
+</tr>
+<tr class="even">
+<td>NR-DRIFT-006</td>
+<td>Modulen skal forutsette korrekt vertstid. Den skal ikke hevde at
+ekstern NTP-nøyaktighet er verifisert.</td>
+<td>Kontrollen kan formatere containerens klokke i valgt tidssone, men
+kan ikke sammenligne den med en ekstern tidskilde. NTP og korrekt
+vertsklokke er et driftsansvar.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kontroller systemtidsraden med gyldig containerklokke
+og tidssone; den skal vise observert systemtid, men ikke påstå at NTP
+eller ekstern klokkeavvik er målt.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-tekniske-avhengigheter-og-stier">3.2 Tekniske avhengigheter
+og stier</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-INT-001</td>
+<td>Modulen skal kjøre i Node-RED med
+<code>node-red-contrib-home-assistant-websocket</code>.</td>
+<td>Websocket-pakken er koblingen som oppretter entiteter, mottar
+knappetrykk og publiserer state til Home Assistant. Manglende pakke gjør
+HA-grensesnittet ubrukelig.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Start containeren med referansemounts og
+manglende/ugyldig variant i testmiljø; riktig sti skal fungere og avvik
+skal diagnostiseres før start.</td>
+</tr>
+<tr class="even">
+<td>NR-INT-002</td>
+<td>Vedvarende Node-RED-data skal være tilgjengelige under
+<code>/data</code>.</td>
+<td><code>/data</code> må være vedvarende lagring, ellers forsvinner
+flow, state og konfigurasjon når containeren
+erstattes.<br><br><strong>Observerbar effekt og kontroll:</strong> Start
+containeren med referansemounts og manglende/ugyldig variant i
+testmiljø; riktig sti skal fungere og avvik skal diagnostiseres før
+start.</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-003</td>
+<td>Modulets dataområde skal være
+<code>/data/brewing-assistant</code>.</td>
+<td>Alle modulspesifikke filer samles under én kjent rot. Dette gjør
+mount, backup og tilgangskontroll
+oversiktlig.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Start containeren med referansemounts og manglende/ugyldig variant i
+testmiljø; riktig sti skal fungere og avvik skal diagnostiseres før
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-INT-004</td>
+<td>Home Assistants offentlige rapportkatalog skal være montert i
+containeren som <code>/data/brewing-assistant/ha-public</code>.</td>
+<td>Stien er et bind-mount direkte til Home Assistants
+<code>www/brygging</code>. Skriving her publiserer rapporten uten et
+ekstra kopieringstrinn på verten.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Start containeren med referansemounts og
+manglende/ugyldig variant i testmiljø; riktig sti skal fungere og avvik
+skal diagnostiseres før start.</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-005</td>
+<td>Standard runtime-konfigurasjon skal leses fra
+<code>/data/brewing-assistant/config/runtime.json</code>.</td>
+<td>Filen gir runtime faste opplysninger som ikke skal hardkodes spredt
+i flowen. Den opprettes og vedlikeholdes av
+installeren.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Start containeren med referansemounts og manglende/ugyldig variant i
+testmiljø; riktig sti skal fungere og avvik skal diagnostiseres før
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-INT-006</td>
+<td>Runtime-konfigurasjonen skal minst angi <code>schema_version</code>,
+<code>default_template_filename</code> og <code>timezone</code>.</td>
+<td>Disse tre feltene avgjør hvilket schema som godtas, hvilken template
+som lastes ved fallback og hvordan lokale klokkeslett
+vises.<br><br><strong>Observerbar effekt og kontroll:</strong> Start
+containeren med referansemounts og manglende/ugyldig variant i
+testmiljø; riktig sti skal fungere og avvik skal diagnostiseres før
+start.</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-007</td>
+<td>Det skal ikke ligge passord, token, faste IP-adresser eller Home
+Assistant-porter i produksjonsflowen.</td>
+<td>Miljøspesifikke tilkoblingsdata skal ligge i Node-RED/Home
+Assistant-konfigurasjonen. Flowfilen skal kunne deles og
+sikkerhetskopieres uten å røpe hemmeligheter.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Start containeren med referansemounts og
+manglende/ugyldig variant i testmiljø; riktig sti skal fungere og avvik
+skal diagnostiseres før start.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-arkitektur-og-vedlikeholdbarhet">4. Arkitektur og
+vedlikeholdbarhet</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-ARK-001</td>
+<td>Produksjonsflowen skal ha versjonsnøytral fane-ID
+<code>brygging_production</code> og versjonsnøytral etikett
+<code>Brygging – Produksjonsflow</code>.</td>
+<td>Versjon hører hjemme i releasefil, statusattributt og manifest, ikke
+i et arbeidsfanenavn som ellers blir foreldet ved hver
+oppgradering.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-002</td>
+<td>Produksjonslogikken skal være visuelt gruppert etter ansvar, uten
+foreldede dokumentasjonsgrupper, overlappende grupper eller noder uten
+definert eier.</td>
+<td>Flowen skal kunne revideres visuelt, men normativ dokumentasjon skal
+ligge i eksterne, versjonerte dokumenter.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kravet skal ha en navngitt automatisert
+kontroll når dette er teknisk mulig, og ellers en eksplisitt
+målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-003</td>
+<td>Dataveien skal følge prinsippet inngang → normalisering/streng
+validering → kommandomodul → runtimekontroll/commit → statusprojeksjon →
+persistens og Home Assistant-publisering.</td>
+<td>Bare validerte og normaliserte data skal nå state-commit.
+Publisering og lagring skjer etter at én autoritativ endring er
+godkjent.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+statisk flowanalyse av faner, grupper, node-/wiretyper og tickbaner;
+alle strukturelle avvik skal gi mislykket releasetest.</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-004</td>
+<td>Kommandoer skal rutes eksplisitt. Ukjente kommandoer skal avvises,
+diagnostiseres og logges.</td>
+<td>En kommando skal alltid ende i en kjent handler eller et kontrollert
+avslag. Stavefeil eller gamle kommandoer skal ikke forsvinne
+lydløst.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+statisk flowanalyse av faner, grupper, node-/wiretyper og tickbaner;
+alle strukturelle avvik skal gi mislykket releasetest.</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-005</td>
+<td>Produksjonsflowen skal ikke inneholde TEST-inject-noder, debug-noder
+eller manuell restore-inject.</td>
+<td>Produksjonsflowen skal ikke inneholde knapper som omgår dashboardets
+vern eller genererer uønsket testtrafikk.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kjør statisk flowanalyse av faner, grupper,
+node-/wiretyper og tickbaner; alle strukturelle avvik skal gi mislykket
+releasetest.</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-006</td>
+<td>Automatisk restore ved oppstart skal være eneste restorebane i
+normal produksjonsflow.</td>
+<td>Gjenoppretting skjer deterministisk under oppstart. Operatøren skal
+ikke kunne laste en eldre state manuelt inn i en kjørende
+prosess.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+statisk flowanalyse av faner, grupper, node-/wiretyper og tickbaner;
+alle strukturelle avvik skal gi mislykket releasetest.</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-007</td>
+<td>Femsekunderstick skal avsluttes uten videre arbeid når brygging er
+passiv, ingen skrive-retry venter og Home Assistant-forbindelsen er
+klar.</td>
+<td>Ticken brukes bare når noe faktisk må beregnes, republiseres eller
+forsøkes skrevet på nytt. Dette begrenser unødvendig CPU- og
+meldingsaktivitet i idle.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør statisk flowanalyse av faner, grupper,
+node-/wiretyper og tickbaner; alle strukturelle avvik skal gi mislykket
+releasetest.</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-008</td>
+<td>Produksjonsflowen skal ikke inneholde en egen
+dokumentasjonsfane.</td>
+<td>Den tidligere kommentarfanen hadde ingen kjørbar funksjon og kunne
+ikke holdes synkron med krav- og
+systemdokumentasjonen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-009</td>
+<td>Node-REDs interne meldings-, context-, runtime-, journal- og
+filgrensesnitt skal være dokumentert i en separat variabel- og
+dataflytkontrakt.</td>
+<td>Kontrakten skal identifisere produsent, mottaker, databruk, levetid
+og valideringsgrense for hvert kontraktfestet
+felt.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-010</td>
+<td>En produsert variabel skal ha en dokumentert mottaker eller en
+uttrykkelig begrunnet intern funksjon. Skrivebare felt uten leser skal
+fjernes eller kobles til autoritativ diagnostikk.</td>
+<td>Write-only contextnøkler og parallelle feilkanaler skal ikke bli
+liggende som tilsynelatende funksjonalitet.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kravet skal ha en navngitt automatisert
+kontroll når dette er teknisk mulig, og ellers en eksplisitt
+målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-template-og-schema-10">5. Template og schema 1.0</h2>
+<h3 id="51-overordnet-modell">5.1 Overordnet modell</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-TPL-001</td>
+<td>En template skal være et JSON-objekt med nøyaktig toppnivåfeltene
+<code>schema_version</code>, <code>note</code>, <code>phases</code> og
+<code>timers</code>. Ekstra eller manglende felt skal avvises.</td>
+<td>Streng toppnivåstruktur gjør at skrivefeil og gamle/private felt
+oppdages tidlig. En template med andre toppnivåfelt kan ikke tas i
+bruk.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-002</td>
+<td><code>schema_version</code> skal være nøyaktig <code>1.0</code>.
+Eldre schema skal avvises uten skjult migrering.</td>
+<td>Schemaet er en eksplisitt kontrakt. En fil med annet schema må
+konverteres utenfor runtime før den kan tas i
+bruk.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-003</td>
+<td><code>note</code> skal være tekst og skal kunne være tom.</td>
+<td>Notatet beskriver malen generelt og er ikke et runtime-notat for en
+konkret bryggedag. Tom tekst er derfor
+gyldig.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-004</td>
+<td>Filnavn skal reduseres til et sikkert basenavn og bare inneholde
+bokstaver, tall, punktum, understrek og bindestrek samt ende på
+<code>.json</code>.</td>
+<td>Bare basenavnet brukes under templatekatalogen. Dette hindrer at et
+filnavn peker utenfor katalogen eller inneholder
+shell-/stiuttrykk.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-005</td>
+<td>Minst én fase skal være aktiv.</td>
+<td>En bryggedag uten noen kjørbar fase gir ingen gyldig tidslinje og
+skal derfor avvises ved validering.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-faser">5.2 Faser</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-TPL-006</td>
+<td>Templaten skal inneholde nøyaktig 15 faseplasser.</td>
+<td>De 15 plassene samsvarer med faste Home Assistant-editorentiteter.
+Også ubrukte plasser må finnes i
+JSON-modellen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-007</td>
+<td>Fase-ID-ene <code>01</code>–<code>15</code> skal være permanente,
+unike og uavhengige av rekkefølge og navn.</td>
+<td>ID-en er identiteten som historikk, punkt-ID-er og timerreferanser
+bygger på. Navn og plassering kan endres uten at identiteten
+endres.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-008</td>
+<td>Hver fase skal ha nøyaktig feltene <code>id</code>,
+<code>order_id</code>, <code>enabled</code>, <code>title</code>,
+<code>duration_min</code> og <code>items</code>.</td>
+<td>En fase har en lukket datamodell. Manglende eller ekstra felt betyr
+at templaten ikke følger schemaet.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-009</td>
+<td><code>order_id</code> skal være et unikt heltall fra 1 til 15. Alle
+15 verdier skal forekomme.</td>
+<td>Rekkefølgen uttrykkes som en komplett permutasjon. Det kan derfor
+ikke oppstå hull eller to faser på samme
+plass.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-010</td>
+<td><code>enabled</code> skal være boolsk. Deaktiverte faser skal
+beholdes i templaten, men hoppes over i aktiv tidslinje og kjøring.</td>
+<td>Deaktivert betyr «lagret, men ikke kjørt». Plassen kan fylles ut på
+forhånd uten å bli del av den aktuelle
+bryggeplanen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-011</td>
+<td>Aktiv fase skal ha et ikke-tomt navn. Like fasenavn skal tillates
+med advarsel fordi ID, ikke navn, skiller fasene.</td>
+<td>Tittelen er operatørens navn på fasen. Like navn er mulig, men
+permanente ID-er brukes for å skille dem
+teknisk.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-012</td>
+<td><code>duration_min</code> skal være et heltall fra 0 til 1440.</td>
+<td>Grensen tillater nullminuttersfaser og inntil ett døgn, samtidig som
+feilaktige negative eller ekstremt store verdier
+avvises.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-013</td>
+<td>Endring av faserekkefølge skal flytte valgt fase og automatisk
+reindeksere alle 15 <code>order_id</code>-verdier. Permanente ID-er skal
+ikke endres.</td>
+<td>Flytting endrer bare visnings- og kjørerekkefølge. Historikk og
+timerreferanser skal fortsatt peke til samme permanente
+fase.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-fasepunkter">5.3 Fasepunkter</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-TPL-014</td>
+<td>Hver fase skal kunne inneholde 0–15 fasepunktobjekter. En generator
+kan skrive alle 15 permanente punktplasser, også når noen er
+deaktiverte.</td>
+<td>Den kompakte og den fullt utfylte representasjonen skal begge være
+gyldige når permanente ID-er og øvrig struktur er
+korrekt.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-015</td>
+<td>Fasepunkt-ID skal være permanent og følge <code>FF_PP</code>, der
+<code>FF</code> er fase-ID og <code>PP</code> er
+<code>01</code>–<code>15</code>.</td>
+<td>Første del identifiserer eierfasen, andre del den permanente
+punktplassen. ID-en påvirkes ikke av nytt navn eller ny
+rekkefølge.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-016</td>
+<td>Hvert fasepunkt skal ha nøyaktig feltene <code>id</code>,
+<code>order_id</code>, <code>enabled</code>, <code>type</code>,
+<code>name</code>, <code>description</code>,
+<code>expected_value</code>, <code>time</code> og
+<code>requires_confirmation</code>.</td>
+<td>Den lukkede feltlisten sikrer at editor, runtime og rapport tolker
+hvert punkt likt.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-017</td>
+<td><code>order_id</code> skal være unikt innen fasen og være et heltall
+fra 1 til 15. Når alle 15 punktplassene finnes, skal verdiene 1–15
+forekomme nøyaktig én gang.</td>
+<td>Rekkefølgen skal være deterministisk både for kompakte templates og
+for generatorer som skriver alle permanente
+plasser.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-018</td>
+<td>Tillatte typer skal være <code>activity</code>,
+<code>addition</code>, <code>measurement</code>, <code>control</code> og
+<code>warning</code>.</td>
+<td>Typen styrer hvordan punktet beskrives og presenteres. Vilkårlige
+typeverdier ville gitt uforutsigbar visning.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Valider både en gyldig referansetemplate og
+en målrettet ugyldig variant; bare referansen skal kunne lastes, lagres
+og brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-019</td>
+<td>Et aktivert fasepunkt skal ha ikke-tomt <code>name</code>. Et
+deaktivert fasepunkt kan ha tomt <code>name</code>.
+<code>description</code> og <code>expected_value</code> skal være tekst
+og kan være tomme.</td>
+<td>Dette gjør tomme, deaktiverte generatorplasser gyldige uten kunstige
+plassholdernavn, samtidig som alle kjørbare punkter er
+identifiserbare.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-020</td>
+<td><code>enabled</code> og <code>requires_confirmation</code> skal være
+boolske.</td>
+<td>Feltene skal være ekte JSON-boolske verdier, ikke tekst som «ja»
+eller «false». Dette fjerner tvetydig
+konvertering.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-021</td>
+<td><code>time</code> skal ha nøyaktig feltene <code>reference</code> og
+<code>offset_min</code>.</td>
+<td>Tidspunktet defineres relativt til en referanse og et offset. Andre
+underfelt godtas ikke.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-022</td>
+<td><code>reference</code> skal være <code>phase_start</code> eller
+<code>phase_end</code>. <code>offset_min</code> skal være et heltall fra
+−1440 til 1440.</td>
+<td>Punktet kan plasseres fra fasens start eller slutt, også før
+referansen med negativt offset. Grensen beskytter mot åpenbare
+tastefeil.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-023</td>
+<td>Deaktiverte fasepunkter skal lagres, men ikke inngå i kjøring,
+tidslinje eller krav om bekreftelse.</td>
+<td>Deaktivert punkt beholdes som konfigurert plass, men skal ikke kunne
+bli forfalt, kreve bekreftelse eller vises som
+runtimeoppgave.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="54-generiske-timere">5.4 Generiske timere</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-TPL-024</td>
+<td>Templaten skal inneholde nøyaktig 15 timerplasser med permanente
+ID-er <code>timer_01</code>–<code>timer_15</code>.</td>
+<td>Timerplassene har samme faste kapasitet som HA-editoren. Permanente
+ID-er gjør referanser og rapportering
+stabile.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-025</td>
+<td>Hver timer skal ha nøyaktig feltene <code>id</code>,
+<code>order_id</code>, <code>enabled</code>, <code>text</code>,
+<code>mode</code>, <code>pause_behavior</code>, <code>start</code> og
+<code>end</code>.</td>
+<td>Alle egenskaper som trengs for start, slutt, visning og
+pauseoppførsel skal ligge i den lukkede
+timermodellen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-026</td>
+<td><code>order_id</code> skal være en unik permutasjon av 1–15. Endret
+rekkefølge skal reindeksere alle timerne uten å endre permanent ID.</td>
+<td>Flytting skal endre rekkefølgen, ikke timerens identitet eller
+historiske kobling.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-027</td>
+<td>Aktiv timer skal ha ikke-tom tekst. Like tekster kan tillates med
+advarsel.</td>
+<td>En aktiv timer må kunne navngis i dashboard og rapport. Like navn
+advares det om, men ID-ene holder dem teknisk
+atskilt.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-028</td>
+<td><code>mode</code> skal være <code>count_up</code> eller
+<code>count_down</code>.</td>
+<td>Opptelling viser tid siden start; nedtelling viser tid fram til
+slutt. Ingen andre beregningsmodi er
+definert.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-029</td>
+<td><code>pause_behavior</code> skal være <code>follow_pause</code>
+eller <code>continue</code>.</td>
+<td>Operatøren velger uttrykkelig om pausetid skal trekkes fra timeren
+eller telle som vanlig veggklokketid.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-030</td>
+<td>Start- og sluttanker skal ha nøyaktig feltene <code>event</code>,
+<code>ref_id</code> og <code>offset_min</code>. Offset skal være et
+heltall fra −1440 til 1440.</td>
+<td>Begge ankere har samme entydige struktur. Offset gjør det mulig å
+starte eller stoppe før eller etter selve
+hendelsen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider både en gyldig referansetemplate og en målrettet ugyldig
+variant; bare referansen skal kunne lastes, lagres og brukes ved
+start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-031</td>
+<td>Tillatte ankerhendelser skal være <code>brew_start_actual</code>,
+<code>brew_end_effective</code>, <code>brew_end_actual</code>,
+<code>phase_start_planned</code>, <code>phase_start_actual</code>,
+<code>phase_end_effective</code>, <code>phase_end_actual</code>,
+<code>phasepoint_due</code>, <code>phasepoint_reached</code> og
+<code>phasepoint_confirmed</code>.</td>
+<td>Listen er den komplette hendelseskontrakten timeren kan lytte til.
+En annen streng kan aldri bli utløst og skal
+avvises.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-032</td>
+<td>Bryggestart/-slutt skal ha tom <code>ref_id</code>. Fasehendelser
+skal referere en gyldig tosifret fase-ID. Fasepunkthendelser skal
+referere en gyldig <code>FF_PP</code>-ID.</td>
+<td><code>ref_id</code> er bare nødvendig når hendelsen gjelder en
+bestemt fase eller et bestemt punkt. Validatoren kontrollerer både
+format og måltype.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Valider både en gyldig referansetemplate og en
+målrettet ugyldig variant; bare referansen skal kunne lastes, lagres og
+brukes ved start.</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-033</td>
+<td>Aktiv timer skal ikke kunne referere til en deaktivert eller ukjent
+fase eller et deaktivert eller ukjent fasepunkt. Deaktiverte
+timerplasser skal fortsatt valideres strukturelt.</td>
+<td>En aktiv timer skal ikke vente på noe som aldri kan skje. Deaktivert
+konfigurasjon beholdes, men må fortsatt være teknisk
+lesbar.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+både en gyldig referansetemplate og en målrettet ugyldig variant; bare
+referansen skal kunne lastes, lagres og brukes ved start.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-runtime-state-og-livssyklus">6. Runtime-state og
+livssyklus</h2>
+<p>Runtime kan leses som følgende hovedlivssyklus:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Status</th>
+<th>Praktisk betydning</th>
+<th>Tillatte hovedhandlinger</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>idle</code></td>
+<td>Ingen aktiv eller avsluttet sesjon holdes åpen. Template kan
+redigeres.</td>
+<td>Velg/rediger/lagre template, systemkontroll og start.</td>
+</tr>
+<tr class="even">
+<td><code>running</code></td>
+<td>Aktiv fase kjører normalt.</td>
+<td>Pause, neste/tilbake, punktbekreftelse/-kommentar, rapport og
+avslutt.</td>
+</tr>
+<tr class="odd">
+<td><code>waiting_event</code></td>
+<td>Et forfalt fasepunkt krever operatørhandling.</td>
+<td>Samme aktive kontrollflate; aktuell bekreftelse får særlig
+betydning.</td>
+</tr>
+<tr class="even">
+<td><code>waiting_confirmation</code></td>
+<td>Fasens planlagte varighet er utløpt og runtime venter på videre
+valg/bekreftelse.</td>
+<td>Samme aktive kontrollflate; Node-RED avgjør konkret gyldighet.</td>
+</tr>
+<tr class="odd">
+<td><code>paused</code></td>
+<td>Aktiv prosess er satt på pause.</td>
+<td>Fortsett, rapport og kontrollert avslutt; tidsberegning følger
+timerens pausemodell.</td>
+</tr>
+<tr class="even">
+<td><code>completed</code></td>
+<td>Siste aktive fase er fullført normalt.</td>
+<td>Rapport og klargjøring av ny bryggedag.</td>
+</tr>
+<tr class="odd">
+<td><code>ended</code></td>
+<td>Operatøren avsluttet før normal fullføring.</td>
+<td>Rapport og klargjøring av ny bryggedag.</td>
+</tr>
+<tr class="even">
+<td><code>error</code></td>
+<td>Autoritativ state eller sentral validering er ugyldig.</td>
+<td>Feilsøking og systemkontroll; ordinære prosesskommandoer skal ikke
+antas trygge.</td>
+</tr>
+</tbody>
+</table>
+<p>Statusen styrer hva runtime godtar. Dashboardets synlighet er bare en
+første brukerhjelp og erstatter ikke kommandovernet.</p>
+<h3 id="61-autoritativ-tilstand">6.1 Autoritativ tilstand</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-STATE-001</td>
+<td>Gyldige runtime-statuser skal være <code>idle</code>,
+<code>running</code>, <code>waiting_confirmation</code>,
+<code>waiting_event</code>, <code>paused</code>, <code>completed</code>,
+<code>ended</code> og <code>error</code>.</td>
+<td>Statusverdiene er den felles livssykluskontrakten mot dashboard,
+restore og kommandovern. Andre verdier betyr ugyldig
+state.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+og restore et kontrollert stateobjekt samt én variant som bryter
+feltkravet; ugyldig state skal avvises uten delvis commit.</td>
+</tr>
+<tr class="even">
+<td>NR-STATE-002</td>
+<td><code>active_phase_id</code> skal være autoritativ peker til aktiv
+fase. <code>phase_index</code> skal avledes for visning og
+bakoverkompatible rapportfelt.</td>
+<td>Permanent fase-ID avgjør hvilken fase som faktisk kjører. Indeksen
+er bare en avledet posisjon og skal ikke brukes som
+identitet.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider og restore et kontrollert stateobjekt samt én variant som bryter
+feltkravet; ugyldig state skal avvises uten delvis commit.</td>
+</tr>
+<tr class="odd">
+<td>NR-STATE-003</td>
+<td>Aktiv status skal kreve gyldig aktiv fase-ID, fasestarttid og
+session-ID. Pause skal i tillegg kreve pausetidspunkt.</td>
+<td>Disse feltene er minste bevis på at en aktiv eller pauset prosess
+kan fortsettes og tidsberegnes etter restart.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Valider og restore et kontrollert
+stateobjekt samt én variant som bryter feltkravet; ugyldig state skal
+avvises uten delvis commit.</td>
+</tr>
+<tr class="even">
+<td>NR-STATE-004</td>
+<td><code>batch_id</code> skal være identisk med aktivt
+templatefilnavn.</td>
+<td>Batch-ID-en er i denne versjonen ikke et eget oppskriftsnummer. Den
+gjør rapport og state sporbare til templatefilen som ble
+brukt.<br><br><strong>Observerbar effekt og kontroll:</strong> Valider
+og restore et kontrollert stateobjekt samt én variant som bryter
+feltkravet; ugyldig state skal avvises uten delvis commit.</td>
+</tr>
+<tr class="odd">
+<td>NR-STATE-005</td>
+<td>State skal inneholde <code>state_schema_version</code> og
+<code>runtime_version</code>.</td>
+<td>Schemafeltet beskriver datastrukturen; runtimeversjonen viser
+hvilken programversjon som skrev state. Begge er nødvendige ved restore
+og feilsøking.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider og restore et kontrollert stateobjekt samt én variant som bryter
+feltkravet; ugyldig state skal avvises uten delvis commit.</td>
+</tr>
+<tr class="even">
+<td>NR-STATE-006</td>
+<td>Lister for bekreftede/loggede punkter, punktresultater,
+fasehistorikk, pausehistorikk, kommentarer og sesjonslogg skal alltid
+være strukturelt gyldige lister.</td>
+<td>Manglende lister skal normaliseres eller gi valideringsfeil, ikke
+føre til tilfeldige runtimefeil når data
+itereres.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Valider og restore et kontrollert stateobjekt samt én variant som bryter
+feltkravet; ugyldig state skal avvises uten delvis commit.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-start-pause-fortsett-avslutt-og-nullstill">6.2 Start, pause,
+fortsett, avslutt og nullstill</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Handling</th>
+<th>Forutsetning</th>
+<th>Resultat ved godkjent kommando</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Start bryggedag</td>
+<td><code>idle</code>, lagret og verifisert template, fersk bestått
+preflight</td>
+<td>Ny session og første aktive fase startes.</td>
+</tr>
+<tr class="even">
+<td>Pause</td>
+<td>Aktiv kjøring eller ventestatus</td>
+<td>Pause startes, og forrige aktive status huskes.</td>
+</tr>
+<tr class="odd">
+<td>Fortsett</td>
+<td><code>paused</code></td>
+<td>Pausen lukkes og forrige aktive status gjenopptas.</td>
+</tr>
+<tr class="even">
+<td>Avslutt</td>
+<td>Aktiv bryggedag</td>
+<td>Aktiv fase lukkes og sesjonen settes til <code>ended</code>;
+rapportgrunnlaget beholdes.</td>
+</tr>
+<tr class="odd">
+<td>Klargjør ny bryggedag</td>
+<td>Ikke aktiv brygging</td>
+<td>Sesjonsdata fjernes, mens aktiv og verifisert template beholdes i
+ren <code>idle</code>.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-CMD-001</td>
+<td>Hvert trykk på <code>button.brygging_start</code> skal utløse en
+fersk full systemkontroll; et eldre godkjent resultat på
+<code>sensor.brygging_systemkontroll</code> skal ikke være
+tilstrekkelig.</td>
+<td>START-meldingen skal holdes tilbake til den nye kontrollen er
+ferdig. Resultatet publiseres både som kontrollstatus og som utført
+eller sperret kommando.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Send kommandoen i både tillatt og sperret status;
+tillatt tilfelle skal gi én komplett stateendring, mens sperret tilfelle
+bare gir logg/diagnostikk.</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-002</td>
+<td>Start skal bare tillates fra <code>idle</code>, med gyldig og lagret
+template, godkjent templatefilidentitet og bestått start-preflight.</td>
+<td><code>idle</code> alene er ikke nok. Systemet kontrollerer også
+ulagrede endringer, backingfilens identitet og alle startkritiske
+driftsforhold.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Send kommandoen i både tillatt og sperret status; tillatt tilfelle skal
+gi én komplett stateendring, mens sperret tilfelle bare gir
+logg/diagnostikk.</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-003</td>
+<td>Vellykket start skal opprette unik session-ID, tømme tidligere
+sesjonsdata, starte første aktive fase og logge knappetrykk, bryggestart
+og fasestart.</td>
+<td>En ny session skal ikke arve kommentarer, historikk eller
+timerresultater fra forrige bryggedag. Oppstartshendelsene gir et
+komplett revisjonsspor.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Send kommandoen i både tillatt og sperret status;
+tillatt tilfelle skal gi én komplett stateendring, mens sperret tilfelle
+bare gir logg/diagnostikk.</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-004</td>
+<td>Kommando fra <code>button.brygging_pause</code> skal bare godtas fra
+<code>running</code>, <code>waiting_confirmation</code> eller
+<code>waiting_event</code>.</td>
+<td>Andre statuser skal gi sperret knappresultat uten stateendring. Ved
+godkjenning settes pausemarkør og status publiseres på
+<code>sensor.brygging_status</code>.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Send kommandoen i både tillatt og sperret status;
+tillatt tilfelle skal gi én komplett stateendring, mens sperret tilfelle
+bare gir logg/diagnostikk.</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-005</td>
+<td>Kommando fra <code>button.brygging_fortsett</code> skal bare godtas
+fra <code>paused</code> og skal gjenopprette statusen som var aktiv før
+pausen.</td>
+<td>Fortsett skal lukke gjeldende pauseperiode, oppdatere akkumulert
+pausetid og publisere ny runtime før dashboardet bytter
+knapp.<br><br><strong>Observerbar effekt og kontroll:</strong> Send
+kommandoen i både tillatt og sperret status; tillatt tilfelle skal gi én
+komplett stateendring, mens sperret tilfelle bare gir
+logg/diagnostikk.</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-006</td>
+<td>Pausehistorikk og samlet pausetid skal oppdateres slik at fase- og
+punktplanen forskyves korrekt.</td>
+<td>Pause skal ikke gjøre planlagte hendelser kunstig forsinket eller
+tidlig; tidslinjen flyttes samlet etter avtalt
+pausemodell.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Send kommandoen i både tillatt og sperret status; tillatt tilfelle skal
+gi én komplett stateendring, mens sperret tilfelle bare gir
+logg/diagnostikk.</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-007</td>
+<td>Kommando fra <code>button.brygging_avslutt</code> skal bare godtas
+under aktiv brygging, lukke aktiv fase, sette <code>ended</code> og
+bevare logg- og rapportgrunnlaget.</td>
+<td>Avslutt er en tidlig slutt, ikke nullstilling.
+<code>sensor.brygging_status</code> skal bli <code>ended</code>, og
+rapportknappen skal fortsatt kunne brukes.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Send kommandoen i både tillatt og sperret
+status; tillatt tilfelle skal gi én komplett stateendring, mens sperret
+tilfelle bare gir logg/diagnostikk.</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-008</td>
+<td>Når siste aktive fase fullføres, skal status bli
+<code>completed</code>.</td>
+<td>Normal fullføring skjer først etter siste aktive fase. Deaktiverte
+faser påvirker ikke sluttstatusen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Send kommandoen i både tillatt og sperret status;
+tillatt tilfelle skal gi én komplett stateendring, mens sperret tilfelle
+bare gir logg/diagnostikk.</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-009</td>
+<td>Kommando fra <code>button.brygging_klargjor_ny_bryggedag</code> skal
+sperres under aktiv brygging og ellers opprette ren
+<code>idle</code>-state med aktiv, validert template og verifisert
+filidentitet beholdt.</td>
+<td>Etter commit skal sesjonsdata være borte og editorene kunne åpnes
+igjen. Templatefilen skal ikke måtte velges på
+nytt.<br><br><strong>Observerbar effekt og kontroll:</strong> Send
+kommandoen i både tillatt og sperret status; tillatt tilfelle skal gi én
+komplett stateendring, mens sperret tilfelle bare gir
+logg/diagnostikk.</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-010</td>
+<td>Ugyldige kommandoer og kommandoer i feil tilstand skal sperres og
+logges; de skal ikke stille endre runtime.</td>
+<td>Et avvist trykk skal ikke gi en delvis endring. Loggen skal forklare
+hva som ble forsøkt og hvorfor det ikke ble
+utført.<br><br><strong>Observerbar effekt og kontroll:</strong> Send
+kommandoen i både tillatt og sperret status; tillatt tilfelle skal gi én
+komplett stateendring, mens sperret tilfelle bare gir
+logg/diagnostikk.</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-011</td>
+<td>To trykk på samme dashboardknapp innen 2000 ms skal behandles som
+dobbelttrykk. Det andre trykket skal ignoreres og logges som
+<code>button_ignored</code>.</td>
+<td>Vernet reduserer doble faser, bekreftelser eller avslutninger fra
+treg nettleser eller gjentatt trykk. Første trykk behandles
+normalt.<br><br><strong>Observerbar effekt og kontroll:</strong> Send
+kommandoen i både tillatt og sperret status; tillatt tilfelle skal gi én
+komplett stateendring, mens sperret tilfelle bare gir
+logg/diagnostikk.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-faser-og-tilbake">6.3 Faser og «Tilbake»</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-FAS-001</td>
+<td>Kommando fra <code>button.brygging_neste_fase</code> skal kunne
+fullføre aktiv fase selv om planlagt tid eller bekreftelser ikke er
+ferdige; ikke nådde punkter skal registreres som avvik.</td>
+<td>Knappen er en operatørstyrt overgang. Runtime skal lukke forsøket,
+logge hopp og starte neste aktive fase eller fullføre
+sesjonen.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+faseovergangen med deaktiverte faser og minst ett Tilbake-forløp; state,
+historikk, punktresultater og rapportforsøk skal være konsistente.</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-002</td>
+<td>Deaktiverte faser skal hoppes over automatisk.</td>
+<td>Bare aktiverte faser deltar i den faktiske kjøringen, uansett at
+alle 15 plasser finnes i templaten.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør faseovergangen med deaktiverte faser og minst
+ett Tilbake-forløp; state, historikk, punktresultater og rapportforsøk
+skal være konsistente.</td>
+</tr>
+<tr class="odd">
+<td>NR-FAS-003</td>
+<td>Kommando fra <code>button.brygging_tilbake</code> skal bare godtas i
+en aktiv fase som har en tidligere aktiv fase.</td>
+<td>Trykk i første fase eller uten aktiv brygging skal sperres og logges
+uten å endre fasehistorikken.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør faseovergangen med deaktiverte faser og minst
+ett Tilbake-forløp; state, historikk, punktresultater og rapportforsøk
+skal være konsistente.</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-004</td>
+<td>«Tilbake» skal lukke gjeldende gjennomføring, starte forrige aktive
+fase fra null og nullstille runtime-resultatene for fasen som startes på
+nytt.</td>
+<td>Den avbrutte gjennomføringen lukkes som historikk. Fasen som åpnes
+igjen får nye startdata og nye
+punktresultater.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør faseovergangen med deaktiverte faser og minst ett Tilbake-forløp;
+state, historikk, punktresultater og rapportforsøk skal være
+konsistente.</td>
+</tr>
+<tr class="odd">
+<td>NR-FAS-005</td>
+<td>Tidligere fasehistorikk og fasepunktkommentarer skal bevares
+kronologisk etter «Tilbake».</td>
+<td>«Tilbake» skal ikke omskrive det som faktisk skjedde. Tidligere
+forsøk og kommentarer forblir dokumentasjon av
+bryggedagen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør faseovergangen med deaktiverte faser og minst ett Tilbake-forløp;
+state, historikk, punktresultater og rapportforsøk skal være
+konsistente.</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-006</td>
+<td>Timere skal bruke den nye gjennomføringen. Gamle resultater fra en
+fase som igjen er framtidig, skal ikke starte eller avslutte
+timeren.</td>
+<td>Timerankere skal følge den nye kronologien. Ellers kunne gamle
+punkt- eller fasehendelser fullføre en timer i det nye
+forsøket.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+faseovergangen med deaktiverte faser og minst ett Tilbake-forløp; state,
+historikk, punktresultater og rapportforsøk skal være konsistente.</td>
+</tr>
+<tr class="odd">
+<td>NR-FAS-007</td>
+<td>Gjentatte fasegjennomføringer skal vises separat i rapporten med
+<code>(forsøk 1)</code>, <code>(forsøk 2)</code> osv. når det finnes mer
+enn ett forsøk.</td>
+<td>Nummereringen gjør planlagt-versus-reell-tabellen entydig når samme
+permanente fase-ID forekommer flere ganger i
+historikken.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør faseovergangen med deaktiverte faser og minst ett Tilbake-forløp;
+state, historikk, punktresultater og rapportforsøk skal være
+konsistente.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64-fasepunkter-og-kommentarer">6.4 Fasepunkter og
+kommentarer</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-PKT-001</td>
+<td>Aktive fasepunkter skal sorteres etter beregnet tidspunkt og
+deretter <code>order_id</code>.</td>
+<td>Tidspunkt er primær arbeidsrekkefølge; <code>order_id</code> løser
+likt tidspunkt deterministisk.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør punktet før og etter forfall, med og uten
+bekreftelse/kommentar; permanente ID-er, tider og statusprojeksjon skal
+samsvare.</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-002</td>
+<td>Ikke-bekreftbare punkter skal registreres som nådd når første tick
+etter forfall behandles. Normal tickforsinkelse skal rapporteres som
+<code>Fasepunkt nådd ihht tidsplan</code>, ikke som et
+prosessavvik.</td>
+<td>Tick er en teknisk samplingsmekanisme. Bare et eksplisitt fasehopp
+skal vise beregnet før-/etter-avvik for
+punktet.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-003</td>
+<td>Bekreftbare punkter skal forbli ventende til operatøren bekrefter
+dem eller fasen hoppes/avsluttes.</td>
+<td>Et bekreftbart punkt dokumenterer operatørens faktiske kvittering.
+Det blir ikke automatisk ferdig bare fordi klokkeslettet
+passeres.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+punktet før og etter forfall, med og uten bekreftelse/kommentar;
+permanente ID-er, tider og statusprojeksjon skal samsvare.</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-004</td>
+<td>Runtime skal kunne gå til <code>waiting_event</code> når et
+bekreftelsespunkt er forfalt, og til <code>waiting_confirmation</code>
+når fasevarigheten er utløpt.</td>
+<td><code>waiting_event</code> markerer at et punkt krever handling,
+mens <code>waiting_confirmation</code> markerer at fasens planlagte
+slutt er passert og må håndteres.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør punktet før og etter forfall, med og uten
+bekreftelse/kommentar; permanente ID-er, tider og statusprojeksjon skal
+samsvare.</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-005</td>
+<td>Kommando fra <code>button.brygging_bekreft_fasepunkt</code> skal
+bare godtas ved aktiv brygging når runtime har et aktuelt
+bekreftelsespunkt.</td>
+<td>Ved godkjenning lagres punktets permanente ID og bekreftelsestid.
+Uten aktuelt punkt skal trykket bli et sperret
+knappresultat.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør punktet før og etter forfall, med og uten bekreftelse/kommentar;
+permanente ID-er, tider og statusprojeksjon skal samsvare.</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-006</td>
+<td>Kommentar fra <code>text.brygging_fasepunktkommentar</code> og mål
+fra <code>select.brygging_fasepunkt_for_kommentar</code> skal bare
+lagres etter <code>button.brygging_lagre_fasepunktkommentar</code>,
+under aktiv brygging, med ikke-tom tekst og gyldig punkt i aktiv
+fase.</td>
+<td>De tre entitetene utgjør én kommando. Runtime skal lese de ferske
+HA-verdiene, løse målet til permanent punkt-ID og enten lagre hele
+kommentaren eller sperre uten delresultat.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kjør punktet før og etter forfall, med og
+uten bekreftelse/kommentar; permanente ID-er, tider og statusprojeksjon
+skal samsvare.</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-007</td>
+<td>Kommentar skal lagre tidspunkt, fase-ID/-navn, punkt-ID/-navn,
+beskrivelse, forventet verdi og tidsavvik.</td>
+<td>Sammen med kommentarteksten lagres nok kontekst til at rapporten kan
+forstås selv om templaten senere endres.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kjør punktet før og etter forfall, med og
+uten bekreftelse/kommentar; permanente ID-er, tider og statusprojeksjon
+skal samsvare.</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-008</td>
+<td>Statusprojeksjonen skal publisere inntil 15 aktive fasepunktobjekter
+i <code>sensor.brygging_fasepunktoversikt.attributes.phasepoints</code>
+med de ni kontraktfestede feltene.</td>
+<td>Ubrukte eller deaktiverte templateplasser skal ikke projiseres.
+Dashboardet skal få én strukturert, validert liste og ikke 15 separate
+sensorskrivere.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-fremdrift-og-timere">6.5 Fremdrift og timere</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-TID-001</td>
+<td>Fasefremdrift skal kunne overstige 100 prosent, og overtid skal
+beregnes separat.</td>
+<td>Over 100 prosent betyr at fasen fortsatt kjører etter planlagt
+slutt. Separat overtid gjør avviket tydelig uten å stoppe
+prosessen.<br><br><strong>Observerbar effekt og kontroll:</strong> Bruk
+kontrollerte klokketider, pause og ny fasegjennomføring; beregnede
+sensor- og timerverdier skal matche forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="even">
+<td>NR-TID-002</td>
+<td>Estimert bryggeslutt skal publiseres som varighet på
+<code>sensor.brygging_tid_til_ferdig_bryggedag</code> og lokalt
+klokkeslett på <code>sensor.brygging_estimert_ferdig_bryggedag</code>,
+basert på aktiv og senere aktive faser.</td>
+<td>Begge sensorene skal beregnes fra samme tidsgrunnlag. Dashboardet
+skal derfor kunne vise konsistente svar på hvor lenge og
+når.<br><br><strong>Observerbar effekt og kontroll:</strong> Bruk
+kontrollerte klokketider, pause og ny fasegjennomføring; beregnede
+sensor- og timerverdier skal matche forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-003</td>
+<td>Pause skal forskyve planlagt faseslutt og fasepunkter.</td>
+<td>Punkter og faseslutt som følger prosessen skal beholde sin relative
+plassering når bryggedagen pauses.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Bruk kontrollerte klokketider, pause og ny
+fasegjennomføring; beregnede sensor- og timerverdier skal matche
+forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="even">
+<td>NR-TID-004</td>
+<td>En <code>follow_pause</code>-timer skal fryse under pause og trekke
+pausetid fra målingen.</td>
+<td><code>follow_pause</code> måler aktiv prosesstid. En pause øker
+derfor ikke timerens viste forløp.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Bruk kontrollerte klokketider, pause og ny
+fasegjennomføring; beregnede sensor- og timerverdier skal matche
+forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-005</td>
+<td>En <code>continue</code>-timer skal følge veggklokken under
+pause.</td>
+<td><code>continue</code> måler faktisk klokketid. Den fortsetter selv
+om selve bryggedagsruntime er satt på pause.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Bruk kontrollerte klokketider, pause og ny
+fasegjennomføring; beregnede sensor- og timerverdier skal matche
+forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="even">
+<td>NR-TID-006</td>
+<td>Nedtelling skal kunne vise overtid etter passert sluttanker.</td>
+<td>En nedtelling forsvinner ikke ved null. Etter sluttankeret går den
+over til å vise hvor mye tiden er
+overskredet.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Bruk kontrollerte klokketider, pause og ny fasegjennomføring; beregnede
+sensor- og timerverdier skal matche forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-007</td>
+<td>Timerstatus skal minst skille <code>waiting</code>,
+<code>waiting_end</code>, <code>active</code>, <code>overdue</code> og
+<code>completed</code>.</td>
+<td>Statusen forklarer om timeren venter på start, har startet uten
+kjent slutt, kjører, er overskredet eller er
+ferdig.<br><br><strong>Observerbar effekt og kontroll:</strong> Bruk
+kontrollerte klokketider, pause og ny fasegjennomføring; beregnede
+sensor- og timerverdier skal matche forventet millisekundgrunnlag.</td>
+</tr>
+<tr class="even">
+<td>NR-TID-008</td>
+<td>Bare aktiverte timere skal inngå i <code>timers</code> på
+<code>sensor.brygging_timeroversikt</code> og i rapportens
+tidsmålinger.</td>
+<td>Deaktiverte timerplasser forblir i templaten og editoren, men skal
+ikke gi runtimeobjekt, dashboardlinje eller
+rapportresultat.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-templatevalg-og-redigering">7. Templatevalg og redigering</h2>
+<p>Node-RED holder både en runtimekopi av templaten og en backingfil.
+Når et HA-editorfelt endres i <code>idle</code>, endres runtimekopien og
+<code>template_dirty</code> settes. Først «Lagre template» validerer
+hele modellen, kontrollerer at backingfilen ikke er endret utenfra og
+skriver ny fil atomisk. «Forkast endringer» gjør det motsatte og leser
+backingfilen inn på nytt.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Tilstand</th>
+<th>Templatevalg og redigering</th>
+<th>Bryggestart</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>idle</code>, ingen ulagrede endringer</td>
+<td>Tillatt</td>
+<td>Mulig etter fersk preflight.</td>
+</tr>
+<tr class="even">
+<td><code>idle</code>, <code>template_dirty=true</code></td>
+<td>Videre redigering, lagring eller eksplisitt forkasting</td>
+<td>Sperret.</td>
+</tr>
+<tr class="odd">
+<td>Aktiv bryggedag</td>
+<td>Sperret</td>
+<td>Allerede startet.</td>
+</tr>
+<tr class="even">
+<td><code>completed</code> eller <code>ended</code></td>
+<td>Sperret til «Klargjør ny bryggedag»</td>
+<td>Sperret.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-EDIT-001</td>
+<td>Templatebytte og alle permanente templateendringer skal bare
+tillates i <code>idle</code>.</td>
+<td>Endring under aktiv eller avsluttet, ikke-nullstilt sesjon kunne
+gjort state og rapportgrunnlag selvmotsigende og er derfor
+sperret.<br><br><strong>Observerbar effekt og kontroll:</strong> Endre
+felt i <code>idle</code>, prøv samme endring i aktiv status og utfør
+reconnect; bare tillatt endring skal sette dirty og alle klientfelt skal
+resynkroniseres.</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-002</td>
+<td>Templatebytte skal sperres når det finnes ulagrede endringer, med
+mindre operatøren eksplisitt forkaster dem.</td>
+<td>Et templatebytte skal ikke stille forkaste operatørens uskrevede
+arbeid. Forkasting må være en egen, synlig
+beslutning.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Endre felt i <code>idle</code>, prøv samme endring i aktiv status og
+utfør reconnect; bare tillatt endring skal sette dirty og alle
+klientfelt skal resynkroniseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-003</td>
+<td>Endringer i notat, faseegenskaper, fasepunkter og timere skal sette
+<code>template_dirty=true</code>.</td>
+<td>Dirty-flagget er systemets bevis på at runtimekopien og backingfilen
+kan være ulike.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Endre felt i <code>idle</code>, prøv samme endring i aktiv status og
+utfør reconnect; bare tillatt endring skal sette dirty og alle
+klientfelt skal resynkroniseres.</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-004</td>
+<td>Ulagrede endringer skal sperre bryggestart.</td>
+<td>Bryggingen skal starte fra en etterprøvbar fil, ikke fra en kladd
+som går tapt ved restart.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Endre felt i <code>idle</code>, prøv samme endring i
+aktiv status og utfør reconnect; bare tillatt endring skal sette dirty
+og alle klientfelt skal resynkroniseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-005</td>
+<td>«Forkast endringer» skal laste aktiv fil på nytt og bare kunne
+brukes i <code>idle</code>.</td>
+<td>Forkasting gjenoppretter sist lagrede filinnhold og er bare trygt
+når ingen bryggedag pågår.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Endre felt i <code>idle</code>, prøv samme endring i
+aktiv status og utfør reconnect; bare tillatt endring skal sette dirty
+og alle klientfelt skal resynkroniseres.</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-006</td>
+<td>Templatekatalogen skal valideres med samme strenge validator som
+lasting og lagring; bare gyldige filer skal publiseres som valg i
+<code>select.brygging_template</code>.</td>
+<td>En ugyldig ikke-aktiv fil skal utelates og rapporteres i
+systemkontrollen, men skal ikke alene sperre start med en annen frisk
+aktiv template.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Endre felt i <code>idle</code>, prøv samme endring i aktiv status og
+utfør reconnect; bare tillatt endring skal sette dirty og alle
+klientfelt skal resynkroniseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-007</td>
+<td>Templateverdier skal synkroniseres til
+<code>text.brygging_fase_FF_navn</code>,
+<code>number.brygging_fase_FF_*</code>,
+<code>select.brygging_fase_FF_status</code>, fasepunkteditoren og
+timereditoren ved lasting, restore, nullstilling, start, editorvalg og
+full reconnect-resynk.</td>
+<td>Alle klienter skal se runtimekopien etter en overgang. Gamle
+HA-feltverdier skal ikke kunne bli liggende og senere overskrive riktig
+template ved et knappetrykk.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Endre felt i <code>idle</code>, prøv samme endring i
+aktiv status og utfør reconnect; bare tillatt endring skal sette dirty
+og alle klientfelt skal resynkroniseres.</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-008</td>
+<td>Forventede Home Assistant-ekko fra programmatisk oppdatering av
+editorentitetene skal filtreres én gang og utløpe etter 60
+sekunder.</td>
+<td>Når Node-RED setter eksempelvis
+<code>text.brygging_timer_navn</code>, skal returekkoet ikke tolkes som
+brukerendring eller sette <code>template_dirty</code>; et reelt senere
+brukerinput skal fortsatt behandles.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Endre felt i <code>idle</code>, prøv samme endring
+i aktiv status og utfør reconnect; bare tillatt endring skal sette dirty
+og alle klientfelt skal resynkroniseres.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="71-sikker-templatelagring">7.1 Sikker templatelagring</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-SAVE-001</td>
+<td>Før kommando fra <code>button.brygging_lagre_template</code> skriver
+fil, skal hele runtime-templaten valideres strengt; ugyldig template
+skal ikke skrives.</td>
+<td>Et avslag skal beholde <code>template_dirty</code>, publisere
+valideringsfeil på <code>sensor.brygging_status</code> og la
+backingfilen være byteidentisk.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Test gyldig lagring, ekstern hashendring og
+skrivefeil; bare fullført atomisk skriving skal fjerne dirty og
+oppdatere filidentiteten.</td>
+</tr>
+<tr class="even">
+<td>NR-SAVE-002</td>
+<td>Aktiv backing-fil skal identifiseres med SHA-256. Endring utenfor
+systemet skal oppdages uavhengig av filsystemets tidsoppløsning.</td>
+<td>Hash oppdager enhver innholdsendring, også når filens tidsstempel er
+likt eller filsystemet har grov
+tidsoppløsning.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Test gyldig lagring, ekstern hashendring og skrivefeil; bare fullført
+atomisk skriving skal fjerne dirty og oppdatere filidentiteten.</td>
+</tr>
+<tr class="odd">
+<td>NR-SAVE-003</td>
+<td>Filens endringstid skal også kontrolleres og leses tilbake etter
+vellykket lagring.</td>
+<td>Endringstid gir lesbar diagnostikk og en ekstra identitetskontroll
+etter skriving, men erstatter ikke SHA-256.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Test gyldig lagring, ekstern hashendring og
+skrivefeil; bare fullført atomisk skriving skal fjerne dirty og
+oppdatere filidentiteten.</td>
+</tr>
+<tr class="even">
+<td>NR-SAVE-004</td>
+<td>Template skal skrives atomisk via unik midlertidig fil og rename,
+med forrige fil som <code>.prev</code>.</td>
+<td>Den nye filen blir synlig i ett rename-steg. <code>.prev</code> gir
+en lokal forrige versjon dersom siste fil viser seg å være
+problematisk.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Test gyldig lagring, ekstern hashendring og skrivefeil; bare fullført
+atomisk skriving skal fjerne dirty og oppdatere filidentiteten.</td>
+</tr>
+<tr class="odd">
+<td>NR-SAVE-005</td>
+<td><code>template_dirty</code> skal først fjernes når filskriving og
+etterkontroll er bekreftet.</td>
+<td>Først en kontrollert ferdig fil betyr at dashboardet kan vise
+«lagret» og tillate start.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Test gyldig lagring, ekstern hashendring og
+skrivefeil; bare fullført atomisk skriving skal fjerne dirty og
+oppdatere filidentiteten.</td>
+</tr>
+<tr class="even">
+<td>NR-SAVE-006</td>
+<td>Feil skal gi eksplisitt lagringsfeil, diagnostikk og hendelseslogg.
+Midlertidig fil skal ryddes.</td>
+<td>Operatøren skal få en varig og sporbar feil, og en mislykket tempfil
+skal ikke bli liggende som mulig
+templatekandidat.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Test gyldig lagring, ekstern hashendring og
+skrivefeil; bare fullført atomisk skriving skal fjerne dirty og
+oppdatere filidentiteten.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-persistens-restore-og-logging">8. Persistens, restore og
+logging</h2>
+<p>State og JSONL har forskjellige roller. State er siste komplette
+gjenopprettingsbilde; JSONL er et appendbasert hendelsesspor. De skrives
+separat, og rapport kan genereres fra runtime/state selv om
+public-kopien eller en rapportskriving tidligere har feilet.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Filtype</th>
+<th>Formål</th>
+<th>Oppførsel ved feil</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>current_state.json</code></td>
+<td>Primær restorekilde</td>
+<td>Vedvarende kritisk diagnostikk og kontrollert retry.</td>
+</tr>
+<tr class="even">
+<td><code>current_state.prev.json</code></td>
+<td>Forrige komplette state</td>
+<td>Brukes automatisk når current-state ikke kan valideres.</td>
+</tr>
+<tr class="odd">
+<td><code>&lt;session&gt;-brewday.jsonl</code></td>
+<td>Kronologiske hendelser og knappresultater</td>
+<td>Feilen registreres separat; siste event kan i et smalt
+strømbruddsvindu finnes bare i state eller logg.</td>
+</tr>
+<tr class="even">
+<td>Templatefil og <code>.prev</code></td>
+<td>Permanent prosessmal og forrige filversjon</td>
+<td>Dirty fjernes ikke før fil og etterkontroll har lyktes.</td>
+</tr>
+<tr class="odd">
+<td>Rapport og public-kopi</td>
+<td>Arkivoriginal og stabil HA-lenke</td>
+<td>Runtime beholdes; generering/publisering kan forsøkes på nytt.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="81-state">8.1 State</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-PER-001</td>
+<td>Primær state skal lagres som
+<code>/data/brewing-assistant/state/current_state.json</code>.</td>
+<td>Dette er filen oppstart forsøker først. Den inneholder siste
+godkjente, persistente runtimebilde.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Simuler raske stateendringer og en kontrollert
+skrivefeil; køen skal serialisere skriv, slå sammen ventende state og
+beholde feilen til vellykket retry.</td>
+</tr>
+<tr class="even">
+<td>NR-PER-002</td>
+<td>Forrige atomiske state skal lagres som
+<code>/data/brewing-assistant/state/current_state.prev.json</code>.</td>
+<td>Forrige fil er reserve dersom primærfilen er korrupt eller
+ufullstendig etter en hendelse.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Simuler raske stateendringer og en kontrollert
+skrivefeil; køen skal serialisere skriv, slå sammen ventende state og
+beholde feilen til vellykket retry.</td>
+</tr>
+<tr class="odd">
+<td>NR-PER-003</td>
+<td>State skal skrives ved meningsfulle endringer, ikke uendret hvert
+femte sekund.</td>
+<td>Tidsvisning kan oppdateres ofte i minnet uten å slite lagring eller
+fylle skrivekøen med identiske states.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Simuler raske stateendringer og en kontrollert
+skrivefeil; køen skal serialisere skriv, slå sammen ventende state og
+beholde feilen til vellykket retry.</td>
+</tr>
+<tr class="even">
+<td>NR-PER-004</td>
+<td>State-, template- og rapportskriving skal gå gjennom én serialisert
+atomisk skrivekø. Flere ventende stateoppdateringer skal kunne slås
+sammen.</td>
+<td>Én skriver hindrer konkurrerende rename-operasjoner. Sammenslåing
+gjør at bare nyeste state trenger å vente når flere endringer kommer
+raskt.<br><br><strong>Observerbar effekt og kontroll:</strong> Simuler
+raske stateendringer og en kontrollert skrivefeil; køen skal serialisere
+skriv, slå sammen ventende state og beholde feilen til vellykket
+retry.</td>
+</tr>
+<tr class="odd">
+<td>NR-PER-005</td>
+<td>Mislykket state-skriving skal gi vedvarende diagnostikk og
+kontrollert retry. Feilen skal først kvitteres når samme filtype senere
+er skrevet vellykket.</td>
+<td>En skrivefeil skal være synlig til en reell ny skriving lykkes. En
+vanlig tick eller annen kommando kan ikke kvittere
+den.<br><br><strong>Observerbar effekt og kontroll:</strong> Simuler
+raske stateendringer og en kontrollert skrivefeil; køen skal serialisere
+skriv, slå sammen ventende state og beholde feilen til vellykket
+retry.</td>
+</tr>
+<tr class="even">
+<td>NR-PER-006</td>
+<td>State skal være primær gjenopprettingskilde.</td>
+<td>Rapport og JSONL er støttedata; restore bygger først og fremst på
+den atomiske statefilen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Simuler raske stateendringer og en kontrollert
+skrivefeil; køen skal serialisere skriv, slå sammen ventende state og
+beholde feilen til vellykket retry.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="82-oppstartsrekkefølge-og-restore">8.2 Oppstartsrekkefølge og
+restore</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-RES-001</td>
+<td>Oppstart skal først lese runtime-konfigurasjon og standardtemplate
+og deretter avgjøre restore uten å overskrive eksisterende state på
+forhånd.</td>
+<td>Oppstartslogikken må vite schema, tidssone og fallback før den
+vurderer filene. Den skal aldri lage tom state foran en mulig gyldig
+restore.<br><br><strong>Observerbar effekt og kontroll:</strong> Start
+med gyldig current, korrupt current/gyldig previous og begge ugyldige;
+restorekilden og diagnostikken skal følge den dokumenterte
+prioritetskjeden.</td>
+</tr>
+<tr class="even">
+<td>NR-RES-002</td>
+<td>Restorekjeden skal være: gyldig current-state → gyldig
+previous-state → strengt validert standardtemplate.</td>
+<td>Kjeden prioriterer nyeste state, deretter sikkerhetskopien og til
+slutt en ren idle fra template. Hvert trinn må valideres før
+bruk.<br><br><strong>Observerbar effekt og kontroll:</strong> Start med
+gyldig current, korrupt current/gyldig previous og begge ugyldige;
+restorekilden og diagnostikken skal følge den dokumenterte
+prioritetskjeden.</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-003</td>
+<td>Kun state med <code>state_schema_version=1.0</code> og gyldig
+innebygd template 1.0 skal kunne gjenopprettes.</td>
+<td>Restore skal ikke forsøke en skjult migrering av strukturer den ikke
+kjenner.<br><br><strong>Observerbar effekt og kontroll:</strong> Kravet
+skal ha en navngitt automatisert kontroll når dette er teknisk mulig, og
+ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-RES-004</td>
+<td>Ved restore skal aktiv templatefils eksistens og SHA-256
+sammenholdes med state.</td>
+<td>State inneholder templateinnhold, men backingfilen må fortsatt være
+den samme som da sesjonen ble lagret.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Start med gyldig current, korrupt current/gyldig
+previous og begge ugyldige; restorekilden og diagnostikken skal følge
+den dokumenterte prioritetskjeden.</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-005</td>
+<td>Manglende eller endret templatefil skal sperre ny start i
+<code>idle</code>. En allerede aktiv, gjenopprettet bryggedag skal ikke
+avbrytes av dette avviket, men avviket skal vises og logges.</td>
+<td>En pågående sesjon bevares for å unngå datatap, men avviket må løses
+før en ny sesjon kan starte.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Start med gyldig current, korrupt current/gyldig
+previous og begge ugyldige; restorekilden og diagnostikken skal følge
+den dokumenterte prioritetskjeden.</td>
+</tr>
+<tr class="even">
+<td>NR-RES-006</td>
+<td>Tidsberegninger etter restart skal fortsette fra lagrede
+tidsstempler. Nedetid skal telle som reell prosesstid.</td>
+<td>Restart nullstiller ikke veggklokken. Et fem minutters avbrudd øker
+derfor reell fase- og timertid med fem minutter etter avtalt
+pausemodell.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Start med gyldig current, korrupt current/gyldig previous og begge
+ugyldige; restorekilden og diagnostikken skal følge den dokumenterte
+prioritetskjeden.</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-007</td>
+<td>Vellykket restore av en aktiv eller avsluttet sesjon skal produsere
+én varig <code>state_restored</code>-hendelse for den aktuelle
+oppstarten.</td>
+<td>Hendelsen skal minst angi restorekilde, restarttid, gjenopprettet
+status, fase-ID/-navn, forsøksnummer, aktuelt eller neste fasepunkt og
+tidsposisjon både i fasen og relativt til punktets planlagte tidspunkt.
+Manglende punkt skal uttrykkes eksplisitt som
+tomtilstand.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-RES-008</td>
+<td>Mislykket restore skal registreres i autoritativ
+oppstartsdiagnostikk. Dersom en gyldig sesjonsjournal er tilgjengelig,
+skal feilen også kunne spores der uten å fremstilles som en
+dashboardhandling.</td>
+<td>Operatøren skal kunne skille gjenopprettet state, fallback til
+previous og ren idle-fallback fra hverandre.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kravet skal ha en navngitt automatisert
+kontroll når dette er teknisk mulig, og ellers en eksplisitt
+målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-hendelseslogg">8.3 Hendelseslogg</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-LOG-001</td>
+<td>Hver bryggedag skal ha én append-basert JSONL-fil med session-ID i
+filnavnet: <code>&lt;session-id&gt;-brewday.jsonl</code>.</td>
+<td>Append-formatet gir et kronologisk revisjonsspor som kan leses linje
+for linje selv om siste append skulle feile.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Parse hver JSONL-linje og kontroller
+arkivklassifisering/rydding med filer i alle kategorier; aktive eller
+uferdige logger skal aldri slettes.</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-002</td>
+<td>Hver JSONL-rad skal være gyldig JSON og inneholde minst tidsstempel,
+hendelse, status, <code>flow_version</code> og
+<code>state_schema_version</code>.</td>
+<td>Versjonsfeltene gjør hver linje fortolkbar uten å måtte gjette
+hvilken flow eller datamodell som skrev den.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Parse hver produserte JSONL-linje og
+kontroller at minimumsfeltene finnes med gyldige verdier, også etter
+restart.</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-003</td>
+<td>Loggen skal skille utførte, sperrede, feilede og ignorerte
+dobbelttrykk.</td>
+<td>Rapport og feilsøking skal kunne skille en gjennomført handling fra
+et kontrollert avslag, en feil og et filtrert
+dobbelttrykk.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Utløs én utført, sperret, feilet og dobbeltfiltrert kommando; JSONL og
+rapportgrunnlag skal skille de fire resultatklassene.</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-004</td>
+<td>Runtime-sesjonsloggen skal begrenses til de 3000 nyeste
+postene.</td>
+<td>Begrensningen gjelder kopien som holdes i runtime-state. Selve
+appendfilen er det varige og komplette
+hendelsessporet.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Legg inn mer enn 3000 runtimeposter og kontroller at state beholder
+nøyaktig de 3000 nyeste, mens JSONL-filen fortsatt inneholder hele
+appendhistorikken.</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-005</td>
+<td>State og JSONL skal behandles som separate skriv. Det skal
+dokumenteres at siste hendelse ved strømbrudd i et svært smalt intervall
+kan finnes bare ett av stedene.</td>
+<td>De to filene kan ikke godkjennes som én samlet filtransaksjon. State
+er restorekilden dersom strømmen forsvinner mellom
+skrivene.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Simuler avbrudd mellom state- og JSONL-skriv i testmiljø; restore skal
+velge atomisk state som autoritet og dokumentasjonen skal ikke love en
+felles transaksjon.</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-006</td>
+<td>Loggarkivet skal klassifisere filer gjensidig utelukkende som aktiv,
+avsluttet, gjenkjennelig uferdig eller legacy/uklassifisert.</td>
+<td>Hver fil får én kategori, slik at antall og ryddevalg ikke
+overlapper eller dobbeltteller.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Parse hver JSONL-linje og kontroller
+arkivklassifisering/rydding med filer i alle kategorier; aktive eller
+uferdige logger skal aldri slettes.</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-007</td>
+<td>Produksjonsgrensesnittet skal ikke tilby generell sletting av
+sesjonsjournaler. <code>sensor.brygging_sesjonsarkiv</code> skal
+klassifisere og summere journalene, mens oppbevaring og eventuell
+sletting håndteres som en separat driftsoppgave.</td>
+<td>Aktive eller uferdige journaler skal aldri kunne slettes ved et
+ordinært dashboardtrykk.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-008</td>
+<td>Bare reelle Home Assistant-knappetrykk skal registreres som
+dashboardknapper. Automatiske oppstarts-, systemkontroll- og
+lagringsmeldinger skal ha eksplisitt systemopprinnelse og skal ikke
+sette <code>dashboard_button</code>.</td>
+<td>En automatisk <code>STORAGE_REFRESH</code> etter restart skal kunne
+spores som systemaktivitet, men aldri vises som om operatøren trykket
+«Oppdater systemkontroll».<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-009</td>
+<td>Hendelsestyper som kan vises i rapport eller arkiv skal ha en
+faktisk produsent. Renderergrener uten mulig produsent skal fjernes
+eller fullføres med en dokumentert produsent.</td>
+<td>Den lukkede hendelseslisten skal kontrolleres begge veier: produsert
+men ikke konsumert, og konsumert men ikke
+produsert.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-home-assistant-grensesnitt">9. Home Assistant-grensesnitt</h2>
+<p>Home Assistant-grensesnittet er en projeksjon og kommandokanal, ikke
+en ekstra state-database. Alle HA-brukere med tilgang ser de samme
+Companion-entitetene. Dersom to klienter sender ulike handlinger nær
+samtidig, behandles meldingene sekvensielt i mottatt rekkefølge og hvert
+forsøk valideres mot state som gjelder akkurat da.</p>
+<p>De viktigste faste entity-rollene er:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Sensor/familie</th>
+<th>Eierdata</th>
+<th>Bruk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sensor.brygging_status</code></td>
+<td>Livssyklus og fire versjonsattributter</td>
+<td>Overordnet status og versjonskontroll.</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td>Fasetittel, planlagt/forløpt/gjenstående/overtid og fremdrift</td>
+<td>Aktiv fasevisning.</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_faseoversikt</code></td>
+<td>Strukturert liste over aktive faser</td>
+<td>Dashboardets tidslinje.</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_fasepunktoversikt</code></td>
+<td>Strukturert liste over aktive fasepunkter</td>
+<td>Kronologisk arbeidsliste.</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_timeroversikt</code></td>
+<td>Strukturert liste over aktiverte timere</td>
+<td>Generiske tidsmålinger.</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td>Templatefil, validering, dirty og lagringstid</td>
+<td>Templatevalg og editorstatus.</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_driftsmeldinger</code></td>
+<td>Aktive feil og advarsler</td>
+<td>Operatørdiagnostikk.</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_systemkontroll</code>,
+<code>sensor.brygging_rapportarkiv</code>,
+<code>sensor.brygging_sesjonsarkiv</code></td>
+<td>Prober og arkivsummer</td>
+<td>Teknisk visning og startgrunnlag.</td>
+</tr>
+<tr class="odd">
+<td>Editorentiteter</td>
+<td>Runtimekopien av templatefelt</td>
+<td>Redigering i <code>idle</code>; Node-RED validerer og publiserer
+ekko tilbake.</td>
+</tr>
+<tr class="even">
+<td>De 17 knappene</td>
+<td>Navngitte kommandoforespørsler</td>
+<td>Node-RED avgjør om handlingen er gyldig og publiserer
+resultatet.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-HA-001</td>
+<td>Alle <code>sensor.brygging_*</code>, <code>button.brygging_*</code>,
+<code>select.brygging_*</code>, <code>number.brygging_*</code> og
+<code>text.brygging_*</code> i releasekontrakten skal registreres under
+én felles Bryggedagsassistent-enhet i Home Assistant.</td>
+<td>Entitetsregisteret skal vise én enhet med den dokumenterte
+domenefordelingen. En releaseentitet uten samme devicekonfigurasjon skal
+oppdages ved grensesnittkontroll.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Sammenlign alle Companion-entity-ID-er, domener,
+states og attributtmappinger mot dashboardkontrakten; avvik eller tom
+udefinert state skal stoppe releasegodkjenning.</td>
+</tr>
+<tr class="even">
+<td>NR-HA-002</td>
+<td>Releaseflowen skal opprette nøyaktig 230 Companion-entiteter: 17
+<code>button</code>, 48 <code>number</code>, 87 <code>select</code>, 15
+<code>sensor</code> og 63 <code>text</code>.</td>
+<td>Flow, dashboard og entitets-/attributtkontrakt skal telles uavhengig
+og ha samme komplette sett av entity-ID-er.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kravet skal ha en navngitt automatisert
+kontroll når dette er teknisk mulig, og ellers en eksplisitt
+målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-003</td>
+<td>Entitets-ID-er som brukes av dashboardet skal være stabile i
+1.0-linjen.</td>
+<td>Dashboard-YAML refererer konkrete entity-ID-er. Endring uten
+samtidig dashboardoppdatering ville gi <code>unavailable</code> eller
+ødelagte kort.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Sammenlign alle Companion-entity-ID-er, domener, states og
+attributtmappinger mot dashboardkontrakten; avvik eller tom udefinert
+state skal stoppe releasegodkjenning.</td>
+</tr>
+<tr class="even">
+<td>NR-HA-004</td>
+<td>Publiserte sensorstates skal aldri være tomme. Meningsfulle
+fallbackverdier skal brukes ved manglende data.</td>
+<td>Home Assistant-kort skal få en uttrykkelig verdi som
+<code>ukjent</code>, <code>-</code> eller tom JSON-liste i stedet for en
+ugyldig blank sensorstate.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Publiser manglende/nullverdier for hver sensortype i
+en testprojeksjon; Home Assistant skal motta avtalt fallback og aldri
+tom sensorstate.</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-005</td>
+<td>Uendrede sensorverdier skal ikke republiseres unødvendig.</td>
+<td>Publisering skal være endringsdrevet slik at websocket, database og
+frontend ikke får identiske oppdateringer hvert femte
+sekund.<br><br><strong>Observerbar effekt og kontroll:</strong> Hold
+runtime uendret gjennom flere femsekunderstick og tell HA-publiseringer;
+identisk sensorstate skal ikke sendes på nytt.</td>
+</tr>
+<tr class="even">
+<td>NR-HA-006</td>
+<td>Ved oppstart skal HA-publisering bufres i 30 sekunder. Ved manglende
+Companion-klarhet skal nytt forsøk gjøres etter 15 sekunder.</td>
+<td>Bufferen lar Node-RED og Companion bli klare før massepublisering.
+Retry håndterer normal oppstartsrekkefølge uten å miste
+initiering.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Start Node-RED med Companion utilgjengelig og gjør den deretter klar;
+første massepublisering og nytt forsøk skal følge de avtalte
+30/15-sekundersvinduene.</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-007</td>
+<td>Etter reconnect skal alle runtime-, fase-, fasepunkt- og
+timereditorverdier resynkroniseres.</td>
+<td>Resynk gjør Home Assistant til et riktig speil etter nettverksbrudd,
+også for editorfelt som ikke nylig har endret
+seg.<br><br><strong>Observerbar effekt og kontroll:</strong> Endre
+representative runtime- og editorverdier, bryt HA-forbindelsen og koble
+til igjen; alle entitetsfamilier skal resynkroniseres til autoritativ
+state.</td>
+</tr>
+<tr class="even">
+<td>NR-HA-008</td>
+<td>Start skal sperres uten verifisert Home Assistant-forbindelse. En
+reconnect-feil under aktiv brygging skal diagnostiseres uten å ødelegge
+state.</td>
+<td>En start uten fungerende kommandoflate er uforsvarlig. Ved brudd
+under drift fortsetter den persistente motoren og varsler om manglende
+grensesnitt.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Prøv start uten verifisert HA-forbindelse og bryt deretter forbindelsen
+under aktiv testsesjon; start skal sperres, mens aktiv state skal
+bevares og feilen diagnostiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-009</td>
+<td><code>sensor.brygging_status</code> skal publisere nøyaktig de
+kontraktfestede versjonsattributtene <code>flow_version</code>,
+<code>expected_dashboard_version</code>,
+<code>session_schema_version</code> og
+<code>event_schema_version</code>.</td>
+<td>Restore og driftsdiagnostikk publiseres gjennom de kontraktfestede
+sensorene og skal ikke gjeninnføres som uavtalte
+statusattributter.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-HA-010</td>
+<td>Strukturerte lister skal publiseres som <code>phases</code> på
+<code>sensor.brygging_faseoversikt</code>, <code>phasepoints</code> på
+<code>sensor.brygging_fasepunktoversikt</code> og <code>timers</code> på
+<code>sensor.brygging_timeroversikt</code>.</td>
+<td>Dashboardet skal konsumere ferdig validerte listeobjekter og skal
+ikke parse parallelle JSON-strenger eller reparere
+produsentdata.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-systemkontroll-og-start-preflight">10. Systemkontroll og
+start-preflight</h2>
+<h3 id="101-kjøring">10.1 Kjøring</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-SYS-001</td>
+<td>Utover den obligatoriske start-preflighten i <code>NR-CMD-001</code>
+skal systemkontroll kjøres etter oppstart, fra
+<code>button.brygging_oppdater_systemkontroll</code>, etter relevante
+arkiv-/publiseringsoperasjoner og etter fil- eller HA-feil.</td>
+<td>Dette kravet eier de øvrige triggerne og dupliserer ikke
+startkravet. Hver kjøring skal publisere nytt <code>checked_at</code> på
+<code>sensor.brygging_systemkontroll</code>.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kjør kontrollen med ett kjent avvik per
+probe og deretter frisk tilstand; status, blokkeringsbeslutning, tiltak
+og kvittering skal følge samme kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-002</td>
+<td>Systemkontrollen skal være hendelsesstyrt og skal ikke innføre en ny
+fast 30-sekunders skann.</td>
+<td>En tung fil- og katalogskann hvert 30. sekund er unødvendig.
+Femsekunderstick og systemkontroll har ulike
+oppgaver.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Observer flowen i idle over flere minutter og utløs deretter én manuell
+kontroll; ingen periodisk tung probe skal kjøre, mens knappetrykket skal
+gi nøyaktig én ny kontroll.</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-003</td>
+<td>Hver kontrollrad skal inneholde gruppe, navn, status, om feilen
+sperrer start, testmetode, mål, observert resultat, konklusjon og
+eventuelt tiltak.</td>
+<td>Hver rad skal forklare hva som faktisk ble testet, ikke bare vise
+rødt eller grønt. Tiltaket skal være konkret når noe
+feiler.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+kontrollen med ett kjent avvik per probe og deretter frisk tilstand;
+status, blokkeringsbeslutning, tiltak og kvittering skal følge samme
+kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-004</td>
+<td>Samlet kontrollstatus skal være <code>OK</code>,
+<code>ADVARSEL</code> eller <code>FEIL</code>, og kontrollradene skal
+publiseres som <code>checks_json</code> med opptellinger og
+startbeslutning på <code>sensor.brygging_systemkontroll</code>.</td>
+<td>Dashboardet skal kunne vise både sammendrag og full forklaring fra
+samme kontrollresultat uten en egen
+beregningsmodell.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør kontrollen med ett kjent avvik per probe og
+deretter frisk tilstand; status, blokkeringsbeslutning, tiltak og
+kvittering skal følge samme kilde.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="102-kontroller-og-sperreregler">10.2 Kontroller og
+sperreregler</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Kontroll</th>
+<th style="text-align: right;">Skal sperre start ved feil</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Runtime/state/schema-konsistens</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="even">
+<td>Gyldig IANA-tidssone og lesbar systemtid</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="odd">
+<td>Verifisert Home Assistant-forbindelse</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="even">
+<td>Skrive/lese/slette-probe i statekatalog</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="odd">
+<td>Skrive/lese/slette-probe i loggkatalog</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="even">
+<td>Gyldig current-state</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="odd">
+<td>Aktiv templatefil, streng validering og SHA-256</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="even">
+<td>Ulagrede templateendringer</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="odd">
+<td>Kritisk lite plass i Node-RED-dataområdet</td>
+<td style="text-align: right;">Ja</td>
+</tr>
+<tr class="even">
+<td>Templatekatalog, rapportkatalog og HA-public</td>
+<td style="text-align: right;">Nei, advarsel</td>
+</tr>
+<tr class="odd">
+<td>Previous-state mangler</td>
+<td style="text-align: right;">Nei, informasjon</td>
+</tr>
+<tr class="even">
+<td>Ugyldige ikke-aktive templatefiler</td>
+<td style="text-align: right;">Nei, advarsel</td>
+</tr>
+<tr class="odd">
+<td>Publisert rapport mangler eller avviker</td>
+<td style="text-align: right;">Nei, advarsel</td>
+</tr>
+<tr class="even">
+<td>Kritisk lite plass i HA-public</td>
+<td style="text-align: right;">Nei, advarsel</td>
+</tr>
+<tr class="odd">
+<td>Historisk/uavklart skriverfeil uten aktuell kritisk probe</td>
+<td style="text-align: right;">Nei, advarsel</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-SYS-005</td>
+<td>Katalogprobe skal faktisk opprette, lese og slette en kontrollfil og
+kontrollere oppryddingen.</td>
+<td>En ren rettighets- eller eksistenskontroll er ikke nok. Proben
+beviser at den konkrete containerprosessen kan gjennomføre hele
+filoperasjonen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør kontrollen med ett kjent avvik per probe og deretter frisk
+tilstand; status, blokkeringsbeslutning, tiltak og kvittering skal følge
+samme kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-006</td>
+<td>Aktiv template skal kontrolleres mot SHA-256 og streng
+runtimevalidering.</td>
+<td>Både runtimeobjektet og filen må være gyldige og identiske. Dette
+oppdager ekstern filendring og strukturfeil før
+start.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+kontrollen med ett kjent avvik per probe og deretter frisk tilstand;
+status, blokkeringsbeslutning, tiltak og kvittering skal følge samme
+kilde.</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-007</td>
+<td>Nyeste originalrapport og public-kopi skal sammenlignes med
+SHA-256.</td>
+<td>Samme hash betyr at filen Home Assistant tilbyr er bit-identisk med
+nyeste arkivoriginal.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Publiser en identisk og deretter manipulert
+public-kopi; SHA-256-raden skal skifte fra godkjent til avvik uten å
+sperre en ellers gyldig start.</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-008</td>
+<td>Aktiv JSONL-logg skal ved aktiv brygging ha forventet sessionfil,
+startmarkør og gyldig siste JSON-linje.</td>
+<td>Under aktiv drift skal den forventede sessionloggen finnes, ha en
+start og slutte med en parsebar JSON-rad.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kjør kontrollen med ett kjent avvik per
+probe og deretter frisk tilstand; status, blokkeringsbeslutning, tiltak
+og kvittering skal følge samme kilde.</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-009</td>
+<td>Diskadvarsel skal gis under 250 MiB ledig eller ved minst 95 % bruk.
+Node-RED-dataområdet skal sperre start under 50 MiB ledig eller ved
+minst 99 % bruk.</td>
+<td>Advarsel gir tid til vedlikehold; den strengere dataområdegrensen
+hindrer start når state og logg står i umiddelbar fare for å ikke kunne
+skrives.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+kontrollen med ett kjent avvik per probe og deretter frisk tilstand;
+status, blokkeringsbeslutning, tiltak og kvittering skal følge samme
+kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-010</td>
+<td>Systemkontrollen skal vise flowversjon, forventet dashboardversjon,
+state-writerversjon, schema, Node.js-, Node-RED- og HA-nodeversjon når
+tilgjengelig.</td>
+<td>Versjonsbildet gjør det mulig å finne blandede installasjoner og
+relevante avhengighetsversjoner uten å åpne flere
+systemer.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+kontrollen med ett kjent avvik per probe og deretter frisk tilstand;
+status, blokkeringsbeslutning, tiltak og kvittering skal følge samme
+kilde.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-rapportgenerering-og-arkiv">11. Rapportgenerering og
+arkiv</h2>
+<h3 id="111-generering-og-innhold">11.1 Generering og innhold</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-RAP-001</td>
+<td>Kommando fra <code>button.brygging_generer_rapport</code> skal
+godtas under aktiv brygging og i <code>completed</code> eller
+<code>ended</code>, men sperres i <code>idle</code>.</td>
+<td>Godkjent kommando oppretter en ny rapportjobb; sperret kommando skal
+logges uten filendring.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-002</td>
+<td>Rapporten skal genereres som komplett HTML på norsk med UTF-8 og
+utskriftsvennlig CSS.</td>
+<td>Rapportfilen skal kunne åpnes selvstendig i nettleser og skrives ut
+uten avhengighet til Home Assistant-frontend.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Generer rapport med HTML-tegn, flere
+faseforsøk, kommentarer og knappresultater; innhold, escaping, arkivfil,
+public-hash og opprydding skal verifiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-003</td>
+<td>Alt template-, kommentar- og logginnhold skal HTML-escapes før
+innsetting.</td>
+<td>Bruker- og templateinnhold behandles som tekst. Dette hindrer at
+HTML-tegn eller innlimt kode endrer
+rapportstrukturen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Generer rapport med HTML-tegn, flere faseforsøk,
+kommentarer og knappresultater; innhold, escaping, arkivfil, public-hash
+og opprydding skal verifiseres.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-004</td>
+<td>Rapportens metadata skal vise template, status, start, slutt,
+genereringstid og generatorversjon.</td>
+<td>Metadataene identifiserer grunnlag, livssyklus og hvilken generator
+som produserte akkurat denne filen.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Generer rapport med HTML-tegn, flere faseforsøk,
+kommentarer og knappresultater; innhold, escaping, arkivfil, public-hash
+og opprydding skal verifiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-005</td>
+<td>Rapporten skal inneholde seksjonene «Template-notat», «Plan»,
+«Faser: planlagt vs. reell tidsbruk», «Kronologisk logg», «Tidsmålinger»
+og «Knappetrykk fra dashboard».</td>
+<td>Fast seksjonssett gjør rapporter sammenlignbare og sikrer at både
+plan, faktisk forløp og operatørhandlinger blir
+med.<br><br><strong>Observerbar effekt og kontroll:</strong> Generer
+rapport med HTML-tegn, flere faseforsøk, kommentarer og knappresultater;
+innhold, escaping, arkivfil, public-hash og opprydding skal
+verifiseres.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-006</td>
+<td>Planen skal vise alle 15 faser med ID, rekkefølge, aktiv/deaktivert,
+navn, planlagt tid og antall lagrede/aktive punkter.</td>
+<td>Planseksjonen dokumenterer også deaktiverte plasser og skiller
+lagret konfigurasjon fra det som faktisk var
+aktivt.<br><br><strong>Observerbar effekt og kontroll:</strong> Generer
+rapport med HTML-tegn, flere faseforsøk, kommentarer og knappresultater;
+innhold, escaping, arkivfil, public-hash og opprydding skal
+verifiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-007</td>
+<td>Fasetabellen skal sorteres kronologisk etter faktisk starttid.
+<code>Start/slutt</code> skal være første kolonne og vises som
+<code>HH:MM:SS – HH:MM:SS</code>. Gjentatte gjennomføringer skal
+nummereres som forsøk.</td>
+<td>Komplette tidsstempler skal fortsatt brukes internt til sortering og
+beregning, også ved A → B → A-forløp.<br><br><strong>Observerbar effekt
+og kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll
+når dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-008</td>
+<td>Kronologisk logg skal vise klokkeslett, fase, fasepunktnavn,
+beskrivelse, forventet verdi/kommentar og tidsplan. Når en fase har
+flere forsøk, skal alle dens punkt- og kommentarrader merkes
+<code>(forsøk n)</code>.</td>
+<td>Faser med bare ett forsøk skal ikke
+nummereres.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-009</td>
+<td>Automatisk nådde fasepunkter skal vise
+<code>Fasepunkt nådd ihht tidsplan</code>. Fasehoppede punkter skal vise
+beregnet avvik, for eksempel
+<code>Fasepunkt fasehoppet 1:31 før tidsplan</code>. Kommentarer skal
+fortsatt ha egen lys gul radmarkering.</td>
+<td>Teknisk tickforsinkelse skal ikke framstilles som
+prosessavvik.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-010</td>
+<td>Tidsmålinger skal vise timertekst, start, slutt, resultat og status
+for aktiverte timere. Start og slutt skal vises som
+<code>HH:MM:SS</code>.</td>
+<td>Komplette tidsstempler beholdes i modell og journal; bare
+rapportvisningen forkortes.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-011</td>
+<td>Knappetabellen skal vise alle reelle dashboardknappetrykk med
+klokkeslett, fase, fasepunktkontekst, knapp, kommando og resultat.
+Automatiske systemhandlinger skal ikke forekomme som knappetrykk.</td>
+<td>Utførte, sperrede, ignorerte dobbelttrykk og feilede handlinger skal
+være komplette, inkludert nødavslutnings- og
+klargjøringsforsøk.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="112-lagring-og-publisering">11.2 Lagring og publisering</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-RAP-012</td>
+<td>Originalrapport skal lagres atomisk under
+<code>/data/brewing-assistant/reports</code>.</td>
+<td>Arkivfilen bruker samme sikre skrivemønster som andre kritiske
+filer, slik at en halv HTML-fil ikke blir stående som gyldig
+rapport.<br><br><strong>Observerbar effekt og kontroll:</strong> Generer
+rapport med HTML-tegn, flere faseforsøk, kommentarer og knappresultater;
+innhold, escaping, arkivfil, public-hash og opprydding skal
+verifiseres.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-013</td>
+<td>Filnavnet skal inneholde lokalt tidsstempel, sikkert
+batch/template-stem og suffikset <code>brewday-report.html</code>.</td>
+<td>Navnet gjør rapporten sorterbar og gjenkjennelig uten å åpne den,
+samtidig som templatekomponenten renses for usikre
+tegn.<br><br><strong>Observerbar effekt og kontroll:</strong> Generer
+rapport med HTML-tegn, flere faseforsøk, kommentarer og knappresultater;
+innhold, escaping, arkivfil, public-hash og opprydding skal
+verifiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-014</td>
+<td>Nyeste rapport skal kopieres atomisk til
+<code>/data/brewing-assistant/ha-public/siste-bryggerapport.html</code>,
+som Home Assistant eksponerer på
+<code>/local/brygging/siste-bryggerapport.html</code>.</td>
+<td>Den faste filen er målet alle dashboardlenker bruker. En
+ufullstendig kopi skal aldri bli synlig som ferdig
+public-rapport.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Generer rapport med HTML-tegn, flere faseforsøk, kommentarer og
+knappresultater; innhold, escaping, arkivfil, public-hash og opprydding
+skal verifiseres.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-015</td>
+<td>Publisert kopi skal SHA-256-verifiseres mot originalen. Avvik skal
+kunne utløse automatisk republisering.</td>
+<td>Verifisering oppdager manglende eller avbrutt publisering.
+Automatisk republisering kan rette kopien uten å regenerere
+rapporten.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Generer rapport med HTML-tegn, flere faseforsøk, kommentarer og
+knappresultater; innhold, escaping, arkivfil, public-hash og opprydding
+skal verifiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-016</td>
+<td>Rapportskrivingsfeil skal gi vedvarende diagnostikk og logghendelse,
+men skal ikke i seg selv ødelegge bryggedagens state.</td>
+<td>Rapporttap skal varsles, men en ellers pågående bryggedag skal kunne
+fortsette og senere generere rapport på nytt fra
+state.<br><br><strong>Observerbar effekt og kontroll:</strong> Generer
+rapport med HTML-tegn, flere faseforsøk, kommentarer og knappresultater;
+innhold, escaping, arkivfil, public-hash og opprydding skal
+verifiseres.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-017</td>
+<td>Kommando fra <code>button.brygging_behold_siste_100_rapporter</code>
+skal slette alle arkivrapporter unntatt de 100 nyeste og deretter
+oppdatere <code>sensor.brygging_rapportarkiv</code>.</td>
+<td>Sletting skal bare skje etter eksplisitt operatørhandling. Nyeste
+rapport og public-kopi skal fortsatt kunne identifiseres etter ny
+skann.<br><br><strong>Observerbar effekt og kontroll:</strong> Generer
+rapport med HTML-tegn, flere faseforsøk, kommentarer og knappresultater;
+innhold, escaping, arkivfil, public-hash og opprydding skal
+verifiseres.</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-018</td>
+<td>Alle tabellheadere i rapporten skal bruke en tydelig grå bakgrunn,
+<code>#bfbfbf</code>, med tilstrekkelig kontrast mot tekst og
+datarader.</td>
+<td>Tidligere lys gul header skal erstattes; øvrige semantiske radfarger
+beholdes med mindre et eget krav endrer dem.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Kravet skal ha en navngitt automatisert
+kontroll når dette er teknisk mulig, og ellers en eksplisitt
+målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-019</td>
+<td>En <code>state_restored</code>-rad i kronologisk logg skal
+umiddelbart vise hvor prosessen fortsatte etter restart.</td>
+<td>Raden skal vise fase/forsøk, aktuelt eller neste fasepunkt,
+restartklokkeslett, forløpt fasetid og før-/etter-posisjon relativt til
+punktets planlagte tidspunkt.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kravet skal ha en navngitt automatisert kontroll når
+dette er teknisk mulig, og ellers en eksplisitt målmiljøtest i
+sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="12-feilhåndtering-og-diagnostikk">12. Feilhåndtering og
+diagnostikk</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-FEIL-001</td>
+<td>Diagnostikk skal skille aktive feil/advarsler fra historisk siste
+feil/advarsel.</td>
+<td>«Aktiv» beskriver et problem som fortsatt gjelder; «siste» bevarer
+historikk etter at problemet er rettet. Begrepene skal ikke
+blandes.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Fremkall og rett én feil per kilde; aktiv feil skal bestå gjennom
+irrelevante handlinger og først forsvinne etter vellykket kontroll av
+samme kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-FEIL-002</td>
+<td>En aktiv feil skal beholdes gjennom vanlige ticks og kommandoer og
+bare fjernes når samme kilde senere består kontroll eller
+operasjon.</td>
+<td>Feilkilden selv må bevise bedring. En vellykket, irrelevant handling
+skal ikke skjule en fortsatt skrive- eller
+forbindelsesfeil.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Fremkall og rett én feil per kilde; aktiv feil skal
+bestå gjennom irrelevante handlinger og først forsvinne etter vellykket
+kontroll av samme kilde.</td>
+</tr>
+<tr class="odd">
+<td>NR-FEIL-003</td>
+<td>Runtimevalideringsfeil skal sette status <code>error</code> og
+logges.</td>
+<td>Ugyldig autoritativ state gjør videre kommandoer usikre.
+<code>error</code> og logg gir en kontrollert stopp for
+feilsøking.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Fremkall og rett én feil per kilde; aktiv feil skal bestå gjennom
+irrelevante handlinger og først forsvinne etter vellykket kontroll av
+samme kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-FEIL-004</td>
+<td>Feil i state, JSONL, template, rapport, public-kopi og HA-inndata
+skal registreres per kilde.</td>
+<td>Kildeinndeling gjør at en vellykket rapportskriving ikke kvitterer
+en statefeil, og omvendt.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Fremkall og rett én feil per kilde; aktiv feil skal
+bestå gjennom irrelevante handlinger og først forsvinne etter vellykket
+kontroll av samme kilde.</td>
+</tr>
+<tr class="odd">
+<td>NR-FEIL-005</td>
+<td><code>sensor.brygging_status</code> skal publisere aktuell
+systemhelse, aktiv feil/advarsel, historisk siste feil, antall
+feil/advarsler, restore-resultat og siste vellykkede kommando.</td>
+<td>Dette er diagnostikkinnholdet som forbrukes av dashboard og
+feilsøking. Det supplerer, men erstatter ikke detaljradene på
+<code>sensor.brygging_systemkontroll</code>.<br><br><strong>Observerbar
+effekt og kontroll:</strong> Fremkall og rett én feil per kilde; aktiv
+feil skal bestå gjennom irrelevante handlinger og først forsvinne etter
+vellykket kontroll av samme kilde.</td>
+</tr>
+<tr class="even">
+<td>NR-FEIL-006</td>
+<td>Lagringsfeil skal ikke skrives til en intern sidekanal uten leser.
+Hver feil skal enten oppdatere autoritativ diagnostikk per kilde eller
+dokumenteres som allerede fullstendig håndtert av den aktuelle
+skrivebanen.</td>
+<td><code>storage_operation_error</code> og tilsvarende write-only felt
+skal fjernes når de ikke inngår i faktisk
+feilhåndtering.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kravet skal ha en navngitt automatisert kontroll når dette er teknisk
+mulig, og ellers en eksplisitt målmiljøtest i sporbarhetsmatrisen.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="13-ikke-funksjonelle-krav">13. Ikke-funksjonelle krav</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Forklaring og praktisk betydning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NR-NF-001</td>
+<td>Flowen skal tåle Node-RED-restart og Home Assistant-reconnect uten
+tap av gyldig, allerede persistert state.</td>
+<td>Allerede bekreftet og lagret arbeid skal kunne rekonstrueres etter
+prosess- eller nettverksavbrudd.<br><br><strong>Observerbar effekt og
+kontroll:</strong> Kjør statisk syntaks-, restart-, reconnect- og
+ressursregresjon; persistert state skal overleve og
+meldings-/minnegrenser skal forbli avgrenset.</td>
+</tr>
+<tr class="even">
+<td>NR-NF-002</td>
+<td>Atomisk lagring og forrige state skal begrense risikoen for korrupt
+primær state ved strømbrudd.</td>
+<td>Rename og previous-state reduserer skadeomfanget ved strømbrudd, men
+erstatter ikke ordinær backup av
+vertslagringen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kjør statisk syntaks-, restart-, reconnect- og ressursregresjon;
+persistert state skal overleve og meldings-/minnegrenser skal forbli
+avgrenset.</td>
+</tr>
+<tr class="odd">
+<td>NR-NF-003</td>
+<td>Publisering og editorsynk skal være avgrenset slik at
+feedback-løkker og ukontrollert heapvekst unngås.</td>
+<td>Meldingstrafikk og datastrukturer må ha eksplisitte grenser for å
+unngå selvforsterkende HA-ekko eller ubegrenset
+minnebruk.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+statisk syntaks-, restart-, reconnect- og ressursregresjon; persistert
+state skal overleve og meldings-/minnegrenser skal forbli
+avgrenset.</td>
+</tr>
+<tr class="even">
+<td>NR-NF-004</td>
+<td>Alle Function-noder skal ha gyldig JavaScript-syntaks i aktuell
+Node.js/Node-RED-runtime.</td>
+<td>En syntaksfeil i én Function-node kan hindre sentral logikk i å
+lastes. Derfor valideres alle funksjoner som del av
+leveransen.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+statisk syntaks-, restart-, reconnect- og ressursregresjon; persistert
+state skal overleve og meldings-/minnegrenser skal forbli
+avgrenset.</td>
+</tr>
+<tr class="odd">
+<td>NR-NF-005</td>
+<td>Produksjonsmiljøet bør bruke eksplisitt pinnede versjoner av
+Node-RED-image og HA-nodepakken, ikke <code>latest</code>.</td>
+<td>Pinned image- og pakkeversjon gjør produksjonsmiljøet
+reproduserbart. Dette styres i drifts-/Compose-konfigurasjonen, ikke i
+flowen.<br><br><strong>Observerbar effekt og kontroll:</strong>
+Kontroller produksjonens Compose-/driftskonfigurasjon; image og
+HA-nodepakke skal ha eksplisitte versjoner og ingen
+produksjonsavhengighet skal bruke <code>latest</code>.</td>
+</tr>
+<tr class="even">
+<td>NR-NF-006</td>
+<td>Entitets- og filgrensesnitt skal være versjonssporbart gjennom
+flow-, runtime- og schemaversjon.</td>
+<td>Filer og publiserte metadata skal vise både produkt- og
+dataschemaversjon slik at avvik kan spores ved support og
+restore.<br><br><strong>Observerbar effekt og kontroll:</strong> Kjør
+statisk syntaks-, restart-, reconnect- og ressursregresjon; persistert
+state skal overleve og meldings-/minnegrenser skal forbli
+avgrenset.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="14-akseptansekriterier">14. Akseptansekriterier</h2>
+<p>Modulen kan godkjennes for 1.0 når:</p>
+<ol type="1">
+<li>Alle 159 navngitte runtime-/regresjonstester fra RC3.3.2
+består.</li>
+<li>Streng validator godtar referansetemplaten og avviser eldre/ugyldige
+schema.</li>
+<li>Start-preflight sperrer alle startkritiske feil og slipper gjennom
+et friskt system.</li>
+<li>En akselerert full syklus med pause, fortsett, bekreftelse,
+kommentar, dobbelttrykk, «Tilbake», fasehopp, timere, rapport og
+nullstilling består.</li>
+<li>Restore består fra current-state, previous-state og
+templatefallback.</li>
+<li>Restart under <code>running</code>, <code>paused</code> og
+<code>waiting_confirmation</code> bevarer prosessen.</li>
+<li>Home Assistant-frakobling og reconnect gir kontrollert retry og full
+resynk.</li>
+<li>Skrivefeil i state og logg gir vedvarende feil og ryddes etter
+vellykket ny operasjon.</li>
+<li>Rapporten inneholder alle avtalte seksjoner og korrekt
+forsøksnummerering.</li>
+<li>24–48 timers idle-test og én komplett, reell bryggedag er
+gjennomført på produksjonsmaskinen.</li>
+</ol>
+<p>RC3.3.2-baselinen og 2026.11.07-1 består samme runtime-regresjon: 7154
+tekniske assertions i 159 navngitte tester, men dette beviser fortsatt
+ikke alle funksjonelle krav. Bare dokumenterte test- og
+målmiljøresultater i matrisen skal brukes som godkjenningsstatus.
+Langtidstest og full live-brygging gjenstår før endelig
+<code>v1.0.0</code>.</p>
+<h2 id="15-kjente-avgrensninger">15. Kjente avgrensninger</h2>
+<ul>
+<li>Template- og stateschema <code>1.0</code> er uavhengig av
+applikasjonsversjon <code>1.0.0</code>.</li>
+<li>Faste 15 fase-, fasepunkt- og timerplasser er en bevisst Home
+Assistant-integrasjonsgrense.</li>
+<li>Flowen kan oppgi containerens systemtid, men kan ikke bevise ekstern
+NTP-korrekthet.</li>
+<li>Flere Home Assistant-klienter kan vise samme state samtidig, men
+runtime har ingen operatørlås, brukerspesifikk editorkladd eller
+konfliktvarsling for motstridende samtidige kommandoer.</li>
+<li>State og JSONL er separate skriv. Atomisk state er den primære
+restorekilden dersom strømmen forsvinner mellom de to operasjonene.</li>
+</ul>
+<h3 id="151-rc331-avvik-som-rc332-lukker">15.1 RC3.3.2-avvik som 2026.11.07-1
+lukker</h3>
+<ul>
+<li>automatisk oppstartsrefresh er feilklassifisert som
+dashboardknapp</li>
+<li>vellykket restore produserer ikke <code>state_restored</code></li>
+<li>restore-resultatet mangler fasepunkt og tidsposisjon i
+rapporten</li>
+<li>rapportheadere har for svak lys gul bakgrunn</li>
+<li>produksjonsfanens etikett er foreldet, og dokumentasjonsfanen skal
+fjernes</li>
+<li>fire flow-contextnøkler og én lagringsfeilkanal er write-only</li>
+<li>rapportmotoren har produsent-/konsumentavvik i hendelseslisten</li>
+<li>deaktivert fasepunkt med tomt navn avvises, noe som hindrer en
+statisk Excel-generator med alle 15 plasser</li>
+</ul>
+<p>Disse punktene er implementert i 2026.11.07-1 og har krav-ID-merkede
+automatiske kontroller. Målmiljøakseptansen står separat i
+sporbarhetsmatrisen.</p>
+<h2 id="16-sporbarhet">16. Sporbarhet</h2>
+<p>Kravene skal spores gjennom dokumentet
+<code>KRAV-SPORBARHET-2026.11.07-1.html</code>. Normative kilder
+er:</p>
+<ul>
+<li>faktisk 2026.11.07-1-flow, dashboard, installer og template med 7154
+kontroller i 159 navngitte tester</li>
+<li>urørt RC3.3.2-regresjonsgrunnlag med 7154 kontroller i 159 navngitte
+tester</li>
+<li>entitets- og attributtkontrakten for RC3.3.2</li>
+<li>Node-RED variabel- og dataflytkontrakt for RC3.3.2</li>
+<li>verifiserte målmiljøfunn fra templatekatalog, templatelagring,
+rapport og restart</li>
+<li>godkjente prosjektbeslutninger fram til 26. august 2026</li>
+</ul>
+</main></body></html>

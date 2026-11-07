@@ -1,0 +1,3049 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Home Assistant–Node-RED entitets- og attributtkontrakt – 2026.11.07-1</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="home-assistantnode-red-entitets--og-attributtkontrakt--v100-rc332">Home
+Assistant–Node-RED entitets- og attributtkontrakt – 2026.11.07-1</h1>
+<h2 id="1-dokumentstatus">1. Dokumentstatus</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Felt</th>
+<th>Verdi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dokumenttype</td>
+<td>Normativ teknisk grensekontrakt</td>
+</tr>
+<tr class="even">
+<td>Kilde</td>
+<td>Faktisk pakket 2026.11.07-1-flow og dashboard</td>
+</tr>
+<tr class="odd">
+<td>Flow SHA-256</td>
+<td><code>93e6ba95cc1f8793222728c35d7fd5f59da006c6de979890a91ca1f9d87291f2</code></td>
+</tr>
+<tr class="even">
+<td>Release</td>
+<td>2026.11.07-1</td>
+</tr>
+<tr class="odd">
+<td>Schema</td>
+<td>state/event/template 1.0</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Komplett og verifiserbar</td>
+</tr>
+</tbody>
+</table>
+<p>Denne kontrakten erstatter tidligere reduserte kontraktutgaver.
+Gyldige datatype- og tomtilstandsregler er konsolidert, mens alle ID-er,
+navn, produsenter og dashboardreferanser er regenerert fra denne
+releasen.</p>
+<h2 id="2-omfang-og-grenseregler">2. Omfang og grenseregler</h2>
+<ul>
+<li>Node-RED er autoritativ produsent for de 15 sensorskjemaene; Home
+Assistant sender de 215 kontrollentitetene inn til streng
+validering.</li>
+<li>Tekstgrenser er 120 eller 255 Unicode-kodepunkter. For lange verdier
+avvises; de trunkeres ikke.</li>
+<li>Norske synlige enumverdier brukes ved HA-grensen. Tekniske koder
+beholdes i template, runtime og journal.</li>
+<li>Alle utgående state-/attributtobjekter valideres før publisering.
+Ugyldig kandidat skal ikke erstatte siste gyldige verdi.</li>
+<li>Dashboardet skal ikke oversette, typekonvertere eller reparere
+ugyldige produsentdata.</li>
+<li><code>unknown</code> og <code>unavailable</code> er
+HA-transporttilstander og ikke gyldige Node-RED-verdier.</li>
+</ul>
+<h2 id="3-fullstendighet">3. Fullstendighet</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Målepunkt</th>
+<th style="text-align: right;">Antall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Totalt</td>
+<td style="text-align: right;">230</td>
+</tr>
+<tr class="even">
+<td>Sensorer</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr class="odd">
+<td>Knapper</td>
+<td style="text-align: right;">17</td>
+</tr>
+<tr class="even">
+<td>Selecter</td>
+<td style="text-align: right;">87</td>
+</tr>
+<tr class="odd">
+<td>Tall</td>
+<td style="text-align: right;">48</td>
+</tr>
+<tr class="even">
+<td>Tekster</td>
+<td style="text-align: right;">63</td>
+</tr>
+<tr class="odd">
+<td>Kontrollentiteter</td>
+<td style="text-align: right;">215</td>
+</tr>
+<tr class="even">
+<td>Toppnivåattributter</td>
+<td style="text-align: right;">51</td>
+</tr>
+<tr class="odd">
+<td>Strukturerte objektfelt</td>
+<td style="text-align: right;">27</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-komplett-entitetsinventar">4. Komplett entitetsinventar</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Entity-ID</th>
+<th>Retning</th>
+<th>Synlig HA-navn</th>
+<th>Type, grense eller initialt valg</th>
+<th>Node-RED-eier</th>
+<th style="text-align: right;">Dashboardreferanser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>button.brygging_avslutt</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Avslutt</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_avslutt</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_behold_siste_100_rapporter</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Behold siste 100 rapporter</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>Behold siste 100 rapporter</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_bekreft_fasepunkt</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Bekreft fasepunkt</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_bekreft_fasepunkt</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_forkast_templateendringer</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Forkast templateendringer</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_forkast_templateendringer</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_fortsett</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fortsett</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_fortsett</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_generer_historisk_rapport</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Generer historisk rapport</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_generer_historisk_rapport</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_generer_rapport</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Generer rapport</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_generer_rapport</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_klargjor_ny_bryggedag</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Klargjør ny bryggedag</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_klargjor_ny_bryggedag</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_lagre_fasepunktkommentar</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Lagre fasepunktkommentar</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_lagre_fasepunktkommentar</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_lagre_template</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Lagre template</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_lagre_template</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_neste_fase</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Neste fase</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_neste_fase</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_nodavslutt_ved_systemfeil</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Nødavslutt ved systemfeil</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_nodavslutt_ved_systemfeil</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_oppdater_systemkontroll</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Oppdater systemkontroll</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_oppdater_systemkontroll</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_oppdater_templateliste</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Oppdater templateliste</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>Oppdater templateliste</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_pause</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Pause</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_pause</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_start</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Start</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_start</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_tilbake</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Tilbake</td>
+<td>Diskret trykk; ingen applikasjons-state</td>
+<td>brygging_tilbake</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_01_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 01 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_01_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_01_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 01 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_01_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_02_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 02 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_02_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_02_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 02 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_02_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_03_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 03 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_03_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_03_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 03 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_03_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_04_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 04 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_04_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_04_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 04 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_04_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_05_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 05 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_05_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_05_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 05 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_05_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_06_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 06 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_06_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_06_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 06 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_06_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_07_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 07 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_07_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_07_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 07 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_07_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_08_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 08 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_08_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_08_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 08 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_08_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_09_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 09 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_09_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_09_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 09 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_09_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_10_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 10 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_10_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_10_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 10 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_10_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_11_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 11 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_11_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_11_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 11 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_11_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_12_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 12 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_12_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_12_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 12 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_12_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_13_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 13 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_13_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_13_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 13 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_13_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_14_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 14 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_14_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_14_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 14 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_14_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_15_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 15 – rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_fase_15_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_fase_15_varighet_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 15 – varighet (min)</td>
+<td>heltall 0…1440, steg 1 min</td>
+<td>brygging_fase_15_varighet_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_01_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_01_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_02_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_02_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_03_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_03_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_04_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_04_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_05_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_05_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_06_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_06_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_07_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_07_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_08_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_08_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_09_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_09_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_10_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_10_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_11_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_11_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_12_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_12_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_13_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_13_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_14_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_14_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_punkt_15_tid_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 tid min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_punkt_15_tid_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_timer_rekkefolge</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer rekkefølge</td>
+<td>heltall 1…15, steg 1</td>
+<td>brygging_timer_rekkefolge</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_timer_slutt_offset_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer slutt offset min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_timer_slutt_offset_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_timer_start_offset_min</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer start offset min</td>
+<td>heltall -1440…1440, steg 1 min</td>
+<td>brygging_timer_start_offset_min</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_01_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 01 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_01_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_02_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 02 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_02_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_03_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 03 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_03_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_04_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 04 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_04_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_05_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 05 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_05_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_06_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 06 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_06_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_07_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 07 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_07_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_08_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 08 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_08_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_09_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 09 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_09_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_10_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 10 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_10_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_11_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 11 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_11_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_12_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 12 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_12_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_13_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 13 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_13_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fase_14_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 14 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_14_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fase_15_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 15 – status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_fase_15_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_fasepunkt_for_kommentar</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fasepunkt for kommentar</td>
+<td>Enum/dynamisk valg: ["Neste aktuelle fasepunkt","Forrige aktuelle
+fasepunkt"]</td>
+<td>brygging_fasepunkt_for_kommentar; Oppdater
+brygging_fasepunkt_for_kommentar</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_historisk_sesjon</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Historisk sesjon</td>
+<td>Enum/dynamisk valg: ["Ingen sesjoner"]</td>
+<td>brygging_historisk_sesjon; Oppdater historiske sesjoner</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_01_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_01_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_01_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_01_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_01_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_01_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_01_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_01_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_02_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_02_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_02_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_02_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_02_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_02_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_02_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_02_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_03_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_03_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_03_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_03_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_03_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_03_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_03_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_03_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_04_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_04_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_04_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_04_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_04_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_04_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_04_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_04_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_05_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_05_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_05_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_05_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_05_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_05_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_05_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_05_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_06_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_06_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_06_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_06_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_06_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_06_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_06_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_06_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_07_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_07_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_07_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_07_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_07_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_07_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_07_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_07_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_08_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_08_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_08_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_08_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_08_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_08_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_08_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_08_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_09_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_09_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_09_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_09_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_09_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_09_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_09_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_09_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_10_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_10_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_10_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_10_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_10_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_10_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_10_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_10_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_11_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_11_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_11_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_11_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_11_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_11_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_11_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_11_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_12_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_12_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_12_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_12_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_12_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_12_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_12_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_12_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_13_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_13_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_13_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_13_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_13_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_13_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_13_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_13_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_14_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_14_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_14_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_14_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_14_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_14_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_14_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_14_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_15_aktiv</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 aktiv</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_punkt_15_aktiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_15_bekreftelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 bekreftelse</td>
+<td>Enum/dynamisk valg: ["Ja","Nei"]</td>
+<td>brygging_punkt_15_bekreftelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_15_tid_ref</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 tid ref</td>
+<td>Enum/dynamisk valg: ["Fasestart","Faseslutt"]</td>
+<td>brygging_punkt_15_tid_ref</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_15_type</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 type</td>
+<td>Enum/dynamisk valg:
+["Aktivitet","Tilsetning","Måling","Kontroll","Varsel"]</td>
+<td>brygging_punkt_15_type</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_rediger_fase</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Rediger fase</td>
+<td>Enum/dynamisk valg: ["01 – laster template"]</td>
+<td>brygging_rediger_fase; Oppdater brygging_rediger_fase</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_rediger_timer</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Rediger timer</td>
+<td>Enum/dynamisk valg: ["timer_01"]</td>
+<td>brygging_rediger_timer; Oppdater timervalg</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_template</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Template</td>
+<td>Enum/dynamisk valg: ["Ingen valgt"]</td>
+<td>brygging_template; Oppdater brygging_template</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_pauseoppforsel</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer pauseoppforsel</td>
+<td>Enum/dynamisk valg: ["Følg bryggepause","Fortsett etter
+klokke"]</td>
+<td>brygging_timer_pauseoppforsel</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_timer_retning</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer retning</td>
+<td>Enum/dynamisk valg: ["Tell opp","Tell ned"]</td>
+<td>brygging_timer_retning</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_slutt_hendelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer slutt hendelse</td>
+<td>Enum/dynamisk valg: ["Bryggestart (faktisk)","Bryggeslutt
+(løpende)","Bryggeslutt (faktisk)","Fasestart (planlagt)","Fasestart
+(faktisk)","Faseslutt (løpende)","Faseslutt (faktisk)","Fasepunkt
+(plantid)","Fasepunkt passert","Fasepunkt bekreftet"]</td>
+<td>brygging_timer_slutt_hendelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_timer_slutt_referanse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer slutt referanse</td>
+<td>Enum/dynamisk valg: ["–"]</td>
+<td>brygging_timer_slutt_referanse; Oppdater sluttreferanser</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_start_hendelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer start hendelse</td>
+<td>Enum/dynamisk valg: ["Bryggestart (faktisk)","Bryggeslutt
+(løpende)","Fasestart (planlagt)","Fasestart (faktisk)","Faseslutt
+(løpende)","Faseslutt (faktisk)","Fasepunkt (plantid)","Fasepunkt
+passert","Fasepunkt bekreftet"]</td>
+<td>brygging_timer_start_hendelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_timer_start_referanse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer start referanse</td>
+<td>Enum/dynamisk valg: ["–"]</td>
+<td>brygging_timer_start_referanse; Oppdater startreferanser</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_status</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer status</td>
+<td>Enum/dynamisk valg: ["Aktiv","Deaktivert"]</td>
+<td>brygging_timer_status</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td>Node-RED → HA</td>
+<td>Aktiv fase</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_aktiv_fase</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td>Node-RED → HA</td>
+<td>Aktiv template</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_aktiv_template</td>
+<td style="text-align: right;">129</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_driftsmeldinger</code></td>
+<td>Node-RED → HA</td>
+<td>Driftsmeldinger</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_driftsmeldinger</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_estimert_ferdig_bryggedag</code></td>
+<td>Node-RED → HA</td>
+<td>Estimert ferdig bryggedag</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_estimert_ferdig_bryggedag</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_faseoversikt</code></td>
+<td>Node-RED → HA</td>
+<td>Faseoversikt</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_faseoversikt</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_fasepunktoversikt</code></td>
+<td>Node-RED → HA</td>
+<td>Fasepunktoversikt</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_fasepunktoversikt</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_kommandoresultat</code></td>
+<td>Node-RED → HA</td>
+<td>Kommandoresultat</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_kommandoresultat</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_neste_fasepunkt</code></td>
+<td>Node-RED → HA</td>
+<td>Neste fasepunkt</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_neste_fasepunkt</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td>Node-RED → HA</td>
+<td>Rapportarkiv</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_rapportarkiv</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td>Node-RED → HA</td>
+<td>Sesjonsarkiv</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_sesjonsarkiv</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_siste_fasepunktkommentar</code></td>
+<td>Node-RED → HA</td>
+<td>Siste fasepunktkommentar</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_siste_fasepunktkommentar</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_status</code></td>
+<td>Node-RED → HA</td>
+<td>Status</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_status</td>
+<td style="text-align: right;">95</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td>Node-RED → HA</td>
+<td>Systemkontroll</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_systemkontroll</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_tid_til_ferdig_bryggedag</code></td>
+<td>Node-RED → HA</td>
+<td>Tid til ferdig bryggedag</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_tid_til_ferdig_bryggedag</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_timeroversikt</code></td>
+<td>Node-RED → HA</td>
+<td>Timeroversikt</td>
+<td>State og attributter etter sensorskjemaet nedenfor</td>
+<td>brygging_timeroversikt</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_01_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 01 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_01_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_02_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 02 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_02_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_03_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 03 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_03_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_04_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 04 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_04_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_05_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 05 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_05_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_06_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 06 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_06_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_07_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 07 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_07_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_08_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 08 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_08_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_09_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 09 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_09_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_10_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 10 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_10_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_11_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 11 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_11_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_12_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 12 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_12_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_13_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 13 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_13_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fase_14_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 14 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_14_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fase_15_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fase 15 – navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_fase_15_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_fasepunktkommentar</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Fasepunktkommentar</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_fasepunktkommentar</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_01_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_01_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_01_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_01_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_01_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 01 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_01_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_02_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_02_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_02_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_02_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_02_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 02 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_02_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_03_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_03_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_03_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_03_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_03_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 03 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_03_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_04_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_04_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_04_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_04_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_04_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 04 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_04_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_05_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_05_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_05_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_05_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_05_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 05 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_05_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_06_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_06_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_06_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_06_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_06_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 06 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_06_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_07_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_07_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_07_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_07_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_07_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 07 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_07_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_08_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_08_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_08_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_08_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_08_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 08 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_08_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_09_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_09_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_09_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_09_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_09_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 09 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_09_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_10_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_10_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_10_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_10_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_10_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 10 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_10_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_11_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_11_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_11_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_11_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_11_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 11 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_11_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_12_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_12_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_12_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_12_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_12_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 12 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_12_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_13_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_13_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_13_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_13_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_13_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 13 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_13_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_14_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_14_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_14_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_14_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_14_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 14 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_14_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_15_beskrivelse</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 beskrivelse</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_15_beskrivelse</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_15_forventet</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 forventet</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_15_forventet</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_15_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Punkt 15 navn</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_punkt_15_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_template_notat</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Template notat</td>
+<td>tekst 0…255 Unicode-tegn</td>
+<td>brygging_template_notat</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_timer_navn</code></td>
+<td>HA ↔︎ Node-RED</td>
+<td>Timer navn</td>
+<td>tekst 0…120 Unicode-tegn</td>
+<td>brygging_timer_navn</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="41-knapper-og-kommandoer">4.1 Knapper og kommandoer</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Entity-ID</th>
+<th>Synlig navn</th>
+<th>Intern kommando</th>
+<th>Forbruker</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>button.brygging_avslutt</code></td>
+<td>Avslutt</td>
+<td><code>END_BREWDAY</code></td>
+<td>brygging_avslutt</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_behold_siste_100_rapporter</code></td>
+<td>Behold siste 100 rapporter</td>
+<td><code>CLEAN_REPORTS</code></td>
+<td>Behold siste 100 rapporter</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_bekreft_fasepunkt</code></td>
+<td>Bekreft fasepunkt</td>
+<td><code>CONFIRM_EVENT</code></td>
+<td>brygging_bekreft_fasepunkt</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_forkast_templateendringer</code></td>
+<td>Forkast templateendringer</td>
+<td><code>LOAD_TEMPLATE</code></td>
+<td>brygging_forkast_templateendringer</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_fortsett</code></td>
+<td>Fortsett</td>
+<td><code>RESUME</code></td>
+<td>brygging_fortsett</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_generer_historisk_rapport</code></td>
+<td>Generer historisk rapport</td>
+<td><code>HISTORICAL_REPORT</code></td>
+<td>brygging_generer_historisk_rapport</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_generer_rapport</code></td>
+<td>Generer rapport</td>
+<td><code>REPORT</code></td>
+<td>brygging_generer_rapport</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_klargjor_ny_bryggedag</code></td>
+<td>Klargjør ny bryggedag</td>
+<td><code>RESET</code></td>
+<td>brygging_klargjor_ny_bryggedag</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_lagre_fasepunktkommentar</code></td>
+<td>Lagre fasepunktkommentar</td>
+<td><code>PHASE_NOTE</code></td>
+<td>brygging_lagre_fasepunktkommentar</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_lagre_template</code></td>
+<td>Lagre template</td>
+<td><code>SAVE_TEMPLATE</code></td>
+<td>brygging_lagre_template</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_neste_fase</code></td>
+<td>Neste fase</td>
+<td><code>CONFIRM_DONE</code></td>
+<td>brygging_neste_fase</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_nodavslutt_ved_systemfeil</code></td>
+<td>Nødavslutt ved systemfeil</td>
+<td><code>EMERGENCY_END</code></td>
+<td>brygging_nodavslutt_ved_systemfeil</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_oppdater_systemkontroll</code></td>
+<td>Oppdater systemkontroll</td>
+<td><code>STORAGE_REFRESH</code></td>
+<td>brygging_oppdater_systemkontroll</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_oppdater_templateliste</code></td>
+<td>Oppdater templateliste</td>
+<td><code>REFRESH_TEMPLATE_LIST</code></td>
+<td>Oppdater templateliste</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_pause</code></td>
+<td>Pause</td>
+<td><code>PAUSE</code></td>
+<td>brygging_pause</td>
+</tr>
+<tr class="even">
+<td><code>button.brygging_start</code></td>
+<td>Start</td>
+<td><code>START_PREFLIGHT</code></td>
+<td>brygging_start</td>
+</tr>
+<tr class="odd">
+<td><code>button.brygging_tilbake</code></td>
+<td>Tilbake</td>
+<td><code>PREVIOUS</code></td>
+<td>brygging_tilbake</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-utgangskontrakt-for-15-sensorer">5. Utgangskontrakt for 15
+sensorer</h2>
+<h3 id="51-sensor-state">5.1 Sensor-state</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Planlagt sensor</th>
+<th>Logisk datatype</th>
+<th>Tillatte verdier eller format</th>
+<th>Tomtilstand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sensor.brygging_status</code></td>
+<td>enum-tekst</td>
+<td><code>idle</code>, <code>running</code>,
+<code>waiting_confirmation</code>, <code>waiting_event</code>,
+<code>paused</code>, <code>completed</code>, <code>ended</code>,
+<code>error</code></td>
+<td>Ingen. Node-RED skal alltid publisere én gyldig status;
+transportfeil håndteres som
+<code>unknown</code>/<code>unavailable</code> av HA.</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td>tekst</td>
+<td>Ikke-tomt fasenavn, maksimalt 120 tegn</td>
+<td><code>Ikke startet</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_faseoversikt</code></td>
+<td>formatert heltallstekst</td>
+<td><code>N faser</code>, der N er 0–15</td>
+<td><code>0 faser</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_tid_til_ferdig_bryggedag</code></td>
+<td><code>duration-text</code></td>
+<td>Ferdig formatert gjenstående tid</td>
+<td><code>Ikke beregnet</code> når ingen gyldig template eller tidsplan
+finnes</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_estimert_ferdig_bryggedag</code></td>
+<td>klokkeslett-tekst</td>
+<td><code>HH:MM</code> i containerens dokumenterte lokale tidssone</td>
+<td><code>Ikke beregnet</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td>filnavn-tekst</td>
+<td>Basename som ender med <code>.json</code></td>
+<td><code>Ingen valgt</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_fasepunktoversikt</code></td>
+<td>formatert heltallstekst</td>
+<td><code>N fasepunkter</code>, der N er 0–15</td>
+<td><code>0 fasepunkter</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_neste_fasepunkt</code></td>
+<td>enum-tekst</td>
+<td><code>Ingen</code>, <code>Kommende</code>, <code>Forfalt</code></td>
+<td><code>Ingen</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_driftsmeldinger</code></td>
+<td>heltallstekst</td>
+<td>Desimalt heltall ≥ 0; antall aktive meldinger</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_kommandoresultat</code></td>
+<td>enum-tekst</td>
+<td><code>Ingen kommando</code>, <code>Utført</code>,
+<code>Ignorert dobbelttrykk</code>, <code>Sperret</code>,
+<code>Feilet</code></td>
+<td><code>Ingen kommando</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_siste_fasepunktkommentar</code></td>
+<td>klokkeslett-tekst</td>
+<td><code>HH:MM:SS</code></td>
+<td><code>Ingen kommentar</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td>enum-tekst</td>
+<td><code>IKKE KJØRT</code>, <code>OK</code>, <code>ADVARSEL</code>,
+<code>FEIL</code></td>
+<td><code>IKKE KJØRT</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td>formatert tekst</td>
+<td><code>N rapporter · S</code>, N ≥ 0 og S følger størrelsesformatet
+<code>B</code>, <code>KiB</code> eller <code>MiB</code></td>
+<td><code>0 rapporter · 0 B</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td>formatert tekst</td>
+<td><code>N sesjoner · S</code>, N ≥ 0</td>
+<td><code>0 sesjoner · 0 B</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_timeroversikt</code></td>
+<td>formatert heltallstekst</td>
+<td><code>N timere</code>, der N er 0–15</td>
+<td><code>0 timere</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-toppnivåattributter--51-felt">5.2 Toppnivåattributter – 51
+felt</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Sensor</th>
+<th>Attributt</th>
+<th>Datatype</th>
+<th>Tillatte verdier / enhet</th>
+<th>Tomtilstand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sensor.brygging_status</code></td>
+<td><code>flow_version</code></td>
+<td>tekst</td>
+<td>Ikke-tom byggversjon, eksempel <code>2026.11.07-1</code></td>
+<td>Ikke tillatt</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_status</code></td>
+<td><code>expected_dashboard_version</code></td>
+<td>tekst</td>
+<td>Ikke-tom byggversjon som skal være identisk med installert
+dashboardversjon</td>
+<td>Ikke tillatt</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_status</code></td>
+<td><code>session_schema_version</code></td>
+<td>tekst-enum</td>
+<td><code>1.0</code></td>
+<td>Ikke tillatt</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_status</code></td>
+<td><code>event_schema_version</code></td>
+<td>tekst-enum</td>
+<td><code>1.0</code></td>
+<td>Ikke tillatt</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td><code>planned_duration_min</code></td>
+<td>heltall</td>
+<td>0–1440 min</td>
+<td><code>0</code> når ingen aktiv fase</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td><code>elapsed_min</code></td>
+<td>heltall</td>
+<td>≥ 0 min</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td><code>remaining_min</code></td>
+<td>heltall</td>
+<td>min; negativ verdi betyr overtid</td>
+<td><code>0</code> når ingen aktiv fase</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td><code>overtime_min</code></td>
+<td>heltall</td>
+<td>≥ 0 min</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_fase</code></td>
+<td><code>progress_percent</code></td>
+<td>heltall</td>
+<td>≥ 0 %; kan være over 100 ved overtid</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_faseoversikt</code></td>
+<td><code>phases</code></td>
+<td>liste&lt;fase&gt;</td>
+<td>0–15 objekter etter punkt 6.4; ferdig sortert</td>
+<td><code>[]</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td><code>status</code></td>
+<td>enum-tekst</td>
+<td><code>Ingen valgt</code>, <code>Ikke validert</code>,
+<code>Gyldig</code>, <code>Ugyldig</code></td>
+<td><code>Ingen valgt</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td><code>dirty</code></td>
+<td>boolsk</td>
+<td><code>true</code> eller <code>false</code></td>
+<td><code>false</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td><code>saved_at</code></td>
+<td>RFC 3339-tekst eller <code>null</code></td>
+<td>Tidspunkt med eksplisitt tidssone</td>
+<td><code>null</code> når templaten ikke er lagret eller valgt</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td><code>validation_errors</code></td>
+<td>liste&lt;tekst&gt;</td>
+<td>Hvert element er en ikke-tom, ferdig norsk feilmelding</td>
+<td><code>[]</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_aktiv_template</code></td>
+<td><code>validation_warnings</code></td>
+<td>liste&lt;tekst&gt;</td>
+<td>Hvert element er en ikke-tom, ferdig norsk advarsel</td>
+<td><code>[]</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_fasepunktoversikt</code></td>
+<td><code>phasepoints</code></td>
+<td>liste&lt;fasepunkt&gt;</td>
+<td>0–15 objekter etter punkt 6.4; ferdig sortert</td>
+<td><code>[]</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_neste_fasepunkt</code></td>
+<td><code>phasepoint_id</code></td>
+<td>tekst eller <code>null</code></td>
+<td><code>NN_NN</code></td>
+<td><code>null</code> når state er <code>Ingen</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_neste_fasepunkt</code></td>
+<td><code>phasepoint_name</code></td>
+<td>tekst eller <code>null</code></td>
+<td>1–255 tegn</td>
+<td><code>null</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_neste_fasepunkt</code></td>
+<td><code>time_until_due</code></td>
+<td><code>duration-text</code> eller <code>null</code></td>
+<td>Negativ verdi betyr forfalt</td>
+<td><code>null</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_neste_fasepunkt</code></td>
+<td><code>requires_confirmation</code></td>
+<td>boolsk eller <code>null</code></td>
+<td><code>true</code> eller <code>false</code></td>
+<td><code>null</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_driftsmeldinger</code></td>
+<td><code>messages</code></td>
+<td>liste&lt;driftsmelding&gt;</td>
+<td>Objekter etter punkt 6.4; alvorligste først, deretter nyeste internt
+registrerte tidspunkt</td>
+<td><code>[]</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_kommandoresultat</code></td>
+<td><code>command</code></td>
+<td>tekst eller <code>null</code></td>
+<td>Ferdig norsk kommandonavn; ukjent intern kode brukes bare som
+reserve</td>
+<td><code>null</code> før første kommando</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_kommandoresultat</code></td>
+<td><code>message</code></td>
+<td>tekst eller <code>null</code></td>
+<td>Ferdig norsk forklaring ved sperring eller feil</td>
+<td><code>null</code> når ingen forklaring er nødvendig</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_kommandoresultat</code></td>
+<td><code>processed_at</code></td>
+<td>RFC 3339-tekst eller <code>null</code></td>
+<td>Tidspunkt da Node-RED ferdigbehandlet kommandoen</td>
+<td><code>null</code> før første kommando</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_siste_fasepunktkommentar</code></td>
+<td><code>phase_title</code></td>
+<td>tekst eller <code>null</code></td>
+<td>1–120 tegn</td>
+<td><code>null</code> før første kommentar</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_siste_fasepunktkommentar</code></td>
+<td><code>phasepoint_name</code></td>
+<td>tekst eller <code>null</code></td>
+<td>1–255 tegn</td>
+<td><code>null</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_siste_fasepunktkommentar</code></td>
+<td><code>comment_text</code></td>
+<td>tekst eller <code>null</code></td>
+<td>1–255 tegn; blank kommentar kan ikke lagres</td>
+<td><code>null</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td><code>checked_at</code></td>
+<td>RFC 3339-tekst eller <code>null</code></td>
+<td>Tidspunkt for fullført kontroll</td>
+<td><code>null</code> før første kontroll</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td><code>checks_json</code></td>
+<td>JSON-tekst&lt;liste&lt;kontroll&gt;&gt;</td>
+<td>Gyldig UTF-8 JSON som dekoder til nøyaktig skjema i punkt 6.4</td>
+<td><code>"[]"</code> før første kontroll</td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td><code>ok_count</code></td>
+<td>heltall</td>
+<td>≥ 0</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td><code>warning_count</code></td>
+<td>heltall</td>
+<td>≥ 0</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td><code>error_count</code></td>
+<td>heltall</td>
+<td>≥ 0</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_systemkontroll</code></td>
+<td><code>start_summary</code></td>
+<td>tekst</td>
+<td><code>TILLATT</code>, <code>IKKE KONTROLLERT</code> eller
+<code>SPERRET: &lt;norsk årsak&gt;</code></td>
+<td><code>IKKE KONTROLLERT</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>total_count</code></td>
+<td>heltall</td>
+<td>≥ 0 rapporter</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>ordinary_count</code></td>
+<td>heltall</td>
+<td>≥ 0 rapporter</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>historical_count</code></td>
+<td>heltall</td>
+<td>≥ 0 rapporter</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>total_size</code></td>
+<td>formatert tekst</td>
+<td>Ikke-negativ størrelse i <code>B</code>, <code>KiB</code> eller
+<code>MiB</code></td>
+<td><code>0 B</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>ordinary_latest_filename</code></td>
+<td>tekst eller <code>null</code></td>
+<td>Basename som ender med <code>.html</code></td>
+<td><code>null</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>ordinary_latest_url</code></td>
+<td>relativ URL eller <code>null</code></td>
+<td><code>/local/brygging/…</code> med produsentstyrt cacheversjon</td>
+<td><code>null</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>ordinary_public_copy_ok</code></td>
+<td>boolsk eller <code>null</code></td>
+<td><code>true</code> verifisert, <code>false</code> rapport finnes men
+kopi avviker</td>
+<td><code>null</code> når ingen ordinær rapport finnes</td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>historical_latest_filename</code></td>
+<td>tekst eller <code>null</code></td>
+<td>Basename som ender med <code>.html</code></td>
+<td><code>null</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>historical_latest_url</code></td>
+<td>relativ URL eller <code>null</code></td>
+<td><code>/local/brygging/…</code> med produsentstyrt cacheversjon</td>
+<td><code>null</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_rapportarkiv</code></td>
+<td><code>historical_public_copy_ok</code></td>
+<td>boolsk eller <code>null</code></td>
+<td><code>true</code>, <code>false</code> eller <code>null</code> etter
+samme regel som ordinær rapport</td>
+<td><code>null</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>total_count</code></td>
+<td>heltall</td>
+<td>≥ 0 sesjoner</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>total_size</code></td>
+<td>formatert tekst</td>
+<td>Ikke-negativ størrelse i <code>B</code>, <code>KiB</code> eller
+<code>MiB</code></td>
+<td><code>0 B</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>active_count</code></td>
+<td>heltall</td>
+<td>0 eller 1</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>completed_count</code></td>
+<td>heltall</td>
+<td>≥ 0</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>ended_count</code></td>
+<td>heltall</td>
+<td>≥ 0; vanlig manuell Avslutt</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>unfinished_count</code></td>
+<td>heltall</td>
+<td>≥ 0; avbrutt, nødavsluttet eller ikke ferdigstilt</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>sensor.brygging_sesjonsarkiv</code></td>
+<td><code>unclassified_count</code></td>
+<td>heltall</td>
+<td>≥ 0; mangler gyldig <code>brewday_started</code></td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>sensor.brygging_timeroversikt</code></td>
+<td><code>timers</code></td>
+<td>liste&lt;timer&gt;</td>
+<td>0–15 objekter etter punkt 6.4; ferdig sortert</td>
+<td><code>[]</code></td>
+</tr>
+</tbody>
+</table>
+<p>Sesjonsarkivet har i tillegg invariantet
+<code>active_count + completed_count + ended_count + unfinished_count + unclassified_count = total_count</code>.
+Rapportarkivet har invariantet
+<code>ordinary_count + historical_count = total_count</code>. Brudd er
+produsentfeil, ikke en situasjon dashboardet skal korrigere.</p>
+<h3 id="53-eksakte-skjemaer-for-listeobjekter--27-felt">5.3 Eksakte
+skjemaer for listeobjekter – 27 felt</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Objekttype</th>
+<th>Felt</th>
+<th>Datatype</th>
+<th>Tillatte verdier / tomtilstand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fase</td>
+<td><code>title</code></td>
+<td>tekst</td>
+<td>1–120 tegn; aldri tom</td>
+</tr>
+<tr class="even">
+<td>fase</td>
+<td><code>duration_min</code></td>
+<td>heltall</td>
+<td>0–1440 min</td>
+</tr>
+<tr class="odd">
+<td>fase</td>
+<td><code>status</code></td>
+<td>enum-tekst</td>
+<td><code>Kommende</code>, <code>Aktiv</code>,
+<code>Fullført</code></td>
+</tr>
+<tr class="even">
+<td>fasepunkt</td>
+<td><code>id</code></td>
+<td>tekst</td>
+<td><code>NN_NN</code>; permanent ID, aldri tom</td>
+</tr>
+<tr class="odd">
+<td>fasepunkt</td>
+<td><code>name</code></td>
+<td>tekst</td>
+<td>1–255 tegn</td>
+</tr>
+<tr class="even">
+<td>fasepunkt</td>
+<td><code>type</code></td>
+<td>enum-tekst</td>
+<td><code>Aktivitet</code>, <code>Tilsetning</code>,
+<code>Måling</code>, <code>Kontroll</code>, <code>Varsel</code></td>
+</tr>
+<tr class="odd">
+<td>fasepunkt</td>
+<td><code>description</code></td>
+<td>tekst</td>
+<td>0–255 tegn; <code>""</code> betyr at beskrivelse ikke er angitt</td>
+</tr>
+<tr class="even">
+<td>fasepunkt</td>
+<td><code>expected_value</code></td>
+<td>tekst</td>
+<td>0–255 tegn; <code>""</code> betyr at forventet verdi ikke er
+angitt</td>
+</tr>
+<tr class="odd">
+<td>fasepunkt</td>
+<td><code>requires_confirmation</code></td>
+<td>boolsk</td>
+<td><code>true</code> eller <code>false</code></td>
+</tr>
+<tr class="even">
+<td>fasepunkt</td>
+<td><code>time_until_due</code></td>
+<td><code>duration-text</code></td>
+<td>Alltid ikke-tom når objektet publiseres</td>
+</tr>
+<tr class="odd">
+<td>fasepunkt</td>
+<td><code>status</code></td>
+<td>enum-tekst</td>
+<td><code>Kommende</code>, <code>Neste</code>, <code>Forfalt</code>,
+<code>Passert</code>, <code>Bekreftet</code></td>
+</tr>
+<tr class="even">
+<td>fasepunkt</td>
+<td><code>timing</code></td>
+<td>formatert tekst</td>
+<td><code>N min fra fasestart</code> eller
+<code>N min fra faseslutt</code>; N er heltall</td>
+</tr>
+<tr class="odd">
+<td>timer</td>
+<td><code>name</code></td>
+<td>tekst</td>
+<td>1–120 tegn</td>
+</tr>
+<tr class="even">
+<td>timer</td>
+<td><code>status</code></td>
+<td>enum-tekst</td>
+<td><code>Venter på start</code>, <code>Venter på slutt</code>,
+<code>Aktiv</code>, <code>Over tiden</code>, <code>Fullført</code></td>
+</tr>
+<tr class="odd">
+<td>timer</td>
+<td><code>display_text</code></td>
+<td>tekst</td>
+<td>Ikke-tom, ferdig norsk visningstekst</td>
+</tr>
+<tr class="even">
+<td>driftsmelding</td>
+<td><code>severity</code></td>
+<td>enum-tekst</td>
+<td><code>Feil</code>, <code>Advarsel</code></td>
+</tr>
+<tr class="odd">
+<td>driftsmelding</td>
+<td><code>source</code></td>
+<td>tekst</td>
+<td>Ikke-tomt norsk kildenavn; intern kildekode beholdes bare i
+runtime/logg</td>
+</tr>
+<tr class="even">
+<td>driftsmelding</td>
+<td><code>message</code></td>
+<td>tekst</td>
+<td>Ikke-tom norsk melding</td>
+</tr>
+<tr class="odd">
+<td>kontroll</td>
+<td><code>group</code></td>
+<td>tekst</td>
+<td>Ikke-tomt norsk gruppenavn</td>
+</tr>
+<tr class="even">
+<td>kontroll</td>
+<td><code>name</code></td>
+<td>tekst</td>
+<td>Ikke-tomt norsk kontrollnavn; unikt innen gruppen</td>
+</tr>
+<tr class="odd">
+<td>kontroll</td>
+<td><code>status</code></td>
+<td>enum-tekst</td>
+<td><code>OK</code>, <code>Advarsel</code>, <code>Feil</code>,
+<code>Informasjon</code></td>
+</tr>
+<tr class="even">
+<td>kontroll</td>
+<td><code>blocks_start</code></td>
+<td>boolsk</td>
+<td><code>true</code> eller <code>false</code></td>
+</tr>
+<tr class="odd">
+<td>kontroll</td>
+<td><code>method</code></td>
+<td>tekst</td>
+<td>Ikke-tom, ferdig norsk testbeskrivelse</td>
+</tr>
+<tr class="even">
+<td>kontroll</td>
+<td><code>target</code></td>
+<td>tekst</td>
+<td>Ikke-tomt kontrollmål</td>
+</tr>
+<tr class="odd">
+<td>kontroll</td>
+<td><code>result</code></td>
+<td>tekst</td>
+<td>Ikke-tomt testresultat</td>
+</tr>
+<tr class="even">
+<td>kontroll</td>
+<td><code>conclusion</code></td>
+<td>tekst</td>
+<td>Ikke-tom norsk konklusjon</td>
+</tr>
+<tr class="odd">
+<td>kontroll</td>
+<td><code>remediation</code></td>
+<td>tekst</td>
+<td><code>""</code> når tiltak ikke er nødvendig; ellers ferdig norsk
+tiltakstekst</td>
+</tr>
+</tbody>
+</table>
+<p>Faselisten sorteres etter intern <code>order_id</code>.
+Fasepunktlisten sorteres etter beregnet plantid og deretter intern
+rekkefølge. Timerlisten sorteres etter intern <code>order_id</code>.
+Driftsmeldinger sorteres etter alvorlighet og internt tidspunkt.
+Systemkontroll sorteres i produsentdefinert gruppe- og
+kontrollrekkefølge. Sorteringsnøkler publiseres ikke.</p>
+<h2 id="6-inndatakontrakt-for-215-kontrollentiteter">6. Inndatakontrakt
+for 215 kontrollentiteter</h2>
+<p>Matrisen i punkt 2 er autoritativ for hvilken kommando hver av de 17
+knappene utløser. En knapp har ingen applikasjons-state; bare en diskret
+trykkhandling. HA-generert sist-trykket-tidspunkt skal aldri brukes som
+bryggedata. Tabellen nedenfor dekker samtlige 87 select-, 48 number- og
+63 text-entiteter ved eksplisitte familier.</p>
+<h3 id="61-select--87-entiteter">6.1 Select – 87 entiteter</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Entitetsfamilie</th>
+<th>Antall</th>
+<th>Tillatte synlige verdier</th>
+<th>Tomtilstand og tilleggskrav</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>select.brygging_fase_NN_status</code></td>
+<td>15</td>
+<td><code>Aktiv</code>, <code>Deaktivert</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_fasepunkt_for_kommentar</code></td>
+<td>1</td>
+<td><code>Neste aktuelle fasepunkt</code>,
+<code>Forrige aktuelle fasepunkt</code> eller dynamisk
+<code>NN_NN – navn</code></td>
+<td>Standard er <code>Neste aktuelle fasepunkt</code>; foreldet dynamisk
+valg avvises</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_historisk_sesjon</code></td>
+<td>1</td>
+<td><code>Ingen sesjoner</code> eller gyldig session-ID uten
+<code>.jsonl</code></td>
+<td><code>Ingen sesjoner</code></td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_NN_aktiv</code></td>
+<td>15</td>
+<td><code>Aktiv</code>, <code>Deaktivert</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_NN_bekreftelse</code></td>
+<td>15</td>
+<td><code>Ja</code>, <code>Nei</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_punkt_NN_tid_ref</code></td>
+<td>15</td>
+<td><code>Fasestart</code>, <code>Faseslutt</code></td>
+<td>Node-RED mapper til interne
+<code>phase_start</code>/<code>phase_end</code></td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_punkt_NN_type</code></td>
+<td>15</td>
+<td><code>Aktivitet</code>, <code>Tilsetning</code>,
+<code>Måling</code>, <code>Kontroll</code>, <code>Varsel</code></td>
+<td>Node-RED mapper til tekniske schema-1.0-koder</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_rediger_fase</code></td>
+<td>1</td>
+<td>Dynamisk <code>NN – fasenavn</code> for de 15 faseplassene</td>
+<td>Før synkronisering kan produsenten bruke
+<code>01 – laster template</code>; denne kan ikke lagres som
+brukerdata</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_template</code></td>
+<td>1</td>
+<td><code>Ingen valgt</code> eller gyldig basename som ender med
+<code>.json</code></td>
+<td><code>Ingen valgt</code>; bare strengt validerte schema-1.0-filer
+tilbys</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_status</code></td>
+<td>1</td>
+<td><code>Aktiv</code>, <code>Deaktivert</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_timer_pauseoppforsel</code></td>
+<td>1</td>
+<td><code>Følg bryggepause</code>,
+<code>Fortsett etter klokke</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_retning</code></td>
+<td>1</td>
+<td><code>Tell opp</code>, <code>Tell ned</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_timer_start_hendelse</code></td>
+<td>1</td>
+<td>Bryggestart (faktisk), Bryggeslutt (løpende), Fasestart
+(planlagt/faktisk), Faseslutt (løpende/faktisk), Fasepunkt
+(plantid/passert/bekreftet)</td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_slutt_hendelse</code></td>
+<td>1</td>
+<td>Samme som start, i tillegg <code>Bryggeslutt (faktisk)</code></td>
+<td>Ingen tom verdi</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_timer_start_referanse</code></td>
+<td>1</td>
+<td><code>–</code>, dynamisk <code>NN – fasenavn</code> eller
+<code>NN_NN – fasepunktnavn</code></td>
+<td><code>–</code> er bare gyldig når valgt hendelse ikke krever
+referanse</td>
+</tr>
+<tr class="even">
+<td><code>select.brygging_timer_slutt_referanse</code></td>
+<td>1</td>
+<td>Samme dynamiske format som startreferanse</td>
+<td>Samme regel som startreferanse</td>
+</tr>
+<tr class="odd">
+<td><code>select.brygging_rediger_timer</code></td>
+<td>1</td>
+<td>Dynamisk <code>timer_NN – tekst</code>, eventuelt med
+<code>(deaktivert)</code></td>
+<td>Alltid én av de 15 timerplassene</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-number--48-entiteter">6.2 Number – 48 entiteter</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Entitetsfamilie</th>
+<th>Antall</th>
+<th>Datatype / område / steg</th>
+<th>Enhet og tomtilstand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>number.brygging_fase_NN_rekkefolge</code></td>
+<td>15</td>
+<td>heltall 1–15, steg 1; unikt på tvers av faseplassene</td>
+<td>Ingen enhet; ingen tom verdi</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_fase_NN_varighet_min</code></td>
+<td>15</td>
+<td>heltall 0–1440, steg 1</td>
+<td>min; <code>0</code> er gyldig</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_punkt_NN_tid_min</code></td>
+<td>15</td>
+<td>heltall −1440–1440, steg 1</td>
+<td>min; <code>0</code> betyr nøyaktig på valgt referanse</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_timer_rekkefolge</code></td>
+<td>1</td>
+<td>heltall 1–15, steg 1; unikt i timerlisten</td>
+<td>Ingen enhet; ingen tom verdi</td>
+</tr>
+<tr class="odd">
+<td><code>number.brygging_timer_start_offset_min</code></td>
+<td>1</td>
+<td>heltall −1440–1440, steg 1</td>
+<td>min; <code>0</code> er gyldig</td>
+</tr>
+<tr class="even">
+<td><code>number.brygging_timer_slutt_offset_min</code></td>
+<td>1</td>
+<td>heltall −1440–1440, steg 1</td>
+<td>min; <code>0</code> er gyldig</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-text--63-entiteter">6.3 Text – 63 entiteter</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Entitetsfamilie</th>
+<th>Antall</th>
+<th>Lengde</th>
+<th>Tomtilstand og validering</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>text.brygging_fase_NN_navn</code></td>
+<td>15</td>
+<td>0–120 tegn</td>
+<td>Tom streng tillatt bare når fasen er deaktivert; aktiv fase krever
+ikke-tomt trimmet navn</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_fasepunktkommentar</code></td>
+<td>1</td>
+<td>0–255 tegn i editoren</td>
+<td>Tom streng er initialverdi, men Lagre avviser tom/blank kommentar;
+lagret verdi er 1–255 tegn</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_NN_beskrivelse</code></td>
+<td>15</td>
+<td>0–255 tegn</td>
+<td><code>""</code> betyr ikke angitt</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_punkt_NN_forventet</code></td>
+<td>15</td>
+<td>0–255 tegn</td>
+<td><code>""</code> betyr ikke angitt</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_punkt_NN_navn</code></td>
+<td>15</td>
+<td>0–255 tegn i editoren</td>
+<td>Aktivt eller lagret fasepunkt krever 1–255 tegn; tom deaktivert
+plass utelates fra template</td>
+</tr>
+<tr class="even">
+<td><code>text.brygging_template_notat</code></td>
+<td>1</td>
+<td>0–255 tegn</td>
+<td><code>""</code> betyr intet notat</td>
+</tr>
+<tr class="odd">
+<td><code>text.brygging_timer_navn</code></td>
+<td>1</td>
+<td>0–120 tegn</td>
+<td>Aktiv timer krever 1–120 tegn; deaktivert timer kan bruke
+<code>""</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-eierskap-og-avhengigheter">7. Eierskap og avhengigheter</h2>
+<p>HA-nodene og statusprojektorene er produsenter. Dashboard-YAML-en er
+presentasjonsforbruker. Intern <code>msg</code>-, context-, runtime-,
+journal- og filflyt eies av
+<code>NODE-RED-VARIABEL-OG-DATAFLYTKONTRAKT-2026.11.07-1.html</code>;
+samme felt skal ikke få motstridende definisjon her.</p>
+<h2 id="8-verifikasjon">8. Verifikasjon</h2>
+<p>Pakketesten sammenligner alle 230 konkrete entity-ID-er, de 51
+attributtnøklene, visible names, HA-grenser og dashboardreferanser mot
+releasefilene. Reell registrering og state/attributtlesing i Home
+Assistant er målmiljøakseptanse.</p>
+</main></body></html>

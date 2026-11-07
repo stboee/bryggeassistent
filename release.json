@@ -1,0 +1,14 @@
+{
+  "version": "2026.11.07-1",
+  "title": "2026.11.07-1 – Første produksjonsutprøving",
+  "tag": "2026.11.07-1",
+  "prerelease": true,
+  "artifact": "bryggeassistent-2026.11.07-1-forste-produksjonsutproving.zip",
+  "package_directory": "package",
+  "import_baseline": "v1.0.0-rc3.3.2",
+  "import_archive_sha256": "61f8e2655852ccf55cbb2273dc52b243d60d11ba715818cc01f12365160cd952",
+  "state_schema_version": "1.0",
+  "event_schema_version": "1.0",
+  "template_schema_version": "1.0",
+  "release_notes": "RELEASE-NOTES.md"
+}

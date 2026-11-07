@@ -1,0 +1,27 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Systemdokumentasjon – Installer 2026.11.07-1</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1 id="systemdokumentasjon--installer-v100-rc332">Systemdokumentasjon –
+Installer 2026.11.07-1</h1>
+<h2 id="status">Status</h2>
+<p>Beskrivende modul- og driftsdokumentasjon. Normative krav ligger i
+KRAV-03-Installer-2026.11.07-1.html.</p>
+<h2 id="endringssekvens">Endringssekvens</h2>
+<ol type="1">
+<li>Parse argumenter og finn flow/manifest.</li>
+<li>Verifiser hash, JSON-struktur, Node-RED-markører, HA-entiteter og
+Function-syntaks.</li>
+<li>Les måltilstand og avvis aktiv session.</li>
+<li>Velg Compose eller Docker og kontroller målparametere.</li>
+<li>Stopp Node-RED, ta backup av eksisterende <code>flows.json</code>,
+skriv og hashkontroller ny fil.</li>
+<li>Start Node-RED og kjør stabilitets- og containerprobe.</li>
+<li>Ved feil: følg valgt rollbackpolicy.</li>
+</ol>
+<h2 id="ikke-omfattet">Ikke omfattet</h2>
+<p>Installeren endrer ikke dashboard, templates, rapporter,
+sessionjournaler, katalogstruktur, mounts, Composefil eller tidssone.
+Disse leveransefilene brukes manuelt eller av runtime etter egne
+krav.</p>
+<h2 id="driftsbevis">Driftsbevis</h2>
+<p>Installerloggen, før-/etterhash, backupsti, containerstatus og
+probeutfall er akseptansebevis. <code>--validate-only</code> er
+mottakskontroll, ikke full installasjonsakseptanse.</p>
+</main></body></html>

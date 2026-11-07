@@ -1,0 +1,202 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kravspesifikasjon 00 – Felles leveranse, dokumentasjon og konfigurasjonsstyring</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="kravspesifikasjon-00--felles-leveranse-dokumentasjon-og-konfigurasjonsstyring">Kravspesifikasjon
+00 – Felles leveranse, dokumentasjon og konfigurasjonsstyring</h1>
+<h2 id="dokumentstatus">Dokumentstatus</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Felt</th>
+<th>Verdi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>System</td>
+<td>Bryggedagsassistent</td>
+</tr>
+<tr class="even">
+<td>Omfang</td>
+<td>Felles release-, dokument- og konfigurasjonsstyring</td>
+</tr>
+<tr class="odd">
+<td>Release</td>
+<td>2026.11.07-1</td>
+</tr>
+<tr class="even">
+<td>Direkte baseline</td>
+<td>v1.0.0-rc3.3.2</td>
+</tr>
+<tr class="odd">
+<td>Dokumenttype</td>
+<td>Normativ kravspesifikasjon</td>
+</tr>
+<tr class="even">
+<td>Status</td>
+<td>Endelig byggegrunnlag</td>
+</tr>
+<tr class="odd">
+<td>Dato</td>
+<td>2026-11-07</td>
+</tr>
+</tbody>
+</table>
+<h2 id="formål">Formål</h2>
+<p>Dokumentet gjør komplett, sporbar og verifiserbar dokumentasjon til
+en obligatorisk del av hver release. Modulkrav kan presisere, men ikke
+svekke, disse felles kravene.</p>
+<h2 id="normative-krav">Normative krav</h2>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Presist krav</th>
+<th>Verifikasjon og akseptansekriterium</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DOC-PKG-001</td>
+<td>Hver komplett releasepakke skal inneholde versjonert dokumentasjon
+som en integrert del av leveransen.</td>
+<td>Pakketesten skal avvise release uten dokumentasjonskatalog eller
+obligatoriske dokumenter.</td>
+</tr>
+<tr class="even">
+<td>DOC-PKG-002</td>
+<td>Alle releasefiler og normative dokumenter skal ha samme
+releaseversjon; schema- og baselineversjoner skal skilles eksplisitt fra
+releaseversjonen.</td>
+<td>Versjonsskann skal kontrollere filnavn, titler, runtimeattributt,
+dashboardtittel og manifest.</td>
+</tr>
+<tr class="odd">
+<td>DOC-PKG-003</td>
+<td>Pakkens README skal peke til den klikkbare dokumentoversikten og
+beskrive installerens reelle endringsgrense.</td>
+<td>Lenken skal løses lokalt; teksten skal si at installeren bare bytter
+Node-RED-flow.</td>
+</tr>
+<tr class="even">
+<td>DOC-PKG-004</td>
+<td>Pakken skal ha én autoritativ SHA-256-fil som dekker alle andre
+leveransefiler.</td>
+<td>Ren utpakking skal bestå <code>sha256sum -c SHA256SUMS</code>.</td>
+</tr>
+<tr class="odd">
+<td>DOC-PKG-005</td>
+<td>Normative dokumentfilnavn skal ikke være merket <code>utkast</code>
+eller <code>arbeidsgrunnlag</code>.</td>
+<td>Pakketesten skal avvise slike markører i dokumentfilnavn.</td>
+</tr>
+<tr class="even">
+<td>DOC-PKG-006</td>
+<td>Den makrofrie XLSX-templategeneratoren skal følge hver release så
+lenge schema 1.0-editoren inngår i produktet.</td>
+<td>Filen skal finnes under <code>verktoy/templategenerator</code> og
+rundturstestes mot runtimevalidatoren.</td>
+</tr>
+<tr class="odd">
+<td>DOC-HIE-001</td>
+<td>Dokumentoversikten skal beskrive dokumenthierarki, normativ status,
+modulansvar og avhengigheter.</td>
+<td>Alle dokumentlenker skal være relative og kunne åpnes fra utpakket
+pakke.</td>
+</tr>
+<tr class="even">
+<td>DOC-HIE-002</td>
+<td>Felles dokumenter skal skilles fra dokumenter for Node-RED, Home
+Assistant-dashboard, installer og templateverktøy.</td>
+<td>Dokumentmatrisen skal ha en eksplisitt modulkolonne.</td>
+</tr>
+<tr class="odd">
+<td>DOC-HIE-003</td>
+<td>Kravdokumenter og grensekontrakter skal være normative;
+systemdokumentasjon, genererte inventarer og rapporter skal angi om de
+er beskrivende eller avledet.</td>
+<td>Dokumentstatus skal stå i hvert dokument og kontrolleres i
+oversikten.</td>
+</tr>
+<tr class="even">
+<td>DOC-TRC-001</td>
+<td>Hvert normativt krav skal ha unik og stabil krav-ID.</td>
+<td>Automatisk kontroll skal samle alle kravtabeller og avvise
+duplikater.</td>
+</tr>
+<tr class="odd">
+<td>DOC-TRC-002</td>
+<td>Hvert krav skal finnes nøyaktig én gang i
+krav–implementasjon–test–akseptanse-matrisen.</td>
+<td>ID-settet i kravdokumentene og matrisen skal være identisk.</td>
+</tr>
+<tr class="even">
+<td>DOC-TRC-003</td>
+<td>Tekniske assertions, navngitte tester og normative krav skal telles
+og rapporteres separat.</td>
+<td>Bygge- og testdokumenter skal ikke omtale assertiontallet som
+funksjonelle krav.</td>
+</tr>
+<tr class="odd">
+<td>DOC-TRC-004</td>
+<td>Hvert krav skal ha automatisert verifikasjon eller et eksplisitt
+målmiljøkriterium med forventet bevis.</td>
+<td>Matrisen skal aldri bruke grønn status uten dokumentert test eller
+akseptanseresultat.</td>
+</tr>
+<tr class="even">
+<td>DOC-CON-001</td>
+<td>HA–Node-RED-kontrakten skal dekke alle 230 entiteter, 15
+sensorstates, 51 toppnivåattributter og 27 felt i strukturerte
+listeobjekter.</td>
+<td>Kontrakttesten skal sammenligne dokumentert sett og telling mot
+faktisk flow.</td>
+</tr>
+<tr class="odd">
+<td>DOC-CON-002</td>
+<td>Kontrakten skal angi synlig navn, retning, produsent/forbruker,
+dashboardbruk, datatype, grenser, enum og tomtilstand der dette
+gjelder.</td>
+<td>Stikkprøver er utilstrekkelige; alle entitetsrader skal ha utfylte
+kontraktkolonner.</td>
+</tr>
+<tr class="even">
+<td>DOC-CON-003</td>
+<td>Variabel- og dataflytinventaret skal genereres fra releaseflowen og
+bære flowens SHA-256.</td>
+<td>Kilden i inventaret skal samsvare byte-for-byte med pakket
+flow.</td>
+</tr>
+<tr class="odd">
+<td>DOC-SYS-001</td>
+<td>Systemoversikten og tre moduldokumenter skal følge pakken og peke
+til normative krav og kontrakter.</td>
+<td>Dokumentoversikten skal ha fungerende lenker til alle fire
+systemdokumenter.</td>
+</tr>
+<tr class="even">
+<td>DOC-VER-001</td>
+<td>Alle lokale lenker i HTML- og Markdown-dokumenter skal løses innen
+releasepakken.</td>
+<td>Automatisk lenkekontroll skal avvise manglende mål og
+katalogtraversering utenfor pakken.</td>
+</tr>
+<tr class="odd">
+<td>DOC-VER-002</td>
+<td>Releasepakken skal verifiseres fra en ny utpakking uten skjulte
+byggekilder.</td>
+<td>Runtime-, dokument-, manifest- og installerens
+validate-only-kontroll skal kjøres i den rene kopien.</td>
+</tr>
+<tr class="even">
+<td>DOC-VER-003</td>
+<td>Dokumentrevisjonen skal ikke endre motor- eller dashboardatferd uten
+et særskilt krav og regresjonstest.</td>
+<td>Normalisert RC3.3.2→2026.11.07-1-diff skal bare vise versjonsmarkører i
+flow og dashboard.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="godkjenning">Godkjenning</h2>
+<p>Release kan ikke godkjennes når et krav over mangler implementasjon
+eller kontroll. Målmiljøkriterier kan stå som åpne, men skal være
+synlige i akseptanseplan og sporbarhetsmatrise.</p>
+</main></body></html>

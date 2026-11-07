@@ -1,0 +1,99 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Akseptanseplan – Bryggedagsassistent 2026.11.07-1</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1 id="akseptanseplan--bryggedagsassistent-v100-rc332">Akseptanseplan –
+Bryggedagsassistent 2026.11.07-1</h1>
+<p>Dokumentet skiller byggbevis fra målmiljøbevis. Status «Gjenstår» er
+en åpen godkjenningsport, ikke en skjult feil.</p>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Område</th>
+<th>Fremgangsmåte</th>
+<th>Akseptansekriterium</th>
+<th>Miljø</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AKS-01</td>
+<td>Ren pakke og integritet</td>
+<td>Pakk ut ZIP i ny katalog; kjør <code>sha256sum -c SHA256SUMS</code>,
+runtime-test, dokumenttest og installer
+<code>--validate-only</code>.</td>
+<td>Alle exit 0; ingen fil utenfor pakken brukes.</td>
+<td>Byggmiljø</td>
+<td>Bestått i releasebygg</td>
+</tr>
+<tr class="even">
+<td>AKS-02</td>
+<td>Node-RED og 230 HA-entiteter</td>
+<td>Installer flow; start Node-RED; sammenlign 15 sensorer og 215
+kontroller med kontrakten.</td>
+<td>Eksakt sett; ingen duplikater eller gamle entiteter.</td>
+<td>Målmiljø</td>
+<td>Gjenstår</td>
+</tr>
+<tr class="odd">
+<td>AKS-03</td>
+<td>Dashboard og reconnect</td>
+<td>Åpne alle visninger, bryt/gjenopprett HA-forbindelsen og kontroller
+resynk.</td>
+<td>Ingen dashboardreparasjon; state og valg blir konsistente.</td>
+<td>Målmiljø</td>
+<td>Gjenstår</td>
+</tr>
+<tr class="even">
+<td>AKS-04</td>
+<td>Restart under brygging</td>
+<td>Start, gå til et fasepunkt, stopp Node-RED, vent og start
+igjen.</td>
+<td>Samme fase/forsøk gjenopprettes; <code>state_restored</code> viser
+fasepunkt og tidsposisjon; automatisk STORAGE_REFRESH er ikke
+knappetrykk.</td>
+<td>Målmiljø</td>
+<td>Gjenstår</td>
+</tr>
+<tr class="odd">
+<td>AKS-05</td>
+<td>Rapport</td>
+<td>Generer rapport med A→B→A, kommentarer, fasehopp, restart og
+timer.</td>
+<td>RC3.3.2-layout videreføres; grå <code>#bfbfbf</code>-headere,
+korrekt forsøk, klokkeslett og restartlinje.</td>
+<td>Målmiljø</td>
+<td>Gjenstår</td>
+</tr>
+<tr class="even">
+<td>AKS-06</td>
+<td>Template og XLSX</td>
+<td>Rediger generatoren, eksporter JSON, valider, last, rediger og lagre
+fra dashboard.</td>
+<td>15 faser, 225 plasser, 15 timere; deaktivert tomt punkt godtas;
+backup opprettes i riktig katalog.</td>
+<td>Bygg + målmiljø</td>
+<td>Byggrundtur bestått; live gjenstår</td>
+</tr>
+<tr class="odd">
+<td>AKS-07</td>
+<td>Installer og rollback</td>
+<td>Kjør dry-run, normal installasjon og indusert ettertestfeil med/uten
+auto-rollback.</td>
+<td>Backup/hash/eier/start/stopp/rollback følger KRAV-03.</td>
+<td>Målmiljø</td>
+<td>Gjenstår</td>
+</tr>
+<tr class="even">
+<td>AKS-08</td>
+<td>Stabilitet</td>
+<td>La løsning og reconnect-/lagringsbaner gå over avtalt
+langtidsperiode og én full bryggedag.</td>
+<td>Ingen tap av journal, heng, ukontrollert vekst eller uvarslet
+feilstillstand.</td>
+<td>Målmiljø</td>
+<td>Gjenstår</td>
+</tr>
+</tbody>
+</table>
+<p>Resultat, dato, operatør og vedlegg skal føres inn før kandidaten
+promoteres til stabil release.</p>
+</main></body></html>

@@ -1,0 +1,3712 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Krav–implementasjon–test–akseptanse-matrise – 2026.11.07-1</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="kravimplementasjontestakseptanse-matrise--v100-rc332">Krav–implementasjon–test–akseptanse-matrise
+– 2026.11.07-1</h1>
+<h2 id="telling-og-fortolkning">Telling og fortolkning</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Målepunkt</th>
+<th style="text-align: right;">Antall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Normative krav</td>
+<td style="text-align: right;">342</td>
+</tr>
+<tr class="even">
+<td>Navngitte runtime-tester</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="odd">
+<td>Tekniske runtime-assertions</td>
+<td style="text-align: right;">7154</td>
+</tr>
+<tr class="even">
+<td>Akseptanseforløp</td>
+<td style="text-align: right;">8</td>
+</tr>
+</tbody>
+</table>
+<p>7154 er tekniske assertions, ikke funksjonelle krav. Én test kan
+dekke flere krav, og ett krav kan kreve både automatikk og
+målmiljøakseptanse.</p>
+<h2 id="matrise">Matrise</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Krav-ID</th>
+<th>Kravdokument</th>
+<th>Modul</th>
+<th>Krav</th>
+<th>Implementasjon/testbevis</th>
+<th>Akseptanse</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DOC-PKG-001</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Hver komplett releasepakke skal inneholde versjonert dokumentasjon
+som en integrert del av leveransen.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-PKG-002</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Alle releasefiler og normative dokumenter skal ha samme
+releaseversjon; schema- og baselineversjoner skal skilles eksplisitt fra
+releaseversjonen.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-PKG-003</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Pakkens README skal peke til den klikkbare dokumentoversikten og
+beskrive installerens reelle endringsgrense.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-PKG-004</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Pakken skal ha én autoritativ SHA-256-fil som dekker alle andre
+leveransefiler.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-PKG-005</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Normative dokumentfilnavn skal ikke være merket <code>utkast</code>
+eller <code>arbeidsgrunnlag</code>.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-PKG-006</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Den makrofrie XLSX-templategeneratoren skal følge hver release så
+lenge schema 1.0-editoren inngår i produktet.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-HIE-001</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Dokumentoversikten skal beskrive dokumenthierarki, normativ status,
+modulansvar og avhengigheter.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-HIE-002</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Felles dokumenter skal skilles fra dokumenter for Node-RED, Home
+Assistant-dashboard, installer og templateverktøy.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-HIE-003</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Kravdokumenter og grensekontrakter skal være normative;
+systemdokumentasjon, genererte inventarer og rapporter skal angi om de
+er beskrivende eller avledet.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-TRC-001</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Hvert normativt krav skal ha unik og stabil krav-ID.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-TRC-002</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Hvert krav skal finnes nøyaktig én gang i
+krav–implementasjon–test–akseptanse-matrisen.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-TRC-003</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Tekniske assertions, navngitte tester og normative krav skal telles
+og rapporteres separat.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-TRC-004</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Hvert krav skal ha automatisert verifikasjon eller et eksplisitt
+målmiljøkriterium med forventet bevis.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-CON-001</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>HA–Node-RED-kontrakten skal dekke alle 230 entiteter, 15
+sensorstates, 51 toppnivåattributter og 27 felt i strukturerte
+listeobjekter.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-CON-002</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Kontrakten skal angi synlig navn, retning, produsent/forbruker,
+dashboardbruk, datatype, grenser, enum og tomtilstand der dette
+gjelder.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-CON-003</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Variabel- og dataflytinventaret skal genereres fra releaseflowen og
+bære flowens SHA-256.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-SYS-001</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Systemoversikten og tre moduldokumenter skal følge pakken og peke
+til normative krav og kontrakter.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-VER-001</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Alle lokale lenker i HTML- og Markdown-dokumenter skal løses innen
+releasepakken.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>DOC-VER-002</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Releasepakken skal verifiseres fra en ny utpakking uten skjulte
+byggekilder.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="even">
+<td>DOC-VER-003</td>
+<td>KRAV-00-Felles-leveranse-dokumentasjon-og-konfigurasjonsstyring-2026.11.07-1</td>
+<td>Felles</td>
+<td>Dokumentrevisjonen skal ikke endre motor- eller dashboardatferd uten
+et særskilt krav og regresjonstest.</td>
+<td>Dokument-/pakkekontroll</td>
+<td>AKS-01</td>
+<td>Automatisert pakketest</td>
+</tr>
+<tr class="odd">
+<td>NR-DRIFT-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Modulen skal støtte nøyaktig én aktiv bryggedag om gangen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-DRIFT-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Modulen skal ha én felles bryggedagsstate som kan vises samtidig i
+flere Home Assistant-klienter. Aktiv betjening og templateendringer skal
+koordineres fordi runtime ikke har operatørlås eller konfliktløsning for
+motstridende samtidige kommandoer.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-DRIFT-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Normal betjening skal skje gjennom Home Assistant-dashboardets
+dokumenterte <code>button.brygging_*</code>-, editor- og
+sensorentiteter; Node-RED-editoren skal ikke være en ordinær
+kommandoflate.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-DRIFT-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Brukerrettede tekster, statusmeldinger, loggbeskrivelser og
+rapporter skal være på norsk. Interne status- og kommandoverdier kan
+være engelske når de er del av grensesnittkontrakten.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-DRIFT-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Modulen skal bruke konfigurert IANA-tidssone, normalt
+<code>Europe/Oslo</code>, for brukerrettede tidsstempler.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-DRIFT-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Modulen skal forutsette korrekt vertstid. Den skal ikke hevde at
+ekstern NTP-nøyaktighet er verifisert.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Modulen skal kjøre i Node-RED med
+<code>node-red-contrib-home-assistant-websocket</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-INT-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Vedvarende Node-RED-data skal være tilgjengelige under
+<code>/data</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Modulets dataområde skal være
+<code>/data/brewing-assistant</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-INT-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Home Assistants offentlige rapportkatalog skal være montert i
+containeren som <code>/data/brewing-assistant/ha-public</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Standard runtime-konfigurasjon skal leses fra
+<code>/data/brewing-assistant/config/runtime.json</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-INT-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Runtime-konfigurasjonen skal minst angi <code>schema_version</code>,
+<code>default_template_filename</code> og <code>timezone</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-INT-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Det skal ikke ligge passord, token, faste IP-adresser eller Home
+Assistant-porter i produksjonsflowen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Produksjonsflowen skal ha versjonsnøytral fane-ID
+<code>brygging_production</code> og versjonsnøytral etikett
+<code>Brygging – Produksjonsflow</code>.</td>
+<td>[NR-ARK-001] Produksjonsfanen er versjonsnøytral</td>
+<td>AKS-02/AKS-08</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Produksjonslogikken skal være visuelt gruppert etter ansvar, uten
+foreldede dokumentasjonsgrupper, overlappende grupper eller noder uten
+definert eier.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Dataveien skal følge prinsippet inngang → normalisering/streng
+validering → kommandomodul → runtimekontroll/commit → statusprojeksjon →
+persistens og Home Assistant-publisering.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommandoer skal rutes eksplisitt. Ukjente kommandoer skal avvises,
+diagnostiseres og logges.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Produksjonsflowen skal ikke inneholde TEST-inject-noder, debug-noder
+eller manuell restore-inject.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Automatisk restore ved oppstart skal være eneste restorebane i
+normal produksjonsflow.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Femsekunderstick skal avsluttes uten videre arbeid når brygging er
+passiv, ingen skrive-retry venter og Home Assistant-forbindelsen er
+klar.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Produksjonsflowen skal ikke inneholde en egen
+dokumentasjonsfane.</td>
+<td>[NR-ARK-008] Dokumentasjonsfanen er fjernet</td>
+<td>AKS-02/AKS-08</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>NR-ARK-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Node-REDs interne meldings-, context-, runtime-, journal- og
+filgrensesnitt skal være dokumentert i en separat variabel- og
+dataflytkontrakt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-ARK-010</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>En produsert variabel skal ha en dokumentert mottaker eller en
+uttrykkelig begrunnet intern funksjon. Skrivebare felt uten leser skal
+fjernes eller kobles til autoritativ diagnostikk.</td>
+<td>[NR-ARK-010] Bekreftede write-only context- og statefelt er
+fjernet</td>
+<td>AKS-02/AKS-08</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>En template skal være et JSON-objekt med nøyaktig toppnivåfeltene
+<code>schema_version</code>, <code>note</code>, <code>phases</code> og
+<code>timers</code>. Ekstra eller manglende felt skal avvises.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>schema_version</code> skal være nøyaktig <code>1.0</code>.
+Eldre schema skal avvises uten skjult migrering.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>note</code> skal være tekst og skal kunne være tom.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Filnavn skal reduseres til et sikkert basenavn og bare inneholde
+bokstaver, tall, punktum, understrek og bindestrek samt ende på
+<code>.json</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Minst én fase skal være aktiv.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Templaten skal inneholde nøyaktig 15 faseplasser.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Fase-ID-ene <code>01</code>–<code>15</code> skal være permanente,
+unike og uavhengige av rekkefølge og navn.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hver fase skal ha nøyaktig feltene <code>id</code>,
+<code>order_id</code>, <code>enabled</code>, <code>title</code>,
+<code>duration_min</code> og <code>items</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>order_id</code> skal være et unikt heltall fra 1 til 15. Alle
+15 verdier skal forekomme.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-010</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>enabled</code> skal være boolsk. Deaktiverte faser skal
+beholdes i templaten, men hoppes over i aktiv tidslinje og kjøring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-011</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv fase skal ha et ikke-tomt navn. Like fasenavn skal tillates
+med advarsel fordi ID, ikke navn, skiller fasene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-012</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>duration_min</code> skal være et heltall fra 0 til 1440.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-013</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Endring av faserekkefølge skal flytte valgt fase og automatisk
+reindeksere alle 15 <code>order_id</code>-verdier. Permanente ID-er skal
+ikke endres.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-014</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hver fase skal kunne inneholde 0–15 fasepunktobjekter. En generator
+kan skrive alle 15 permanente punktplasser, også når noen er
+deaktiverte.</td>
+<td>[NR-TPL-014][NR-TPL-019] Alle 225 statiske fasepunktplasser kan
+valideres</td>
+<td>AKS-06</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-015</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Fasepunkt-ID skal være permanent og følge <code>FF_PP</code>, der
+<code>FF</code> er fase-ID og <code>PP</code> er
+<code>01</code>–<code>15</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-016</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hvert fasepunkt skal ha nøyaktig feltene <code>id</code>,
+<code>order_id</code>, <code>enabled</code>, <code>type</code>,
+<code>name</code>, <code>description</code>,
+<code>expected_value</code>, <code>time</code> og
+<code>requires_confirmation</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-017</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>order_id</code> skal være unikt innen fasen og være et heltall
+fra 1 til 15. Når alle 15 punktplassene finnes, skal verdiene 1–15
+forekomme nøyaktig én gang.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-018</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Tillatte typer skal være <code>activity</code>,
+<code>addition</code>, <code>measurement</code>, <code>control</code> og
+<code>warning</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-019</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Et aktivert fasepunkt skal ha ikke-tomt <code>name</code>. Et
+deaktivert fasepunkt kan ha tomt <code>name</code>.
+<code>description</code> og <code>expected_value</code> skal være tekst
+og kan være tomme.</td>
+<td>[NR-TPL-019][HA-RED-005] Deaktivert tomt fasepunktnavn er gyldig;
+[NR-TPL-014][NR-TPL-019] Alle 225 statiske fasepunktplasser kan
+valideres</td>
+<td>AKS-06</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-020</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>enabled</code> og <code>requires_confirmation</code> skal være
+boolske.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-021</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>time</code> skal ha nøyaktig feltene <code>reference</code> og
+<code>offset_min</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-022</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>reference</code> skal være <code>phase_start</code> eller
+<code>phase_end</code>. <code>offset_min</code> skal være et heltall fra
+−1440 til 1440.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-023</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Deaktiverte fasepunkter skal lagres, men ikke inngå i kjøring,
+tidslinje eller krav om bekreftelse.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-024</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Templaten skal inneholde nøyaktig 15 timerplasser med permanente
+ID-er <code>timer_01</code>–<code>timer_15</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-025</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hver timer skal ha nøyaktig feltene <code>id</code>,
+<code>order_id</code>, <code>enabled</code>, <code>text</code>,
+<code>mode</code>, <code>pause_behavior</code>, <code>start</code> og
+<code>end</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-026</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>order_id</code> skal være en unik permutasjon av 1–15. Endret
+rekkefølge skal reindeksere alle timerne uten å endre permanent ID.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-027</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv timer skal ha ikke-tom tekst. Like tekster kan tillates med
+advarsel.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-028</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>mode</code> skal være <code>count_up</code> eller
+<code>count_down</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-029</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>pause_behavior</code> skal være <code>follow_pause</code>
+eller <code>continue</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-030</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Start- og sluttanker skal ha nøyaktig feltene <code>event</code>,
+<code>ref_id</code> og <code>offset_min</code>. Offset skal være et
+heltall fra −1440 til 1440.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-031</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Tillatte ankerhendelser skal være <code>brew_start_actual</code>,
+<code>brew_end_effective</code>, <code>brew_end_actual</code>,
+<code>phase_start_planned</code>, <code>phase_start_actual</code>,
+<code>phase_end_effective</code>, <code>phase_end_actual</code>,
+<code>phasepoint_due</code>, <code>phasepoint_reached</code> og
+<code>phasepoint_confirmed</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TPL-032</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Bryggestart/-slutt skal ha tom <code>ref_id</code>. Fasehendelser
+skal referere en gyldig tosifret fase-ID. Fasepunkthendelser skal
+referere en gyldig <code>FF_PP</code>-ID.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TPL-033</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv timer skal ikke kunne referere til en deaktivert eller ukjent
+fase eller et deaktivert eller ukjent fasepunkt. Deaktiverte
+timerplasser skal fortsatt valideres strukturelt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-06</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-STATE-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Gyldige runtime-statuser skal være <code>idle</code>,
+<code>running</code>, <code>waiting_confirmation</code>,
+<code>waiting_event</code>, <code>paused</code>, <code>completed</code>,
+<code>ended</code> og <code>error</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-STATE-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>active_phase_id</code> skal være autoritativ peker til aktiv
+fase. <code>phase_index</code> skal avledes for visning og
+bakoverkompatible rapportfelt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-STATE-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv status skal kreve gyldig aktiv fase-ID, fasestarttid og
+session-ID. Pause skal i tillegg kreve pausetidspunkt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-STATE-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>batch_id</code> skal være identisk med aktivt
+templatefilnavn.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-STATE-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>State skal inneholde <code>state_schema_version</code> og
+<code>runtime_version</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-STATE-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Lister for bekreftede/loggede punkter, punktresultater,
+fasehistorikk, pausehistorikk, kommentarer og sesjonslogg skal alltid
+være strukturelt gyldige lister.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hvert trykk på <code>button.brygging_start</code> skal utløse en
+fersk full systemkontroll; et eldre godkjent resultat på
+<code>sensor.brygging_systemkontroll</code> skal ikke være
+tilstrekkelig.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Start skal bare tillates fra <code>idle</code>, med gyldig og lagret
+template, godkjent templatefilidentitet og bestått start-preflight.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Vellykket start skal opprette unik session-ID, tømme tidligere
+sesjonsdata, starte første aktive fase og logge knappetrykk, bryggestart
+og fasestart.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_pause</code> skal bare godtas fra
+<code>running</code>, <code>waiting_confirmation</code> eller
+<code>waiting_event</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_fortsett</code> skal bare godtas
+fra <code>paused</code> og skal gjenopprette statusen som var aktiv før
+pausen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Pausehistorikk og samlet pausetid skal oppdateres slik at fase- og
+punktplanen forskyves korrekt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_avslutt</code> skal bare godtas
+under aktiv brygging, lukke aktiv fase, sette <code>ended</code> og
+bevare logg- og rapportgrunnlaget.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Når siste aktive fase fullføres, skal status bli
+<code>completed</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_klargjor_ny_bryggedag</code> skal
+sperres under aktiv brygging og ellers opprette ren
+<code>idle</code>-state med aktiv, validert template og verifisert
+filidentitet beholdt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-CMD-010</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Ugyldige kommandoer og kommandoer i feil tilstand skal sperres og
+logges; de skal ikke stille endre runtime.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-CMD-011</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>To trykk på samme dashboardknapp innen 2000 ms skal behandles som
+dobbelttrykk. Det andre trykket skal ignoreres og logges som
+<code>button_ignored</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_neste_fase</code> skal kunne
+fullføre aktiv fase selv om planlagt tid eller bekreftelser ikke er
+ferdige; ikke nådde punkter skal registreres som avvik.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-FAS-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Deaktiverte faser skal hoppes over automatisk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_tilbake</code> skal bare godtas i
+en aktiv fase som har en tidligere aktiv fase.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-FAS-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>«Tilbake» skal lukke gjeldende gjennomføring, starte forrige aktive
+fase fra null og nullstille runtime-resultatene for fasen som startes på
+nytt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Tidligere fasehistorikk og fasepunktkommentarer skal bevares
+kronologisk etter «Tilbake».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-FAS-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Timere skal bruke den nye gjennomføringen. Gamle resultater fra en
+fase som igjen er framtidig, skal ikke starte eller avslutte
+timeren.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FAS-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Gjentatte fasegjennomføringer skal vises separat i rapporten med
+<code>(forsøk 1)</code>, <code>(forsøk 2)</code> osv. når det finnes mer
+enn ett forsøk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktive fasepunkter skal sorteres etter beregnet tidspunkt og
+deretter <code>order_id</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Ikke-bekreftbare punkter skal registreres som nådd når første tick
+etter forfall behandles. Normal tickforsinkelse skal rapporteres som
+<code>Fasepunkt nådd ihht tidsplan</code>, ikke som et
+prosessavvik.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Bekreftbare punkter skal forbli ventende til operatøren bekrefter
+dem eller fasen hoppes/avsluttes.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Runtime skal kunne gå til <code>waiting_event</code> når et
+bekreftelsespunkt er forfalt, og til <code>waiting_confirmation</code>
+når fasevarigheten er utløpt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_bekreft_fasepunkt</code> skal
+bare godtas ved aktiv brygging når runtime har et aktuelt
+bekreftelsespunkt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommentar fra <code>text.brygging_fasepunktkommentar</code> og mål
+fra <code>select.brygging_fasepunkt_for_kommentar</code> skal bare
+lagres etter <code>button.brygging_lagre_fasepunktkommentar</code>,
+under aktiv brygging, med ikke-tom tekst og gyldig punkt i aktiv
+fase.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PKT-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommentar skal lagre tidspunkt, fase-ID/-navn, punkt-ID/-navn,
+beskrivelse, forventet verdi og tidsavvik.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PKT-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Statusprojeksjonen skal publisere inntil 15 aktive fasepunktobjekter
+i <code>sensor.brygging_fasepunktoversikt.attributes.phasepoints</code>
+med de ni kontraktfestede feltene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Fasefremdrift skal kunne overstige 100 prosent, og overtid skal
+beregnes separat.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TID-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Estimert bryggeslutt skal publiseres som varighet på
+<code>sensor.brygging_tid_til_ferdig_bryggedag</code> og lokalt
+klokkeslett på <code>sensor.brygging_estimert_ferdig_bryggedag</code>,
+basert på aktiv og senere aktive faser.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Pause skal forskyve planlagt faseslutt og fasepunkter.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TID-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>En <code>follow_pause</code>-timer skal fryse under pause og trekke
+pausetid fra målingen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>En <code>continue</code>-timer skal følge veggklokken under
+pause.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TID-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Nedtelling skal kunne vise overtid etter passert sluttanker.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-TID-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Timerstatus skal minst skille <code>waiting</code>,
+<code>waiting_end</code>, <code>active</code>, <code>overdue</code> og
+<code>completed</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-TID-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Bare aktiverte timere skal inngå i <code>timers</code> på
+<code>sensor.brygging_timeroversikt</code> og i rapportens
+tidsmålinger.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Templatebytte og alle permanente templateendringer skal bare
+tillates i <code>idle</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Templatebytte skal sperres når det finnes ulagrede endringer, med
+mindre operatøren eksplisitt forkaster dem.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Endringer i notat, faseegenskaper, fasepunkter og timere skal sette
+<code>template_dirty=true</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Ulagrede endringer skal sperre bryggestart.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>«Forkast endringer» skal laste aktiv fil på nytt og bare kunne
+brukes i <code>idle</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Templatekatalogen skal valideres med samme strenge validator som
+lasting og lagring; bare gyldige filer skal publiseres som valg i
+<code>select.brygging_template</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-EDIT-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Templateverdier skal synkroniseres til
+<code>text.brygging_fase_FF_navn</code>,
+<code>number.brygging_fase_FF_*</code>,
+<code>select.brygging_fase_FF_status</code>, fasepunkteditoren og
+timereditoren ved lasting, restore, nullstilling, start, editorvalg og
+full reconnect-resynk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-EDIT-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Forventede Home Assistant-ekko fra programmatisk oppdatering av
+editorentitetene skal filtreres én gang og utløpe etter 60
+sekunder.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SAVE-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Før kommando fra <code>button.brygging_lagre_template</code> skriver
+fil, skal hele runtime-templaten valideres strengt; ugyldig template
+skal ikke skrives.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SAVE-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv backing-fil skal identifiseres med SHA-256. Endring utenfor
+systemet skal oppdages uavhengig av filsystemets tidsoppløsning.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SAVE-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Filens endringstid skal også kontrolleres og leses tilbake etter
+vellykket lagring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SAVE-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Template skal skrives atomisk via unik midlertidig fil og rename,
+med forrige fil som <code>.prev</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SAVE-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>template_dirty</code> skal først fjernes når filskriving og
+etterkontroll er bekreftet.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SAVE-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Feil skal gi eksplisitt lagringsfeil, diagnostikk og hendelseslogg.
+Midlertidig fil skal ryddes.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PER-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Primær state skal lagres som
+<code>/data/brewing-assistant/state/current_state.json</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PER-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Forrige atomiske state skal lagres som
+<code>/data/brewing-assistant/state/current_state.prev.json</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PER-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>State skal skrives ved meningsfulle endringer, ikke uendret hvert
+femte sekund.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PER-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>State-, template- og rapportskriving skal gå gjennom én serialisert
+atomisk skrivekø. Flere ventende stateoppdateringer skal kunne slås
+sammen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-PER-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Mislykket state-skriving skal gi vedvarende diagnostikk og
+kontrollert retry. Feilen skal først kvitteres når samme filtype senere
+er skrevet vellykket.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-PER-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>State skal være primær gjenopprettingskilde.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Oppstart skal først lese runtime-konfigurasjon og standardtemplate
+og deretter avgjøre restore uten å overskrive eksisterende state på
+forhånd.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-04</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RES-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Restorekjeden skal være: gyldig current-state → gyldig
+previous-state → strengt validert standardtemplate.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-04</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kun state med <code>state_schema_version=1.0</code> og gyldig
+innebygd template 1.0 skal kunne gjenopprettes.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-04</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RES-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Ved restore skal aktiv templatefils eksistens og SHA-256
+sammenholdes med state.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-04</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Manglende eller endret templatefil skal sperre ny start i
+<code>idle</code>. En allerede aktiv, gjenopprettet bryggedag skal ikke
+avbrytes av dette avviket, men avviket skal vises og logges.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-04</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RES-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Tidsberegninger etter restart skal fortsette fra lagrede
+tidsstempler. Nedetid skal telle som reell prosesstid.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-04</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RES-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Vellykket restore av en aktiv eller avsluttet sesjon skal produsere
+én varig <code>state_restored</code>-hendelse for den aktuelle
+oppstarten.</td>
+<td>[NR-RES-007] Vellykket restore produserer én varig
+state_restored</td>
+<td>AKS-04</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>NR-RES-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Mislykket restore skal registreres i autoritativ
+oppstartsdiagnostikk. Dersom en gyldig sesjonsjournal er tilgjengelig,
+skal feilen også kunne spores der uten å fremstilles som en
+dashboardhandling.</td>
+<td>[NR-RES-008] Mislykket restore gir autoritativ diagnostikk</td>
+<td>AKS-04</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hver bryggedag skal ha én append-basert JSONL-fil med session-ID i
+filnavnet: <code>&lt;session-id&gt;-brewday.jsonl</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hver JSONL-rad skal være gyldig JSON og inneholde minst tidsstempel,
+hendelse, status, <code>flow_version</code> og
+<code>state_schema_version</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Loggen skal skille utførte, sperrede, feilede og ignorerte
+dobbelttrykk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Runtime-sesjonsloggen skal begrenses til de 3000 nyeste
+postene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>State og JSONL skal behandles som separate skriv. Det skal
+dokumenteres at siste hendelse ved strømbrudd i et svært smalt intervall
+kan finnes bare ett av stedene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Loggarkivet skal klassifisere filer gjensidig utelukkende som aktiv,
+avsluttet, gjenkjennelig uferdig eller legacy/uklassifisert.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Produksjonsgrensesnittet skal ikke tilby generell sletting av
+sesjonsjournaler. <code>sensor.brygging_sesjonsarkiv</code> skal
+klassifisere og summere journalene, mens oppbevaring og eventuell
+sletting håndteres som en separat driftsoppgave.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-LOG-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Bare reelle Home Assistant-knappetrykk skal registreres som
+dashboardknapper. Automatiske oppstarts-, systemkontroll- og
+lagringsmeldinger skal ha eksplisitt systemopprinnelse og skal ikke
+sette <code>dashboard_button</code>.</td>
+<td>[NR-LOG-008] Oppstartsrefresh er ikke dashboardknapp</td>
+<td>AKS-02/AKS-08</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-LOG-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hendelsestyper som kan vises i rapport eller arkiv skal ha en
+faktisk produsent. Renderergrener uten mulig produsent skal fjernes
+eller fullføres med en dokumentert produsent.</td>
+<td>[NR-LOG-009] Rapporthendelser uten produsent er fjernet</td>
+<td>AKS-02/AKS-08</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>NR-HA-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Alle <code>sensor.brygging_*</code>, <code>button.brygging_*</code>,
+<code>select.brygging_*</code>, <code>number.brygging_*</code> og
+<code>text.brygging_*</code> i releasekontrakten skal registreres under
+én felles Bryggedagsassistent-enhet i Home Assistant.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Releaseflowen skal opprette nøyaktig 230 Companion-entiteter: 17
+<code>button</code>, 48 <code>number</code>, 87 <code>select</code>, 15
+<code>sensor</code> og 63 <code>text</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-HA-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Entitets-ID-er som brukes av dashboardet skal være stabile i
+1.0-linjen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Publiserte sensorstates skal aldri være tomme. Meningsfulle
+fallbackverdier skal brukes ved manglende data.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-HA-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Uendrede sensorverdier skal ikke republiseres unødvendig.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Ved oppstart skal HA-publisering bufres i 30 sekunder. Ved manglende
+Companion-klarhet skal nytt forsøk gjøres etter 15 sekunder.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-HA-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Etter reconnect skal alle runtime-, fase-, fasepunkt- og
+timereditorverdier resynkroniseres.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Start skal sperres uten verifisert Home Assistant-forbindelse. En
+reconnect-feil under aktiv brygging skal diagnostiseres uten å ødelegge
+state.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-HA-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>sensor.brygging_status</code> skal publisere nøyaktig de
+kontraktfestede versjonsattributtene <code>flow_version</code>,
+<code>expected_dashboard_version</code>,
+<code>session_schema_version</code> og
+<code>event_schema_version</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-HA-010</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Strukturerte lister skal publiseres som <code>phases</code> på
+<code>sensor.brygging_faseoversikt</code>, <code>phasepoints</code> på
+<code>sensor.brygging_fasepunktoversikt</code> og <code>timers</code> på
+<code>sensor.brygging_timeroversikt</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Utover den obligatoriske start-preflighten i <code>NR-CMD-001</code>
+skal systemkontroll kjøres etter oppstart, fra
+<code>button.brygging_oppdater_systemkontroll</code>, etter relevante
+arkiv-/publiseringsoperasjoner og etter fil- eller HA-feil.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Systemkontrollen skal være hendelsesstyrt og skal ikke innføre en ny
+fast 30-sekunders skann.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Hver kontrollrad skal inneholde gruppe, navn, status, om feilen
+sperrer start, testmetode, mål, observert resultat, konklusjon og
+eventuelt tiltak.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Samlet kontrollstatus skal være <code>OK</code>,
+<code>ADVARSEL</code> eller <code>FEIL</code>, og kontrollradene skal
+publiseres som <code>checks_json</code> med opptellinger og
+startbeslutning på <code>sensor.brygging_systemkontroll</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Katalogprobe skal faktisk opprette, lese og slette en kontrollfil og
+kontrollere oppryddingen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv template skal kontrolleres mot SHA-256 og streng
+runtimevalidering.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Nyeste originalrapport og public-kopi skal sammenlignes med
+SHA-256.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Aktiv JSONL-logg skal ved aktiv brygging ha forventet sessionfil,
+startmarkør og gyldig siste JSON-linje.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-SYS-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Diskadvarsel skal gis under 250 MiB ledig eller ved minst 95 % bruk.
+Node-RED-dataområdet skal sperre start under 50 MiB ledig eller ved
+minst 99 % bruk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-SYS-010</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Systemkontrollen skal vise flowversjon, forventet dashboardversjon,
+state-writerversjon, schema, Node.js-, Node-RED- og HA-nodeversjon når
+tilgjengelig.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_generer_rapport</code> skal
+godtas under aktiv brygging og i <code>completed</code> eller
+<code>ended</code>, men sperres i <code>idle</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Rapporten skal genereres som komplett HTML på norsk med UTF-8 og
+utskriftsvennlig CSS.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Alt template-, kommentar- og logginnhold skal HTML-escapes før
+innsetting.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Rapportens metadata skal vise template, status, start, slutt,
+genereringstid og generatorversjon.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Rapporten skal inneholde seksjonene «Template-notat», «Plan»,
+«Faser: planlagt vs. reell tidsbruk», «Kronologisk logg», «Tidsmålinger»
+og «Knappetrykk fra dashboard».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Planen skal vise alle 15 faser med ID, rekkefølge, aktiv/deaktivert,
+navn, planlagt tid og antall lagrede/aktive punkter.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-007</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Fasetabellen skal sorteres kronologisk etter faktisk starttid.
+<code>Start/slutt</code> skal være første kolonne og vises som
+<code>HH:MM:SS – HH:MM:SS</code>. Gjentatte gjennomføringer skal
+nummereres som forsøk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-008</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kronologisk logg skal vise klokkeslett, fase, fasepunktnavn,
+beskrivelse, forventet verdi/kommentar og tidsplan. Når en fase har
+flere forsøk, skal alle dens punkt- og kommentarrader merkes
+<code>(forsøk n)</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-009</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Automatisk nådde fasepunkter skal vise
+<code>Fasepunkt nådd ihht tidsplan</code>. Fasehoppede punkter skal vise
+beregnet avvik, for eksempel
+<code>Fasepunkt fasehoppet 1:31 før tidsplan</code>. Kommentarer skal
+fortsatt ha egen lys gul radmarkering.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-010</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Tidsmålinger skal vise timertekst, start, slutt, resultat og status
+for aktiverte timere. Start og slutt skal vises som
+<code>HH:MM:SS</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-011</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Knappetabellen skal vise alle reelle dashboardknappetrykk med
+klokkeslett, fase, fasepunktkontekst, knapp, kommando og resultat.
+Automatiske systemhandlinger skal ikke forekomme som knappetrykk.</td>
+<td>[NR-RAP-011] Auditloggen inkluderer fire produserte
+kontrollhendelser</td>
+<td>AKS-05</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-012</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Originalrapport skal lagres atomisk under
+<code>/data/brewing-assistant/reports</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-013</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Filnavnet skal inneholde lokalt tidsstempel, sikkert
+batch/template-stem og suffikset <code>brewday-report.html</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-014</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Nyeste rapport skal kopieres atomisk til
+<code>/data/brewing-assistant/ha-public/siste-bryggerapport.html</code>,
+som Home Assistant eksponerer på
+<code>/local/brygging/siste-bryggerapport.html</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-015</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Publisert kopi skal SHA-256-verifiseres mot originalen. Avvik skal
+kunne utløse automatisk republisering.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-016</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Rapportskrivingsfeil skal gi vedvarende diagnostikk og logghendelse,
+men skal ikke i seg selv ødelegge bryggedagens state.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-017</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Kommando fra <code>button.brygging_behold_siste_100_rapporter</code>
+skal slette alle arkivrapporter unntatt de 100 nyeste og deretter
+oppdatere <code>sensor.brygging_rapportarkiv</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-05</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-RAP-018</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Alle tabellheadere i rapporten skal bruke en tydelig grå bakgrunn,
+<code>#bfbfbf</code>, med tilstrekkelig kontrast mot tekst og
+datarader.</td>
+<td>[NR-RAP-018] Rapporten har grå tabellheadere</td>
+<td>AKS-05</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>NR-RAP-019</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>En <code>state_restored</code>-rad i kronologisk logg skal
+umiddelbart vise hvor prosessen fortsatte etter restart.</td>
+<td>[NR-RAP-019] Rapporten viser restorefase og tidsposisjon</td>
+<td>AKS-05</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-FEIL-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Diagnostikk skal skille aktive feil/advarsler fra historisk siste
+feil/advarsel.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FEIL-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>En aktiv feil skal beholdes gjennom vanlige ticks og kommandoer og
+bare fjernes når samme kilde senere består kontroll eller
+operasjon.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-FEIL-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Runtimevalideringsfeil skal sette status <code>error</code> og
+logges.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FEIL-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Feil i state, JSONL, template, rapport, public-kopi og HA-inndata
+skal registreres per kilde.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-FEIL-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td><code>sensor.brygging_status</code> skal publisere aktuell
+systemhelse, aktiv feil/advarsel, historisk siste feil, antall
+feil/advarsler, restore-resultat og siste vellykkede kommando.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-FEIL-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Lagringsfeil skal ikke skrives til en intern sidekanal uten leser.
+Hver feil skal enten oppdatere autoritativ diagnostikk per kilde eller
+dokumenteres som allerede fullstendig håndtert av den aktuelle
+skrivebanen.</td>
+<td>[NR-FEIL-006] Lagringsfeil bruker writer_health og diagnostikk</td>
+<td>AKS-02/AKS-08</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="odd">
+<td>NR-NF-001</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Flowen skal tåle Node-RED-restart og Home Assistant-reconnect uten
+tap av gyldig, allerede persistert state.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-NF-002</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Atomisk lagring og forrige state skal begrense risikoen for korrupt
+primær state ved strømbrudd.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-NF-003</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Publisering og editorsynk skal være avgrenset slik at
+feedback-løkker og ukontrollert heapvekst unngås.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-NF-004</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Alle Function-noder skal ha gyldig JavaScript-syntaks i aktuell
+Node.js/Node-RED-runtime.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>NR-NF-005</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Produksjonsmiljøet bør bruke eksplisitt pinnede versjoner av
+Node-RED-image og HA-nodepakken, ikke <code>latest</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>NR-NF-006</td>
+<td>KRAV-01-Node-RED-runtime-template-og-rapportgenerering-2026.11.07-1</td>
+<td>Node-RED</td>
+<td>Entitets- og filgrensesnitt skal være versjonssporbart gjennom
+flow-, runtime- og schemaversjon.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-08</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal være på norsk.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal være den normale kommandoflaten for bryggedagen og
+skal sende alle prosesshandlinger gjennom de dokumenterte
+<code>button.brygging_*</code>-entitetene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal være lesbart på mobil, nettbrett og bred skjerm
+uten horisontalt brede tabeller i hovedvisningene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal bruke Home Assistants innebygde korttyper og skal
+ikke kreve tredjeparts frontendkort.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Standard layout skal være responsivt masonry. Hovedkort skal være
+løse toppnivåkort, ikke låst i en fullbredde panel- eller
+trekolonne-gridvisning.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>På bred skjerm skal normal masonry-plassering kunne gi tre kolonner.
+På smal skjerm skal kortene stable naturlig.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Handlinger som i detaljkravene er klassifisert som destruktive eller
+som kan endre rapportgrunnlaget, skal ha en handlingsspesifikk
+bekreftelsesdialog.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-BRUK-008</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Når funksjonskort skjules på grunn av livssyklus eller feil, skal
+dashboardet vise en forklarende tekst i stedet for et tomt område.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-BRUK-009</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal presentere state fra
+<code>sensor.brygging_status</code> og de øvrige delte
+Companion-entitetene som én felles bryggedag for alle Home
+Assistant-klienter med tilgang.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-STR-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardtittelen skal inneholde dashboardversjonen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-STR-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>De fire visningstitlene og path-verdiene skal være stabile i
+1.0-linjen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-STR-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Normal brukerflyt skal kunne gjennomføres i de tre første
+visningene. Teknisk-visningen skal ikke være nødvendig i normal
+drift.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kortene for aktiv bryggedag skal vises når
+<code>sensor.brygging_status</code> er <code>running</code>,
+<code>waiting_confirmation</code>, <code>waiting_event</code> eller
+<code>paused</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-LIV-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Når <code>sensor.brygging_status</code> er <code>idle</code>, skal
+aktive prosesskort skjules, mens <code>button.brygging_start</code> og
+templateeditorene skal vises når deres øvrige betingelser er
+oppfylt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Når <code>sensor.brygging_status</code> er <code>completed</code>
+eller <code>ended</code>, skal aktive prosesskort skjules og ett
+sluttkort vise status, <code>sensor.brygging_aktiv_template</code>,
+rapportlenke, <code>button.brygging_generer_rapport</code> og
+<code>button.brygging_klargjor_ny_bryggedag</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-LIV-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Når <code>sensor.brygging_status</code> er <code>error</code>,
+<code>unknown</code>, <code>unavailable</code>, <code>ukjent</code>
+eller <code>ikke startet</code>, skal operative kort skjules og
+erstattes med forklaring og henvisning til
+<code>sensor.brygging_systemkontroll</code> eller
+Teknisk-visningen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Template-, fase-, fasepunkt- og timereditorene skal bare vises når
+<code>sensor.brygging_status</code> er <code>idle</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-LIV-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Ved <code>completed</code> eller <code>ended</code> på
+<code>sensor.brygging_status</code> skal editorene fortsatt være skjult
+frem til <code>button.brygging_klargjor_ny_bryggedag</code> er godkjent
+av Node-RED.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-LIV-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Alle synlighetsregler som avhenger av en entitet, særlig
+<code>sensor.brygging_status</code>, skal behandle <code>unknown</code>
+og <code>unavailable</code> som ikke-operativ tilstand.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-BRY-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>De tre kortene skal være separate toppnivåkort i masonry-layouten og
+beholde rekkefølgen over.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-BRY-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hvert operativt dashboardkort skal kalle tjenesten
+<code>button.press</code> mot den konkrete Companion-knappen som er
+angitt i det tilhørende detaljkravet og i entitetskontrakten i punkt
+10.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TL-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kortet skal ha fast overskrift «Tidslinje».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TL-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidslinjekortet skal vise <code>button.brygging_neste_fase</code> og
+<code>button.brygging_tilbake</code> øverst; Tilbake skal kreve
+bekreftelsen «Gå ett steg tilbake?».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TL-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidslinjen skal bygges dynamisk fra <code>phases</code> på
+<code>sensor.brygging_faseoversikt</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TL-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidslinjen skal vise bare objektene Node-RED publiserer i
+<code>sensor.brygging_faseoversikt.attributes.phases</code>, i mottatt
+rekkefølge.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TL-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hvert faseobjekt skal vise de kontraktfestede feltene
+<code>title</code>, <code>duration_min</code> og
+<code>status</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TL-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Aktiv fase skal vises fra state og attributtene
+<code>planned_duration_min</code>, <code>elapsed_min</code>,
+<code>remaining_min</code>, <code>overtime_min</code> og
+<code>progress_percent</code> på
+<code>sensor.brygging_aktiv_fase</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TL-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Det visuelle minuttfeltet skal bygges fra de fire aktive
+fasesensorene i <code>HA-TL-006</code>, bruke 15 minutter per rad og
+markere brukt plantid blått, gjenstående plantid lyst og overtid
+grønt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Fasepunktkortet skal vise
+<code>button.brygging_bekreft_fasepunkt</code> under aktiv brygging.
+Node-RED skal avvise trykket kontrollert når
+<code>sensor.brygging_neste_fasepunkt</code> ikke angir et bekreftbart,
+forfalt punkt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Neste fasepunkt skal vises fra state og attributtene
+<code>phasepoint_name</code> og <code>requires_confirmation</code> på
+<code>sensor.brygging_neste_fasepunkt</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Fasepunktets tidsstatus skal styres av state <code>Ingen</code>,
+<code>Kommende</code> eller <code>Forfalt</code>, og tiden skal hentes
+fra <code>time_until_due</code> på
+<code>sensor.brygging_neste_fasepunkt</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kortet skal vise inntil 15 kronologiske objekter fra
+<code>sensor.brygging_fasepunktoversikt.attributes.phasepoints</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hvert synlig fasepunktobjekt skal formidle <code>type</code>,
+<code>name</code>, <code>description</code>,
+<code>expected_value</code>, <code>timing</code>,
+<code>time_until_due</code>, <code>status</code> og
+<code>requires_confirmation</code> uten lokal kodeoversettelse.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Operatøren skal velge kommentarmål i
+<code>select.brygging_fasepunkt_for_kommentar</code>, som skal tilby de
+permanente punkt-ID-ene i aktiv fase.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-PKT-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kommentar skal skrives i
+<code>text.brygging_fasepunktkommentar</code>, mål velges i
+<code>select.brygging_fasepunkt_for_kommentar</code>, og lagring skal
+utløses med <code>button.brygging_lagre_fasepunktkommentar</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-PKT-008</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kvitteringsblokken skal lese
+<code>sensor.brygging_siste_fasepunktkommentar</code> og vise
+sensorstate som tidspunkt samt attributtene <code>fase</code>,
+<code>fasepunkt</code> og <code>kommentar</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TID-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidsstyringskortet skal vise <code>button.brygging_pause</code> når
+<code>sensor.brygging_status</code> er aktiv og ikke
+<code>paused</code>, og <code>button.brygging_fortsett</code> bare når
+status er <code>paused</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TID-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidsstyringskortet skal vise
+<code>sensor.brygging_tid_til_ferdig_bryggedag</code> og
+<code>sensor.brygging_estimert_ferdig_bryggedag</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TID-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Aktiverte timere skal bygges dynamisk fra <code>timers</code> på
+<code>sensor.brygging_timeroversikt</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TID-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Bare timerobjekter publisert i
+<code>sensor.brygging_timeroversikt.attributes.timers</code> skal vises;
+hvert objekt skal presentere <code>name</code>,
+<code>display_text</code> og <code>status</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TID-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidsstyringskortet skal vise
+<code>button.brygging_generer_rapport</code> og
+<code>button.brygging_avslutt</code> under aktiv brygging.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TID-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>button.brygging_avslutt</code> skal ha en bekreftelsesdialog
+som forklarer at aktiv prosess og aktive timere stoppes, mens logg og
+rapportgrunnlag beholdes.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-SLU-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Når <code>sensor.brygging_status</code> er <code>idle</code>, skal
+startkortet vise <code>button.brygging_start</code> sammen med en
+tydelig statusindikasjon basert på
+<code>sensor.brygging_systemkontroll</code> eller tilsvarende publisert
+systemstatus.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-SLU-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Trykk på <code>button.brygging_start</code> skal alltid sendes til
+Node-RED, som skal kjøre en fersk preflight og publisere resultatet
+gjennom <code>sensor.brygging_systemkontroll</code> og
+<code>sensor.brygging_status</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-SLU-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>button.brygging_klargjor_ny_bryggedag</code> skal ha en
+bekreftelsesdialog som minner operatøren om å generere rapport før
+sesjonsdata nullstilles.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Første kort skal hete «Lagring og templatebytte».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TPL-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kortet skal inneholde <code>button.brygging_lagre_template</code>,
+<code>button.brygging_oppdater_templateliste</code> og
+<code>button.brygging_forkast_templateendringer</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>button.brygging_lagre_template</code> og
+<code>button.brygging_forkast_templateendringer</code> skal ha hver sin
+konsekvensspesifikke bekreftelsesdialog.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TPL-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>sensor.brygging_aktiv_template</code> skal vises i samme kort
+som og umiddelbart ved <code>select.brygging_template</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>select.brygging_template</code> skal bare inneholde
+templatefilnavn som Node-RED har godkjent med den strenge
+validatoren.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TPL-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Templateblokken skal bruke state og attributtene
+<code>status</code>, <code>dirty</code>, <code>saved_at</code>,
+<code>validation_errors</code> og <code>validation_warnings</code> på
+<code>sensor.brygging_aktiv_template</code>. Skrivefeil skal vises
+gjennom <code>sensor.brygging_driftsmeldinger</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TPL-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>text.brygging_template_notat</code> skal være beholdt som
+templatefelt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-FAS-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Visningen skal ha en introduksjon med tittelen
+«Fasekonfigurasjon».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-FAS-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Det skal finnes 15 separate kort «Fase 01»–«Fase 15».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-FAS-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hvert fasekort <code>FF=01</code>–<code>15</code> skal vise
+<code>text.brygging_fase_FF_navn</code>,
+<code>number.brygging_fase_FF_varighet_min</code>,
+<code>select.brygging_fase_FF_status</code> og
+<code>number.brygging_fase_FF_rekkefolge</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-FAS-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Endring i <code>number.brygging_fase_FF_rekkefolge</code> skal kunne
+flytte fasen uten å endre den permanente fase-ID-en <code>FF</code>
+eller entity-ID-ene i samme fasekort.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-FAS-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kortene skal stå som løse masonry-kort og ikke i en tvungen bred
+tabell.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-HEN-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Det skal finnes ett kort med tittelen «Hendelser».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-HEN-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Kortet skal forklare forskjellen på start, slutt, planlagt, faktisk,
+passert, bekreftet, opptelling, nedtelling og pauseoppførsel.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-HEN-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>select.brygging_rediger_timer</code> skal la operatøren velge
+permanent timer-ID <code>timer_01</code>–<code>timer_15</code> for den
+felles timereditoren.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-HEN-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Timereditoren skal bruke <code>select.brygging_timer_status</code>,
+<code>text.brygging_timer_navn</code>,
+<code>number.brygging_timer_rekkefolge</code>,
+<code>select.brygging_timer_retning</code>,
+<code>select.brygging_timer_pauseoppforsel</code>, start-/slutthendelse
+og -referanse samt de to offsetfeltene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-HEN-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hver gyldig timereditorendring skal valideres atomisk mot valgt
+permanent timerplass, oppdatere runtimekopien og sette
+<code>template_dirty</code>; det skal ikke finnes en separat
+<code>Bruk</code>-knapp.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-HEN-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Programmatisk resynk av <code>select.brygging_timer_*</code>,
+<code>number.brygging_timer_*</code> og
+<code>text.brygging_timer_navn</code> skal ikke tolkes som nye
+brukerendringer.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>sensor.brygging_systemkontroll</code>,
+<code>sensor.brygging_rapportarkiv</code> og
+<code>sensor.brygging_sesjonsarkiv</code> skal presenteres i ett
+vertikalt hovedkort «System og arkiver».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>button.brygging_oppdater_systemkontroll</code> skal utløse en
+ny systemkontroll og oppdatere
+<code>sensor.brygging_systemkontroll</code>,
+<code>sensor.brygging_rapportarkiv</code> og
+<code>sensor.brygging_sesjonsarkiv</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Systemoversikten skal lese state og attributtene
+<code>start_summary</code>, <code>checked_at</code>,
+<code>ok_count</code>, <code>warning_count</code> og
+<code>error_count</code> fra
+<code>sensor.brygging_systemkontroll</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Elementer med <code>status=Feil</code> eller <code>Advarsel</code> i
+<code>checks_json</code> på <code>sensor.brygging_systemkontroll</code>
+skal vises før øvrige kontrollelementer.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hvert element i <code>checks_json</code> på
+<code>sensor.brygging_systemkontroll</code> skal vises som en vertikal
+blokk med <code>method</code>, <code>target</code>, <code>result</code>,
+<code>conclusion</code> og eventuelt <code>remediation</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Rapportarkivet skal lese de ti kontraktfestede attributtene på
+<code>sensor.brygging_rapportarkiv</code> og vise separate ordinære og
+historiske summer, URL-er og public-kopistatus.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>button.brygging_behold_siste_100_rapporter</code> skal kreve
+bekreftelse som sier at eldre rapporter slettes permanent og bare de 100
+nyeste beholdes.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-SYS-008</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Loggarkivet skal lese <code>total_count</code>,
+<code>total_size</code>, <code>active_count</code>,
+<code>completed_count</code>, <code>ended_count</code>,
+<code>unfinished_count</code> og <code>unclassified_count</code> fra
+<code>sensor.brygging_sesjonsarkiv</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-SYS-009</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Teknisk-visningen skal ikke tilby generell sletting av
+sesjonsjournaler. Den skal vise klassifisering og summer fra
+<code>sensor.brygging_sesjonsarkiv</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Første kort skal hete «Velg fase».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RED-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>select.brygging_rediger_fase</code> skal velge én permanent
+fase <code>01</code>–<code>15</code> og laste alle 15 faste
+fasepunkteditorplasser for denne fasen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Det skal finnes 15 separate kort «Fasepunkt 01»–«Fasepunkt 15».</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RED-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hvert punktkort <code>PP=01</code>–<code>15</code> skal bruke
+<code>select.brygging_punkt_PP_aktiv</code>, <code>_type</code>,
+<code>_tid_ref</code> og <code>_bekreftelse</code>,
+<code>text.brygging_punkt_PP_navn</code>, <code>_beskrivelse</code> og
+<code>_forventet</code> samt
+<code>number.brygging_punkt_PP_tid_min</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tomt fasepunktnavn skal godtas bare når den aktuelle editorplassen
+er <code>Deaktivert</code>; <code>Aktiv</code> med tomt navn skal
+avvises atomisk.</td>
+<td>[NR-TPL-019][HA-RED-005] Deaktivert tomt fasepunktnavn er
+gyldig</td>
+<td>AKS-02/AKS-03</td>
+<td>Automatisert test finnes</td>
+</tr>
+<tr class="even">
+<td>HA-RED-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hver gyldig fasepunkteditorendring skal valideres atomisk og
+oppdatere runtimekopien direkte; det skal ikke finnes en separat samlet
+<code>Bruk fasepunkter</code>-knapp.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RED-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Fasepunkteditoren skal bare vises når
+<code>sensor.brygging_status</code> er <code>idle</code>; andre statuser
+skal gi et forklaringskort.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RED-008</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td><code>sensor.brygging_aktiv_template</code> og
+<code>select.brygging_rediger_fase</code> skal vises samlet over
+punktkortene.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-TEK-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Teknisk-visningen skal inneholde domenedelte entities-kort som til
+sammen viser alle Companion-entitetene i releasekontrakten:
+<code>sensor</code>, <code>select</code>, <code>number</code>,
+<code>button</code> og <code>text</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-TEK-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Teknisk-visningen kan være tettere enn normalvisningene, men skal
+ikke erstatte forklarende Systemkontroll.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-INT-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hver konkrete <code>sensor.*</code>, <code>button.*</code>,
+<code>select.*</code>, <code>number.*</code> og <code>text.*</code> som
+dashboard-YAML refererer, skal finnes som tilsvarende
+<code>ha-entity-config</code> i releaseflowen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-INT-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Hver av de 230 Companion-entitetene i releaseflowen skal forekomme i
+dashboard-YAML eller være uttrykkelig begrunnet som backend-only i
+entitetskontrakten. 2026.11.07-1 har ingen planlagte
+backend-only-entiteter.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-INT-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal bruke <code>sensor.brygging_status</code> som
+primær livssykluskilde og lese de fire kontraktfestede
+versjonsattributtene uten lokale reservefelt.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-INT-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal lese templatefil, status, dirty, lagringstid,
+valideringsfeil og advarsler fra
+<code>sensor.brygging_aktiv_template</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-INT-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Tidslinje, fasepunkter og timere skal lese strukturerte lister fra
+henholdsvis <code>sensor.brygging_faseoversikt</code>,
+<code>sensor.brygging_fasepunktoversikt</code> og
+<code>sensor.brygging_timeroversikt</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Home Assistant skal gjøre public-kopien tilgjengelig som
+<code>/local/brygging/siste-bryggerapport.html</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RAP-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Rapportlenker skal bruke <code>ordinary_latest_url</code> eller
+<code>historical_latest_url</code> fra
+<code>sensor.brygging_rapportarkiv</code> etter konteksten.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal bruke rapportarkivets ferdige URL-er uendret;
+cacheversjon skal produseres av Node-RED.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RAP-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Alle rapportlenker skal åpnes i ny fane med
+<code>target="_blank"</code> og
+<code>rel="noopener noreferrer"</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Når relevant rapporttall er null eller relevant
+<code>*_latest_url</code> er <code>null</code>, skal rapportområdet vise
+en forklarende tomtilstand uten lenke.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-RAP-006</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Rapportarkivet skal vise <code>ordinary_public_copy_ok</code> og
+<code>historical_public_copy_ok</code> fra
+<code>sensor.brygging_rapportarkiv</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-RAP-007</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal ikke forsøke å bygge eller endre rapportinnholdet;
+det skal presentere filen Node-RED har generert.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-FEIL-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Alle kort som leser Companion-entiteter, særlig
+<code>sensor.brygging_status</code>, skal håndtere <code>unknown</code>,
+<code>unavailable</code>, tom state og manglende attributter med
+dokumentert sikker fallback.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-FEIL-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal bruke de strukturerte listeattributtene og
+kontraktfestede tomverdiene direkte. Det skal ikke parse parallelle
+JSON-strenger eller reparere ugyldige produsentverdier.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-FEIL-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal ikke lokalt omgå Node-REDs kommandovern. En synlig
+knapp kan sende kommandoen, men Node-RED skal fortsatt være autoritativ
+for om den godtas.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-FEIL-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Feilstatus fra <code>sensor.brygging_status</code>,
+<code>sensor.brygging_systemkontroll</code> eller
+<code>sensor.brygging_driftsmeldinger</code> skal lede operatøren til
+Systemkontroll eller Teknisk-visningen med konkret forklaring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-FEIL-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal forbli lesbart når Home Assistant gjenoppretter
+entiteter etter restart eller reconnect.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-NF-001</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>YAML-filen skal kunne importeres manuelt i Home Assistant uten
+egendefinerte kortressurser.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-NF-002</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Dashboardet skal ikke inneholde hardkodet IP-adresse, vertsport
+eller autentiseringsdata.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-NF-003</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Korttitler, navn og entitets-ID-er skal være konsekvente med
+Node-RED-grensesnittet.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>HA-NF-004</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Versjonen i dashboardtittelen skal samsvare med forventet
+dashboardversjon publisert av flowen. Denne sammenhengen må kontrolleres
+ved release eller installasjon fordi flowen ikke kan lese hvilken YAML
+som faktisk er aktiv i Home Assistant.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>HA-NF-005</td>
+<td>KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1</td>
+<td>Dashboard</td>
+<td>Mobilvisning skal prioriteres fremfor tvungen symmetri på bred
+skjerm.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-02/AKS-03</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-MIL-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Installeren skal være Bash med <code>set -Eeuo pipefail</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-MIL-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Installeren skal arbeide mot en eksisterende Node-RED-container
+eller Compose-service; den skal ikke opprette hele Docker-miljøet.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-MIL-003</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Standard Node-RED hostkatalog skal være
+<code>/mnt/docker/nodered-brygging/data</code> og kunne overstyres med
+<code>--data-dir</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-MIL-004</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Stabilitetsperioden skal være et heltall på minst 15 sekunder;
+standard er 30.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-CLI-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Installeren skal støtte nøyaktig valgene som vises av
+<code>--help</code> for flow, kataloger, service/container, start/stopp,
+UID/GID, recreate, dry-run, validate-only og rollback.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-CLI-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Ukjent valg eller manglende verdi skal gi ikke-null exit uten
+målendring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-CLI-003</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td><code>--start-stop-mode</code> skal bare godta <code>auto</code>,
+<code>compose</code> eller <code>docker</code>.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-CLI-004</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td><code>--recreate</code> skal bare kunne brukes med Compose.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-CLI-005</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td><code>--validate-only</code> skal validere releaseflowen uten krav
+om Docker og uten målendring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-CLI-006</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td><code>--dry-run</code> skal validere og vise planen uten å stoppe
+container eller skrive målfil.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Dersom <code>SHA256SUMS</code> finnes, skal alle oppføringer
+verifiseres før målendring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Flowfilen skal være en JSON-liste med unike node-ID-er og gyldige
+wire- og gruppereferanser.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-003</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Flowen skal ha produksjonsfanen <code>brygging_production</code> med
+etiketten <code>Brygging – Produksjonsflow</code> og ingen
+dokumentasjonsfane.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-004</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Flowen skal ha release-, state-, event- og
+templateschema-signaturene som 2026.11.07-1 krever.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-005</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Flowen skal ha nøyaktig 230 HA-entiteter: 15 sensorer, 17 knapper,
+87 selecter, 48 tall og 63 tekster.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-006</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Alle Function-noder skal syntaksvalideres på verten når Node.js
+finnes, og alltid i containeren etter oppstart.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-VAL-007</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Installerens validatorprobe skal godta en statisk
+schema-1.0-template med 15×15 fasepunktplasser og avvise aktivt punkt
+med tomt navn.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-VAL-008</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Template-, dashboard- og rapportfiler i pakken skal ikke installeres
+eller overskrives av installeren.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-SIK-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Installasjon skal avvises når <code>current_state.json</code> angir
+en aktiv session.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-SIK-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Stier, service-/containernavn og UID/GID skal valideres før
+containerstopp.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-BCK-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Eksisterende <code>flows.json</code> skal kopieres til en
+tidsstemplet backup før erstatning.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-BCK-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Backupkatalogen skal ligge under eksplisitt
+<code>--backup-root</code> og ikke bestemmes av innhold i flowen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-INST-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Node-RED skal stoppes med valgt Compose-/Docker-mekanisme før
+<code>flows.json</code> byttes.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-INST-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Ny flow skal skrives atomisk og hashkontrolleres mot
+kildefilen.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-INST-003</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Eier og gruppe for eksisterende <code>flows.json</code> skal
+bevares; ved ny fil brukes eksplisitt UID/GID.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-INST-004</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Node-RED skal startes med samme valgte mekanisme;
+<code>--recreate</code> skal bruke Compose uten avhengigheter.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-ETTER-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Containeren skal være kjørende gjennom hele
+stabilitetsperioden.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-ETTER-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Ettertesten skal parse faktisk <code>/data/flows.json</code>,
+kompilere Function-noder og kontrollere 2026.11.07-1-signaturer.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-ETTER-003</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Ettertesten skal kontrollere templatebackupvakten,
+oppstartsrestoremarkør og automatisk STORAGE_REFRESH uten
+dashboardknapp.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-ETTER-004</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Vellykket installasjon skal rapportere aktiv flow, backupsti og
+verifisert status.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-RBK-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td><code>--auto-rollback</code> skal gjenopprette førbildet når en feil
+oppstår etter filbyttet.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-RBK-002</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Standard <code>--no-auto-rollback</code> skal beholde ny flow og
+backup ved ettertestfeil, stoppe og forklare manuell videreføring.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="odd">
+<td>INS-SEC-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Installeren skal ikke inneholde eller skrive passord, token eller
+miljøspesifikke HA-hemmeligheter.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+<tr class="even">
+<td>INS-NF-001</td>
+<td>KRAV-03-Installer-2026.11.07-1</td>
+<td>Installer</td>
+<td>Et vellykket installerskript er ikke bevis for alle 230 registrerte
+HA-entiteter, dashboardvisning eller langtidstabilitet.</td>
+<td>Modulregresjon og statisk samsvarskontroll</td>
+<td>AKS-01/AKS-07</td>
+<td>Delvis automatisert; målmiljøport beholdes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="godkjenningsregel">Godkjenningsregel</h2>
+<p>«Automatisert» betyr at releasebyggingen har en direkte kontroll. Det
+erstatter ikke målmiljøforløpet i siste kolonne. Målmiljøport beholdes
+for alle krav som trenger live-bevis. Ingen rad får endelig godkjent
+status før relevant AKS-resultat er dokumentert.</p>
+</main></body></html>

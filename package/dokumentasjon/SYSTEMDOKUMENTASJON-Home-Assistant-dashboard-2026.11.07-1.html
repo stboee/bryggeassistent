@@ -1,0 +1,36 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Systemdokumentasjon – Home Assistant-dashboard 2026.11.07-1</title><style>body{margin:0;background:#eef1ee;color:#17211b;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1700px;margin:24px auto;padding:36px 42px 60px;background:#fff;box-shadow:0 4px 24px #24352a18}h1{margin-top:0}h2{margin-top:2rem;border-bottom:2px solid #cfd7d1;padding-bottom:.3rem}table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:12px}th,td{border:1px solid #cfd7d1;padding:.48rem .58rem;text-align:left;vertical-align:top}th{background:#bfbfbf;position:sticky;top:0}code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}blockquote{border-left:5px solid #28623f;background:#eff7f1;margin:1rem 0;padding:.6rem 1rem}a{color:#0b5c93}@media(max-width:800px){main{margin:0;padding:18px 10px}table{display:block;overflow:auto}th{position:static}}@media print{body{background:#fff}main{box-shadow:none;margin:0;padding:0}th{position:static}}</style></head><body><main><h1
+id="systemdokumentasjon--home-assistant-dashboard-v100-rc332">Systemdokumentasjon
+– Home Assistant-dashboard 2026.11.07-1</h1>
+<h2 id="status">Status</h2>
+<p>Beskrivende moduldokument. Normative krav ligger i
+KRAV-02-Home-Assistant-dashboard-og-rapport-2026.11.07-1.html og
+grensekontrakten.</p>
+<h2 id="leveranse-og-ressurs">Leveranse og ressurs</h2>
+<p>Dashboardet leveres som
+<code>brygging-dashboard-2026.11.07-1.yaml</code>. Eventuelt eget
+Lovelace-kort skal registreres som separat HA-ressurs fra
+<code>/local/brygging/...</code>; Node-RED-mountet
+<code>/data/brewing-assistant/ha-public</code> peker til vertskatalogen
+<code>/mnt/docker/homeassistant/www/brygging</code>.</p>
+<h2 id="grensesnitt">Grensesnitt</h2>
+<p>Dashboard-YAML-en refererer til 230 unike
+Bryggedagsassistent-entiteter. Hele settet finnes i flowen. Sensorstates
+og strukturerte attributter er ferdig norsk visning fra Node-RED;
+dashboardet skal bare presentere og sortere etter dokumenterte
+regler.</p>
+<h2 id="prototypevisninger">Prototypevisninger</h2>
+<p>RC3.3.2/2026.11.07-1 kan inneholde parallelle faseeditorvisninger for
+funksjonell sammenligning. De endrer ikke Node-RED-grensesnittet og skal
+bruke de samme permanente editorentitetene. Stor skjerm er primært mål
+for tabell-/sections-variantene.</p>
+<h2 id="feil--og-transporttilstander">Feil- og transporttilstander</h2>
+<p><code>unknown</code> og <code>unavailable</code> skal gi tydelig
+utilgjengelighetsvisning. <code>checks_json</code> dekodes, men
+statusverdier som <code>Feil</code>, <code>Advarsel</code>,
+<code>OK</code> og <code>Informasjon</code> skal ikke oversettes eller
+repareres.</p>
+<h2 id="rapport">Rapport</h2>
+<p>Dashboardet åpner Node-REDs publiserte rapport-URL-er. Rapportens
+egen HTML-renderer eier tabeller, farger og tidsformat; dashboardet skal
+ikke omformatere rapportinnholdet.</p>
+</main></body></html>
